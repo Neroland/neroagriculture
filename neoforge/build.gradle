@@ -38,11 +38,21 @@ sourceSets.test.runtimeClasspath += sourceSets.main.runtimeClasspath
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.12.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.openjdk.jol:jol-core:0.17'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+}
+
+tasks.register('cropStorageBenchmark', JavaExec) {
+    group = 'verification'
+    description = 'Gate 3 benchmark for 4096 non-ticking crop storage records.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'za.co.neroland.neroagriculture.benchmark.CropStorageBenchmark'
+    jvmArgs '-Djol.magicFieldOffset=true', '-Djdk.attach.allowAttachSelf=true'
 }
 
 dependencies {

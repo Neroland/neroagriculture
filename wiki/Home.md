@@ -9,6 +9,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 ## Contents
 
 - [Stage 2 foundation and stable IDs](Stage-2-Foundation.md)
+- [Material catalog and crop storage](Material-Catalog-and-Crop-Storage.md)
 
 ## See also
 

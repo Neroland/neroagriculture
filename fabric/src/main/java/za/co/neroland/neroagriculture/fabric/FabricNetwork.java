@@ -11,7 +11,21 @@ import za.co.neroland.neroagriculture.platform.NetworkPlatform;
 
 public final class FabricNetwork implements NetworkPlatform {
     public static void register() {
+        for (AgricultureNetwork.Clientbound<?> payload : AgricultureNetwork.clientbound()) registerType(payload);
         for (AgricultureNetwork.Serverbound<?> payload : AgricultureNetwork.serverbound()) register(payload);
+    }
+
+    public static void registerClient() {
+        for (AgricultureNetwork.Clientbound<?> payload : AgricultureNetwork.clientbound()) registerClient(payload);
+    }
+
+    private static <T extends CustomPacketPayload> void registerType(AgricultureNetwork.Clientbound<T> payload) {
+        PayloadTypeRegistry.clientboundPlay().register(payload.type(), payload.codec());
+    }
+
+    private static <T extends CustomPacketPayload> void registerClient(AgricultureNetwork.Clientbound<T> payload) {
+        ClientPlayNetworking.registerGlobalReceiver(payload.type(), (value, context) ->
+                context.client().execute(() -> payload.handler().accept(value)));
     }
 
     private static <T extends CustomPacketPayload> void register(AgricultureNetwork.Serverbound<T> payload) {

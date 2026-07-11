@@ -10,5 +10,6 @@ public final class NeroAgricultureFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Fabric client bootstrap");
+        FabricNetwork.registerClient();
     }
 }

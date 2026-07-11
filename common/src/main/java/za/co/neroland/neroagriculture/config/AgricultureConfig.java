@@ -9,9 +9,12 @@ public final class AgricultureConfig {
     public static final ConfigSchema SCHEMA = ConfigSchema.create("neroagriculture",
             "NeroAgriculture discovery, cultivation and automation settings");
 
-    public static final ConfigValue<Integer> DISCOVERY_SCAN_CAP = integer("discovery.scan_cap", 512, 16, 65_536);
-    public static final ConfigValue<String> MATERIAL_BLACKLIST = text("discovery.material_blacklist", "");
-    public static final ConfigValue<String> MATERIAL_OVERRIDES = text("discovery.material_overrides", "");
+    public static final ConfigValue<Integer> DISCOVERY_SCAN_CAP = SCHEMA.intRange("discovery.scan_cap", 512,
+            16, 65_536, true, "Maximum enabled catalog entries exposed and considered for client sync");
+    public static final ConfigValue<String> MATERIAL_BLACKLIST = SCHEMA.string("discovery.material_blacklist", "",
+            true, "Comma-separated material ids disabled before exposure");
+    public static final ConfigValue<String> MATERIAL_OVERRIDES = SCHEMA.string("discovery.material_overrides", "",
+            true, "Semicolon entries: id|tier=orbital|gate=id|yield=min:max:ramp|conversion=n|enabled=true");
     public static final ConfigValue<Integer> CONDENSATION_TICKS = integer("condensation.ticks", 200, 1, 72_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_CAPACITY = integer("machines.energy_capacity", 100_000, 1_000, 10_000_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_RATE = integer("machines.energy_rate", 80, 1, 32_000);

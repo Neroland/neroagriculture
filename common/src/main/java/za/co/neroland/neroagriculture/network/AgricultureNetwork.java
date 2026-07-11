@@ -3,6 +3,7 @@ package za.co.neroland.neroagriculture.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,13 +14,22 @@ import za.co.neroland.neroagriculture.machine.FoundationMachineBlockEntity;
 
 /** Loader-neutral payload declarations and strict server-side request validation. */
 public final class AgricultureNetwork {
+    public record Clientbound<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type,
+            StreamCodec<? super RegistryFriendlyByteBuf, T> codec, Consumer<T> handler) { }
     public record Serverbound<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type,
             StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, ServerPlayer> handler) { }
     private static final List<Serverbound<?>> SERVERBOUND = new ArrayList<>();
+    private static final List<Clientbound<?>> CLIENTBOUND = new ArrayList<>();
 
     private AgricultureNetwork() { }
 
     public static List<Serverbound<?>> serverbound() { return List.copyOf(SERVERBOUND); }
+    public static List<Clientbound<?>> clientbound() { return List.copyOf(CLIENTBOUND); }
+
+    public static <T extends CustomPacketPayload> void clientbound(CustomPacketPayload.Type<T> type,
+            StreamCodec<? super RegistryFriendlyByteBuf, T> codec, Consumer<T> handler) {
+        CLIENTBOUND.add(new Clientbound<>(type, codec, handler));
+    }
 
     public static <T extends CustomPacketPayload> void serverbound(CustomPacketPayload.Type<T> type,
             StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, ServerPlayer> handler) {
@@ -27,7 +37,13 @@ public final class AgricultureNetwork {
     }
 
     public static void init() {
+        clientbound(MaterialCatalogSyncPayload.TYPE, MaterialCatalogSyncPayload.STREAM_CODEC,
+                za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog::accept);
         serverbound(MachineActionPayload.TYPE, MachineActionPayload.STREAM_CODEC, AgricultureNetwork::handleMachineAction);
+    }
+
+    public static void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
+        za.co.neroland.neroagriculture.platform.Services.NETWORK.sendToPlayer(player, payload);
     }
 
     private static void handleMachineAction(MachineActionPayload payload, ServerPlayer player) {

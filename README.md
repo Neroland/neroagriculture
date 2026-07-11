@@ -2,8 +2,8 @@
 
 > Part of the [Neroland](../neroland-mc-ecosystem) sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** Stage 2 foundation — version `0.0.1-alpha.1`. Stable content ids, dynamic material
-components, machine storage shells, configuration, networking and loader capability bridges are in place.
+**Status:** Stage 3 catalog architecture — version `0.0.1-alpha.1`. Reload-safe material discovery,
+bounded client metadata sync, diagnostics and non-ticking crop identity storage are in place.
 
 ## Build targets
 

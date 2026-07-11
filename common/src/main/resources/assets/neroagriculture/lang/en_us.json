@@ -49,5 +49,7 @@
   "item.neroagriculture.crop_waste": "Crop Waste",
   "item.neroagriculture.biofuel_canister": "Biofuel Canister",
   "item.neroagriculture.terraforming_seed": "Terraforming Seed",
-  "fluid.neroagriculture.nutrient": "Nutrient Solution"
+  "fluid.neroagriculture.nutrient": "Nutrient Solution",
+  "warning.neroagriculture.unknown_material": "Unknown or disabled material — identity preserved; growth disabled",
+  "warning.neroagriculture.disabled_material": "Material disabled by the server catalog — growth disabled"
 }

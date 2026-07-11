@@ -20,8 +20,13 @@ public final class ForgeNetwork implements NetworkPlatform {
         PayloadFlow<RegistryFriendlyByteBuf, CustomPacketPayload> play = ChannelBuilder.named(
                 Identifier.fromNamespaceAndPath(NeroAgricultureCommon.MOD_ID, "main")).optional()
                 .payloadChannel().play().bidirectional();
+        for (AgricultureNetwork.Clientbound<?> payload : AgricultureNetwork.clientbound()) register(play, payload);
         for (AgricultureNetwork.Serverbound<?> payload : AgricultureNetwork.serverbound()) register(play, payload);
         channel = play.build();
+    }
+    private static <T extends CustomPacketPayload> void register(PayloadFlow<RegistryFriendlyByteBuf, CustomPacketPayload> play,
+            AgricultureNetwork.Clientbound<T> payload) {
+        play.addMain(payload.type(), codec(payload.codec()), (value, context) -> payload.handler().accept(value));
     }
     private static <T extends CustomPacketPayload> void register(PayloadFlow<RegistryFriendlyByteBuf, CustomPacketPayload> play,
             AgricultureNetwork.Serverbound<T> payload) {

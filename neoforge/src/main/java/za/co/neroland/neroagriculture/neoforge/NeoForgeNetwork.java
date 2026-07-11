@@ -15,7 +15,13 @@ public final class NeoForgeNetwork implements NetworkPlatform {
     public static void register(IEventBus bus) { bus.addListener(NeoForgeNetwork::onRegister); }
     private static void onRegister(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1").optional();
+        for (AgricultureNetwork.Clientbound<?> payload : AgricultureNetwork.clientbound()) register(registrar, payload);
         for (AgricultureNetwork.Serverbound<?> payload : AgricultureNetwork.serverbound()) register(registrar, payload);
+    }
+    private static <T extends CustomPacketPayload> void register(PayloadRegistrar registrar,
+            AgricultureNetwork.Clientbound<T> payload) {
+        registrar.playToClient(payload.type(), payload.codec(),
+                (value, context) -> context.enqueueWork(() -> payload.handler().accept(value)));
     }
     private static <T extends CustomPacketPayload> void register(PayloadRegistrar registrar,
             AgricultureNetwork.Serverbound<T> payload) {

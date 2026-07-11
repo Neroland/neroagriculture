@@ -2,8 +2,12 @@ package za.co.neroland.neroagriculture.forge;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.event.OnDatapackSyncEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
+import za.co.neroland.neroagriculture.catalog.CatalogSync;
+import za.co.neroland.neroagriculture.command.AgricultureCommands;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
 /** MinecraftForge entry point for NeroAgriculture. */
@@ -17,5 +21,10 @@ public final class NeroAgricultureForge {
         RegistrationProvider.attach(context.getModBusGroup());
         ForgeNetwork.register();
         ForgeCapabilities.register();
+        RegisterCommandsEvent.BUS.addListener(event -> AgricultureCommands.register(event.getDispatcher()));
+        OnDatapackSyncEvent.BUS.addListener(event -> {
+            if (event.getPlayer() == null) CatalogSync.reloadAndSync(event.getPlayerList().getServer());
+            else CatalogSync.syncTo(event.getPlayer());
+        });
     }
 }

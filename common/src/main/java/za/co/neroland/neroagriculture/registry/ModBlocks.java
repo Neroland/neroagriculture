@@ -12,6 +12,7 @@ import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.machine.FoundationMachineBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
 import za.co.neroland.neroagriculture.fluid.NutrientLiquidBlock;
+import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 
@@ -24,7 +25,9 @@ public final class ModBlocks {
     public static final RegistryEntry<Block> ORBITAL_GROW_BED = plain("orbital_grow_bed", MapColor.COLOR_LIGHT_BLUE);
     public static final RegistryEntry<Block> COLONIAL_GROW_BED = plain("colonial_grow_bed", MapColor.COLOR_GREEN);
     public static final RegistryEntry<Block> DEEPVOID_GROW_BED = plain("deepvoid_grow_bed", MapColor.COLOR_PURPLE);
-    public static final RegistryEntry<Block> RESOURCE_CROP = plain("resource_crop", MapColor.PLANT);
+    public static final RegistryEntry<ResourceCropBlock> RESOURCE_CROP = BLOCKS.register("resource_crop",
+            key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
+                    .strength(0.5F).sound(SoundType.CROP).noOcclusion()));
     public static final RegistryEntry<Block> ENGINEERED_FOOD_CROP = plain("engineered_food_crop", MapColor.PLANT);
     public static final RegistryEntry<Block> ALIEN_CROP = plain("alien_crop", MapColor.COLOR_PURPLE);
     public static final RegistryEntry<Block> GREENHOUSE_FRAME = plain("greenhouse_frame", MapColor.METAL);
