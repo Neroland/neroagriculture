@@ -27,3 +27,11 @@ type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+# Neroland Core is the required shared foundation and must load first.
+[[dependencies.${mod_id}]]
+modId = "nerolandcore"
+type = "required"
+versionRange = "${nerolandcore_version_range}"
+ordering = "AFTER"
+side = "BOTH"

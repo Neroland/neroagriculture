@@ -7,11 +7,11 @@ name: Multiloader Build
 # fails the whole workflow. All six loader x version cells are verified buildable
 # from public artifacts:
 #   - neoforge @ 26.1.2  -> NeoForge 26.1.2.76
-#   - neoforge @ 26.2    -> NeoForge 26.2.0.6-beta (now on the public NeoForged Maven)
+#   - neoforge @ 26.2    -> NeoForge 26.2.0.7-beta (on the public NeoForged Maven)
 #   - forge    @ 26.1.2  -> Forge 26.1.2-64.0.10
-#   - forge    @ 26.2    -> Forge 26.2-65.0.0
-#   - fabric   @ 26.2    -> Fabric Loom 1.17 + fabric-api 0.152.1+26.2 (de-obf, no mappings)
-#   - fabric   @ 26.1.2  -> Fabric Loom 1.17 + fabric-api 0.151.0+26.1.2; needs the access
+#   - forge    @ 26.2    -> Forge 26.2-65.0.1
+#   - fabric   @ 26.2    -> Fabric Loom 1.17 + fabric-api 0.153.0+26.2 (de-obf, no mappings)
+#   - fabric   @ 26.1.2  -> Fabric Loom 1.17 + fabric-api 0.153.0+26.1.2; needs the access
 #                          widener (fabric/src/main/resources/neroagriculture.accesswidener) because
 #                          vanilla MC 26.1.2 kept BlockEntityType's constructor private
 #                          (Mojang made it public in 26.2; NeoForge widens it on both).
@@ -105,7 +105,7 @@ jobs:
       # See USING-CORE.md.
       # --- end Neroland Core dependency ---
 
-      - name: Build ${{ matrix.loader }} for MC ${{ matrix.mc }}
+      - name: Build and analyze ${{ matrix.loader }} for MC ${{ matrix.mc }}
         # Stonecutter: each loader x MC version is its own node (:loader:version:build).
         # The old `-Pminecraft_version` axis is gone — the node path selects the version.
         # This workflow only VERIFIES that each cell builds; it uploads no artifacts (the Publish
@@ -125,4 +125,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
           ./gradlew :${{ matrix.loader }}:${{ matrix.mc }}:build
+          :${{ matrix.loader }}:${{ matrix.mc }}:ecjCheck
           --stacktrace

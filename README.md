@@ -23,6 +23,10 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 
 ## Building
 
+Neroland Core `1.7.0` is a required dependency. Local builds prefer artifacts published by the
+sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. See
+[`USING-CORE.md`](USING-CORE.md) for setup and authentication details.
+
 ```sh
 ./gradlew :fabric:26.2:build          # one cell
 ./gradlew :neoforge:26.1.2:build :neoforge:26.2:build \
