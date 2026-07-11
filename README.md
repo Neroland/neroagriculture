@@ -2,7 +2,8 @@
 
 > Part of the [Neroland](../neroland-mc-ecosystem) sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** barebones multiloader skeleton — version `0.0.1-alpha.1`. No gameplay content yet.
+**Status:** Stage 2 foundation — version `0.0.1-alpha.1`. Stable content ids, dynamic material
+components, machine storage shells, configuration, networking and loader capability bridges are in place.
 
 ## Build targets
 
@@ -23,7 +24,7 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 
 ## Building
 
-Neroland Core `1.7.0` is a required dependency. Local builds prefer artifacts published by the
+Neroland Core `1.8.0` is a required dependency. Local builds prefer artifacts published by the
 sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. See
 [`USING-CORE.md`](USING-CORE.md) for setup and authentication details.
 

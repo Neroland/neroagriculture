@@ -11,5 +11,7 @@ public final class NeroAgricultureFabric implements ModInitializer {
     public void onInitialize() {
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Fabric bootstrap");
         NeroAgricultureCommon.init();
+        FabricNetwork.register();
+        FabricCapabilities.register();
     }
 }
