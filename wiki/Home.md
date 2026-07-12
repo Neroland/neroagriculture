@@ -3,13 +3,17 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 2 foundation. Registered content is intentionally functional only as a storage
-> and integration shell; later stages add recipes and gameplay behavior without changing these ids.
+> **Status:** Stage 4 resource cultivation. Resource seeds, generic crops, material essence, and all
+> five grow-bed tiers are functional; fabrication and automation arrive in later stages.
 
 ## Contents
 
 - [Stage 2 foundation and stable IDs](Stage-2-Foundation.md)
 - [Material catalog and crop storage](Material-Catalog-and-Crop-Storage.md)
+- [Resource crops](Resource-Crops.md)
+- [Material essence](Material-Essence.md)
+- [Grow beds](Grow-Beds.md)
+- [Growth conditions](Growth-Conditions.md)
 
 ## See also
 

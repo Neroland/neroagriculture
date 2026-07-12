@@ -17,5 +17,9 @@ public final class FabricCapabilities {
                 ModBlockEntities.FOUNDATION_MACHINE.get());
         FabricFluidLookup.FLUID.registerForBlockEntity((be, side) -> be.sideConfig().fluidView(side),
                 ModBlockEntities.FOUNDATION_MACHINE.get());
+        FabricEnergyLookup.ENERGY.registerForBlockEntity((be, side) -> be.sideConfig().energyView(side),
+                ModBlockEntities.GROW_BED.get());
+        FabricFluidLookup.FLUID.registerForBlockEntity((be, side) -> be.sideConfig().fluidView(side),
+                ModBlockEntities.GROW_BED.get());
     }
 }

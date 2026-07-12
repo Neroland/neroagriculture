@@ -20,5 +20,9 @@ public final class NeoForgeCapabilities {
                 (be, side) -> be.sideConfig().energyView(side));
         event.registerBlockEntity(NeoForgeFluidLookup.FLUID, ModBlockEntities.FOUNDATION_MACHINE.get(),
                 (be, side) -> be.sideConfig().fluidView(side));
+        event.registerBlockEntity(NeoForgeEnergyLookup.ENERGY, ModBlockEntities.GROW_BED.get(),
+                (be, side) -> be.sideConfig().energyView(side));
+        event.registerBlockEntity(NeoForgeFluidLookup.FLUID, ModBlockEntities.GROW_BED.get(),
+                (be, side) -> be.sideConfig().fluidView(side));
     }
 }

@@ -33,6 +33,7 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         output.putInt("Format", variant.formatVersion());
         output.putString("Material", variant.material().toString());
+        output.putString("Family", variant.family().name());
         output.putInt("HarvestCount", variant.harvestCount());
     }
 
@@ -42,7 +43,9 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         int harvests = input.getIntOr("HarvestCount", 0);
         try {
             variant = new CropVariantState(format,
-                    Identifier.parse(input.getStringOr("Material", "neroagriculture:unknown")), harvests);
+                    Identifier.parse(input.getStringOr("Material", "neroagriculture:unknown")),
+                    za.co.neroland.neroagriculture.content.EssenceFamily.valueOf(
+                            input.getStringOr("Family", "ORBITAL")), harvests);
         } catch (RuntimeException e) {
             // Preserve the block and fail closed; malformed legacy data becomes an explicit unknown id.
             variant = CropVariantState.fresh(Identifier.parse("neroagriculture:unknown"));

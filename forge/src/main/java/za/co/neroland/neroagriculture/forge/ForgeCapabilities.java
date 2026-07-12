@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.machine.FoundationMachineBlockEntity;
+import za.co.neroland.neroagriculture.crop.GrowBedBlockEntity;
 import za.co.neroland.nerolandcore.energy.NeroEnergyStorage;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
 import za.co.neroland.nerolandcore.platform.ForgeEnergyLookup;
@@ -29,6 +30,10 @@ public final class ForgeCapabilities {
         if (event.getObject() instanceof FoundationMachineBlockEntity machine) {
             MachineCaps caps = new MachineCaps(machine);
             event.addCapability(ID, caps);
+            event.addListener(caps::invalidate);
+        } else if (event.getObject() instanceof GrowBedBlockEntity bed) {
+            BedCaps caps = new BedCaps(bed);
+            event.addCapability(Identifier.fromNamespaceAndPath(NeroAgricultureCommon.MOD_ID, "grow_bed_caps"), caps);
             event.addListener(caps::invalidate);
         }
     }
@@ -52,5 +57,19 @@ public final class ForgeCapabilities {
             return LazyOptional.empty();
         }
         void invalidate() { energy.invalidate(); fluid.invalidate(); unsided.invalidate(); sided.values().forEach(LazyOptional::invalidate); }
+    }
+    private static final class BedCaps implements ICapabilityProvider {
+        private final LazyOptional<NeroEnergyStorage> energy;
+        private final LazyOptional<NeroFluidStorage> fluid;
+        BedCaps(GrowBedBlockEntity bed) {
+            this.energy = LazyOptional.of(bed::getEnergy);
+            this.fluid = LazyOptional.of(bed::getFluid);
+        }
+        @Override public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction side) {
+            if (capability == ForgeEnergyLookup.ENERGY) return energy.cast();
+            if (capability == ForgeFluidLookup.FLUID) return fluid.cast();
+            return LazyOptional.empty();
+        }
+        void invalidate() { energy.invalidate(); fluid.invalidate(); }
     }
 }

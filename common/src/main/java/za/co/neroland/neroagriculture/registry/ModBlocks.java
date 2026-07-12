@@ -13,6 +13,7 @@ import za.co.neroland.neroagriculture.machine.FoundationMachineBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
 import za.co.neroland.neroagriculture.fluid.NutrientLiquidBlock;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
+import za.co.neroland.neroagriculture.crop.GrowBedBlock;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 
@@ -21,13 +22,14 @@ public final class ModBlocks {
     public static final RegistrationProvider<Block> BLOCKS = RegistrationProvider.get(Registries.BLOCK, NeroAgricultureCommon.MOD_ID);
 
     public static final RegistryEntry<Block> TERRAN_GROW_BED = plain("terran_grow_bed", MapColor.PLANT);
-    public static final RegistryEntry<Block> INDUSTRIAL_GROW_BED = plain("industrial_grow_bed", MapColor.METAL);
-    public static final RegistryEntry<Block> ORBITAL_GROW_BED = plain("orbital_grow_bed", MapColor.COLOR_LIGHT_BLUE);
-    public static final RegistryEntry<Block> COLONIAL_GROW_BED = plain("colonial_grow_bed", MapColor.COLOR_GREEN);
-    public static final RegistryEntry<Block> DEEPVOID_GROW_BED = plain("deepvoid_grow_bed", MapColor.COLOR_PURPLE);
+    public static final RegistryEntry<GrowBedBlock> INDUSTRIAL_GROW_BED = bed("industrial_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.INDUSTRIAL, MapColor.METAL);
+    public static final RegistryEntry<GrowBedBlock> ORBITAL_GROW_BED = bed("orbital_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.ORBITAL, MapColor.COLOR_LIGHT_BLUE);
+    public static final RegistryEntry<GrowBedBlock> COLONIAL_GROW_BED = bed("colonial_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.COLONIAL, MapColor.COLOR_GREEN);
+    public static final RegistryEntry<GrowBedBlock> DEEPVOID_GROW_BED = bed("deepvoid_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.DEEPVOID, MapColor.COLOR_PURPLE);
     public static final RegistryEntry<ResourceCropBlock> RESOURCE_CROP = BLOCKS.register("resource_crop",
             key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
-                    .strength(0.5F).sound(SoundType.CROP).noOcclusion()));
+                    .strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     public static final RegistryEntry<Block> ENGINEERED_FOOD_CROP = plain("engineered_food_crop", MapColor.PLANT);
     public static final RegistryEntry<Block> ALIEN_CROP = plain("alien_crop", MapColor.COLOR_PURPLE);
     public static final RegistryEntry<Block> GREENHOUSE_FRAME = plain("greenhouse_frame", MapColor.METAL);
@@ -77,6 +79,21 @@ public final class ModBlocks {
     private static RegistryEntry<FoundationMachineBlock> machine(String name) {
         return BLOCKS.register(name, key -> new FoundationMachineBlock(BlockBehaviour.Properties.of().setId(key)
                 .mapColor(MapColor.METAL).strength(3.5F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+    }
+
+    private static RegistryEntry<GrowBedBlock> bed(String name,
+            za.co.neroland.neroagriculture.content.EssenceFamily tier, MapColor color) {
+        return BLOCKS.register(name, key -> new GrowBedBlock(tier, BlockBehaviour.Properties.of().setId(key)
+                .mapColor(color).strength(2.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+    }
+
+    public static za.co.neroland.neroagriculture.content.EssenceFamily growBedTier(Block block) {
+        if (block == TERRAN_GROW_BED.get()) return za.co.neroland.neroagriculture.content.EssenceFamily.TERRAN;
+        if (block == INDUSTRIAL_GROW_BED.get()) return za.co.neroland.neroagriculture.content.EssenceFamily.INDUSTRIAL;
+        if (block == ORBITAL_GROW_BED.get()) return za.co.neroland.neroagriculture.content.EssenceFamily.ORBITAL;
+        if (block == COLONIAL_GROW_BED.get()) return za.co.neroland.neroagriculture.content.EssenceFamily.COLONIAL;
+        if (block == DEEPVOID_GROW_BED.get()) return za.co.neroland.neroagriculture.content.EssenceFamily.DEEPVOID;
+        return null;
     }
 
     private ModBlocks() { }

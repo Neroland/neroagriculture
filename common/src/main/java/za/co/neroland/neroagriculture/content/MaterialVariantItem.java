@@ -13,7 +13,7 @@ import za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 
 /** Finite component-backed item with fail-closed client catalog feedback. */
-public final class MaterialVariantItem extends Item {
+public class MaterialVariantItem extends Item {
     public MaterialVariantItem(Properties properties) { super(properties); }
 
     @Override
@@ -23,9 +23,17 @@ public final class MaterialVariantItem extends Item {
         MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
         if (variant == null) return;
         tooltip.accept(Component.literal(variant.material().toString()).withStyle(ChatFormatting.GRAY));
-        if (!ClientMaterialCatalog.entries().containsKey(variant.material())) {
+        var metadata = ClientMaterialCatalog.entries().get(variant.material());
+        if (metadata == null) {
             tooltip.accept(Component.translatable("warning.neroagriculture.unknown_material")
                     .withStyle(ChatFormatting.RED));
+        } else {
+            tooltip.accept(Component.translatable("tooltip.neroagriculture.tier", metadata.tier().name())
+                    .withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.accept(Component.translatable("tooltip.neroagriculture.bed", metadata.tier().name())
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
+        tooltip.accept(Component.translatable("tooltip.neroagriculture.harvests",
+                stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0)).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

@@ -2,6 +2,8 @@ package za.co.neroland.neroagriculture.registry;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import com.mojang.serialization.Codec;
+import net.minecraft.network.codec.ByteBufCodecs;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
@@ -17,6 +19,12 @@ public final class ModDataComponents {
             COMPONENTS.register("material_variant", key -> DataComponentType.<MaterialVariant>builder()
                     .persistent(MaterialVariant.CODEC)
                     .networkSynchronized(MaterialVariant.STREAM_CODEC)
+                    .build());
+
+    public static final RegistryEntry<DataComponentType<Integer>> HARVEST_COUNT =
+            COMPONENTS.register("harvest_count", key -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.intRange(0, za.co.neroland.neroagriculture.crop.CropVariantState.MAX_HARVEST_COUNT))
+                    .networkSynchronized(ByteBufCodecs.VAR_INT)
                     .build());
 
     private ModDataComponents() { }

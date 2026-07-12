@@ -50,6 +50,13 @@
   "item.neroagriculture.biofuel_canister": "Biofuel Canister",
   "item.neroagriculture.terraforming_seed": "Terraforming Seed",
   "fluid.neroagriculture.nutrient": "Nutrient Solution",
+  "tooltip.neroagriculture.tier": "Tier: %s",
+  "tooltip.neroagriculture.bed": "Required grow bed: %s or higher",
+  "tooltip.neroagriculture.harvests": "Completed harvests: %s",
+  "warning.neroagriculture.invalid_seed": "This seed has no valid material identity",
   "warning.neroagriculture.unknown_material": "Unknown or disabled material — identity preserved; growth disabled",
-  "warning.neroagriculture.disabled_material": "Material disabled by the server catalog — growth disabled"
+  "warning.neroagriculture.disabled_material": "Material disabled by the server catalog — growth disabled",
+  "warning.neroagriculture.wrong_bed": "This material requires a higher-tier grow bed",
+  "warning.neroagriculture.gate_closed": "The required progression gate is closed",
+  "warning.neroagriculture.wrong_dimension": "This crop cannot be planted in this dimension"
 }
