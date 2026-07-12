@@ -28,7 +28,11 @@ public final class AgricultureCommands {
                                         .executes(context -> show(context.getSource(),
                                                 StringArgumentType.getString(context, "material")))))
                         .then(Commands.literal("errors").executes(context -> errors(context.getSource())))
-                        .then(Commands.literal("report").executes(context -> report(context.getSource())))));
+                        .then(Commands.literal("report").executes(context -> report(context.getSource()))))
+                .then(Commands.literal("gallery")
+                        .executes(context -> AgricultureGallery.build(context.getSource()))
+                        .then(Commands.literal("clear")
+                                .executes(context -> AgricultureGallery.clear(context.getSource())))));
     }
 
     private static int report(CommandSourceStack source) {
