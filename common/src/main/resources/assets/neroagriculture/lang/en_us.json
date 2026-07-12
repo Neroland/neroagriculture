@@ -81,6 +81,8 @@
   "item.neroagriculture.speed_module": "Agriculture Speed Module",
   "item.neroagriculture.efficiency_module": "Agriculture Efficiency Module",
   "fluid.neroagriculture.nutrient": "Nutrient Solution",
+  "fluid.neroagriculture.biofuel": "Biofuel",
+  "block.neroagriculture.nutrient": "Nutrient Solution",
   "tooltip.neroagriculture.tier": "Tier: %s",
   "tooltip.neroagriculture.bed": "Required grow bed: %s or higher",
   "tooltip.neroagriculture.harvests": "Completed harvests: %s",
