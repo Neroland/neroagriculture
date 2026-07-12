@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:material_essence", "result": { "id": "minecraft:echo_shard" }, "input_count": 24, "energy": 3600, "ticks": 160, "material": "minecraft:echo_shard", "family": "deepvoid" }

@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:colonial_essence", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 3800, "ticks": 120, "family": "colonial" }

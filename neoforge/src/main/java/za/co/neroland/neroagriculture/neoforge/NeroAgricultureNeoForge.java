@@ -3,6 +3,8 @@ package za.co.neroland.neroagriculture.neoforge;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -23,6 +25,7 @@ public final class NeroAgricultureNeoForge {
         RegistrationProvider.attach(modEventBus);
         NeoForgeNetwork.register(modEventBus);
         NeoForgeCapabilities.register(modEventBus);
+        if (FMLEnvironment.getDist() == Dist.CLIENT) NeoForgeClientSetup.init(modEventBus);
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) ->
                 AgricultureCommands.register(event.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> {

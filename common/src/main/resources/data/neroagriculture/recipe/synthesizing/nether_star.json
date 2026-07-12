@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:seed_synthesizing", "ingredient": "minecraft:nether_star", "result": { "id": "neroagriculture:resource_seed" }, "energy": 5600, "ticks": 200, "material": "minecraft:nether_star", "family": "colonial" }

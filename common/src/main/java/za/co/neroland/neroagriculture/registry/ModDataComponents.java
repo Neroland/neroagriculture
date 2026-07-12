@@ -7,6 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
+import za.co.neroland.neroagriculture.content.EssenceCharge;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 
@@ -25,6 +26,12 @@ public final class ModDataComponents {
             COMPONENTS.register("harvest_count", key -> DataComponentType.<Integer>builder()
                     .persistent(Codec.intRange(0, za.co.neroland.neroagriculture.crop.CropVariantState.MAX_HARVEST_COUNT))
                     .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
+
+    public static final RegistryEntry<DataComponentType<EssenceCharge>> ESSENCE_CHARGE =
+            COMPONENTS.register("essence_charge", key -> DataComponentType.<EssenceCharge>builder()
+                    .persistent(EssenceCharge.CODEC)
+                    .networkSynchronized(EssenceCharge.STREAM_CODEC)
                     .build());
 
     private ModDataComponents() { }

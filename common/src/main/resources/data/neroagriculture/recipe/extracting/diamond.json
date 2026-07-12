@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_extraction", "ingredient": "#c:ores/diamond", "result": { "id": "neroagriculture:orbital_essence", "count": 2 }, "energy": 1800, "ticks": 120, "material": "c:diamond", "family": "orbital" }

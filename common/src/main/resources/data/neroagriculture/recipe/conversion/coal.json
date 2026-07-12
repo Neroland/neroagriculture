@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:material_essence", "result": { "id": "minecraft:coal" }, "input_count": 8, "energy": 400, "ticks": 40, "material": "c:coal", "family": "terran" }

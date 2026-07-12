@@ -39,6 +39,8 @@ public final class AgricultureNetwork {
     public static void init() {
         clientbound(MaterialCatalogSyncPayload.TYPE, MaterialCatalogSyncPayload.STREAM_CODEC,
                 za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog::accept);
+        clientbound(MachineMenuPositionPayload.TYPE, MachineMenuPositionPayload.STREAM_CODEC,
+                ClientMachineMenuPositions::accept);
         serverbound(MachineActionPayload.TYPE, MachineActionPayload.STREAM_CODEC, AgricultureNetwork::handleMachineAction);
     }
 
@@ -53,10 +55,9 @@ public final class AgricultureNetwork {
         var pos = payload.blockPos();
         if (!player.level().isLoaded(pos) || player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5,
                 pos.getZ() + 0.5) > 64.0) return;
-        if (!(player.containerMenu instanceof za.co.neroland.neroagriculture.menu.FoundationMachineMenu)) return;
+        if (!(player.containerMenu instanceof za.co.neroland.neroagriculture.menu.FoundationMachineMenu menu)
+                || !menu.blockPos().equals(pos)) return;
         if (!(player.level().getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine)) return;
-        // Stage 2 deliberately exposes only a bounded no-op action surface. Later machine stages map
-        // validated action ids onto concrete controls without changing the wire contract.
-        machine.setChanged();
+        if (payload.action() == 0) machine.tryResearch(player);
     }
 }

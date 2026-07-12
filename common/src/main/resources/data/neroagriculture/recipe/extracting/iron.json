@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_extraction", "ingredient": "#c:ores/iron", "result": { "id": "neroagriculture:industrial_essence", "count": 2 }, "energy": 1200, "ticks": 100, "material": "c:iron", "family": "industrial" }

@@ -26,6 +26,8 @@ public final class BuiltinMaterials {
         ore(result, "quartz", "minecraft:quartz", EssenceFamily.INDUSTRIAL, 0xE8E1D4);
         ore(result, "diamond", "minecraft:diamond", EssenceFamily.ORBITAL, 0x55D6C8);
         ore(result, "emerald", "minecraft:emerald", EssenceFamily.ORBITAL, 0x24C862);
+        direct(result, "minecraft:nether_star", "minecraft:nether_star", EssenceFamily.COLONIAL, 0xDDEEFF);
+        direct(result, "minecraft:echo_shard", "minecraft:echo_shard", EssenceFamily.DEEPVOID, 0x24545A);
         direct(result, "nerolandcore:nero_alloy", "nerolandcore:nero_alloy_dust", EssenceFamily.INDUSTRIAL, 0x5E7C8C);
         direct(result, "nerolandcore:plasma_glass", "nerolandcore:plasma_glass", EssenceFamily.ORBITAL, 0x82E6FF);
         direct(result, "nerolandcore:void_crystal", "nerolandcore:void_crystal_dust", EssenceFamily.DEEPVOID, 0x5D347A);

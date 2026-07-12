@@ -1,0 +1,5 @@
+{
+  "scope": "player",
+  "observations": ["owner_mod", "admin"],
+  "title": "Resource Seed Researched"
+}

@@ -3,8 +3,8 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 4 resource cultivation. Resource seeds, generic crops, material essence, and all
-> five grow-bed tiers are functional; fabrication and automation arrive in later stages.
+> **Status:** Stage 5 fabrication and research. Resource cultivation now connects to the Extractor,
+> Infuser, Synthesizer, Research Bench, and server-authoritative material conversion recipes.
 
 ## Contents
 
@@ -14,6 +14,9 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Material essence](Material-Essence.md)
 - [Grow beds](Grow-Beds.md)
 - [Growth conditions](Growth-Conditions.md)
+- [Fabrication chain](Fabrication-Chain.md)
+- [Seed research](Seed-Research.md)
+- [Material recipe datapacks](Material-Recipe-Datapacks.md)
 
 ## See also
 

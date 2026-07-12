@@ -2,8 +2,8 @@
 
 > Part of the [Neroland](../neroland-mc-ecosystem) sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** Stage 4 resource cultivation — version `0.0.1-alpha.1`. Component-backed resource seeds,
-server-authoritative crop growth and harvesting, and passive/powered grow beds are in place.
+**Status:** Stage 5 fabrication and research — version `0.0.1-alpha.1`. The Extractor, Infuser,
+Synthesizer, Research Bench, and datapack-driven material conversion chain are functional.
 
 ## Build targets
 

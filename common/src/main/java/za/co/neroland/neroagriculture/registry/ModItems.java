@@ -15,6 +15,9 @@ import za.co.neroland.neroagriculture.content.EssenceFamily;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.content.MaterialVariantItem;
 import za.co.neroland.neroagriculture.content.ResourceSeedItem;
+import za.co.neroland.neroagriculture.content.ChargedSeedItem;
+import za.co.neroland.neroagriculture.content.AgricultureUpgradeItem;
+import za.co.neroland.nerolandcore.upgrade.UpgradeType;
 import za.co.neroland.nerolandcore.registry.CoreCreativeTab;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
@@ -32,7 +35,7 @@ public final class ModItems {
     public static final RegistryEntry<Item> COLONIAL_ESSENCE = item("colonial_essence");
     public static final RegistryEntry<Item> DEEPVOID_ESSENCE = item("deepvoid_essence");
     public static final RegistryEntry<Item> BLANK_SEED = item("blank_seed");
-    public static final RegistryEntry<Item> CHARGED_SEED = item("charged_seed");
+    public static final RegistryEntry<Item> CHARGED_SEED = chargedSeed();
     public static final RegistryEntry<Item> NUTRIENT_CANISTER = item("nutrient_canister");
     public static final RegistryEntry<BucketItem> NUTRIENT_BUCKET = bucket();
     public static final RegistryEntry<Item> FOOD_SEED = item("food_seed");
@@ -42,6 +45,8 @@ public final class ModItems {
     public static final RegistryEntry<Item> CROP_WASTE = item("crop_waste");
     public static final RegistryEntry<Item> BIOFUEL_CANISTER = item("biofuel_canister");
     public static final RegistryEntry<Item> TERRAFORMING_SEED = item("terraforming_seed");
+    public static final RegistryEntry<Item> SPEED_MODULE = upgrade("speed_module", UpgradeType.SPEED);
+    public static final RegistryEntry<Item> EFFICIENCY_MODULE = upgrade("efficiency_module", UpgradeType.EFFICIENCY);
 
     static {
         for (RegistryEntry<? extends net.minecraft.world.level.block.Block> block : ModBlocks.ALL) {
@@ -69,6 +74,20 @@ public final class ModItems {
         return entry;
     }
 
+    private static RegistryEntry<Item> chargedSeed() {
+        RegistryEntry<Item> entry = ITEMS.register("charged_seed", key ->
+                new ChargedSeedItem(new Item.Properties().setId(key)));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
+    private static RegistryEntry<Item> upgrade(String name, UpgradeType type) {
+        RegistryEntry<Item> entry = ITEMS.register(name, key ->
+                new AgricultureUpgradeItem(new Item.Properties().setId(key).stacksTo(16), type));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
     private static RegistryEntry<BucketItem> bucket() {
         RegistryEntry<BucketItem> entry = ITEMS.register("nutrient_bucket", key -> new BucketItem(
                 za.co.neroland.neroagriculture.fluid.ModFluids.NUTRIENT.get(),
@@ -79,10 +98,10 @@ public final class ModItems {
 
     public static void addToCreativeTab() {
         TAB_ITEMS.forEach(CoreCreativeTab::add);
-        addExample("minecraft:wheat", EssenceFamily.TERRAN);
-        addExample("minecraft:iron_ingot", EssenceFamily.INDUSTRIAL);
-        addExample("nerospace:nerosium_ingot", EssenceFamily.ORBITAL);
-        addExample("minecraft:emerald", EssenceFamily.COLONIAL);
+        addExample("c:coal", EssenceFamily.TERRAN);
+        addExample("c:iron", EssenceFamily.INDUSTRIAL);
+        addExample("c:diamond", EssenceFamily.ORBITAL);
+        addExample("minecraft:nether_star", EssenceFamily.COLONIAL);
         addExample("minecraft:echo_shard", EssenceFamily.DEEPVOID);
     }
 
