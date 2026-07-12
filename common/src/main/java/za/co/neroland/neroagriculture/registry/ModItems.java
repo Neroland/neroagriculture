@@ -37,6 +37,7 @@ public final class ModItems {
     public static final RegistryEntry<Item> CHARGED_SEED = chargedSeed();
     public static final RegistryEntry<Item> NUTRIENT_CANISTER = item("nutrient_canister");
     public static final RegistryEntry<BucketItem> NUTRIENT_BUCKET = bucket();
+    public static final RegistryEntry<BucketItem> BIOFUEL_BUCKET = biofuelBucket();
     public static final RegistryEntry<Item> FOOD_SEED = speciesSeed("food_seed", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD);
     public static final RegistryEntry<Item> ALIEN_SEED = speciesSeed("alien_seed", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN);
     public static final RegistryEntry<Item> ENGINEERED_FOOD = foodItem("engineered_food");
@@ -110,6 +111,14 @@ public final class ModItems {
     private static RegistryEntry<BucketItem> bucket() {
         RegistryEntry<BucketItem> entry = ITEMS.register("nutrient_bucket", key -> new BucketItem(
                 za.co.neroland.neroagriculture.fluid.ModFluids.NUTRIENT.get(),
+                new Item.Properties().stacksTo(1).setId(key)));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
+    private static RegistryEntry<BucketItem> biofuelBucket() {
+        RegistryEntry<BucketItem> entry = ITEMS.register("biofuel_bucket", key -> new BucketItem(
+                za.co.neroland.neroagriculture.fluid.ModFluids.BIOFUEL.get(),
                 new Item.Properties().stacksTo(1).setId(key)));
         TAB_ITEMS.add(entry);
         return entry;

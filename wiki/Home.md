@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 11 oxygen plants and closed-loop life support. Oxygen flora offset greenhouse upkeep,
-> the bioreactor turns biomass into nutrient with explicit loss, and oxygen production is published to a
-> Nerospace-ready seam.
+> **Status:** Stage 12 biofuel and compacted essence. The Biofuel Converter turns biomass into a renewable,
+> below-ceiling fuel offered through a provider seam, and neutral essences compact 9↔1 into blocks and
+> decorative blocks.
 
 ## Contents
 
@@ -31,6 +31,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Breeding and mutations](Breeding.md)
 - [Pollination](Pollination.md)
 - [Oxygen and life support](Oxygen-and-Life-Support.md)
+- [Biofuel and essence blocks](Biofuel-and-Essence-Blocks.md)
 
 ## See also
 

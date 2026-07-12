@@ -48,6 +48,10 @@ public final class ModBlocks {
             key -> new NutrientLiquidBlock((net.minecraft.world.level.material.FlowingFluid) ModFluids.NUTRIENT.get(),
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.COLOR_GREEN).replaceable()
                             .noCollision().strength(100.0F).noLootTable()));
+    public static final RegistryEntry<NutrientLiquidBlock> BIOFUEL = BLOCKS.register("biofuel",
+            key -> new NutrientLiquidBlock((net.minecraft.world.level.material.FlowingFluid) ModFluids.BIOFUEL.get(),
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.COLOR_BROWN).replaceable()
+                            .noCollision().strength(100.0F).noLootTable()));
 
     public static final RegistryEntry<FoundationMachineBlock> ESSENCE_EXTRACTOR = machine("essence_extractor");
     public static final RegistryEntry<FoundationMachineBlock> ESSENCE_INFUSER = machine("essence_infuser");
@@ -72,7 +76,10 @@ public final class ModBlocks {
             BLOCKS.register("oxygen_plant", key -> new za.co.neroland.neroagriculture.lifesupport.BioreactorBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
-    public static final RegistryEntry<FoundationMachineBlock> BIOFUEL_CONVERTER = machine("biofuel_converter");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlock> BIOFUEL_CONVERTER =
+            BLOCKS.register("biofuel_converter", key -> new za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<FoundationMachineBlock> CROP_TOWER_CONTROLLER = machine("crop_tower_controller");
     public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock> POLLINATION_BEACON =
             BLOCKS.register("pollination_beacon", key -> new za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock(

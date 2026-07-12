@@ -38,6 +38,12 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> BIOREACTOR_NUTRIENT_MB_PER_CYCLE = integer("bioreactor.nutrient_mb_per_cycle", 400, 1, 10_000);
     public static final ConfigValue<Integer> BIOREACTOR_WASTE_PERCENT = integer("bioreactor.waste_byproduct_percent", 25, 0, 100);
     public static final ConfigValue<Integer> BIOREACTOR_TICKS = integer("bioreactor.process_ticks", 100, 1, 72_000);
+    public static final ConfigValue<Integer> BIOFUEL_BIOMASS_PER_CYCLE = integer("biofuel.biomass_per_cycle", 3, 1, 64);
+    public static final ConfigValue<Integer> BIOFUEL_MB_PER_CYCLE = integer("biofuel.biofuel_mb_per_cycle", 250, 1, 10_000);
+    public static final ConfigValue<Integer> BIOFUEL_WASTE_PERCENT = integer("biofuel.waste_byproduct_percent", 20, 0, 100);
+    public static final ConfigValue<Integer> BIOFUEL_TICKS = integer("biofuel.process_ticks", 120, 1, 72_000);
+    public static final ConfigValue<Integer> BIOFUEL_ENERGY_PER_MB = integer("biofuel.energy_nf_per_mb", 3, 0, 100_000);
+    public static final ConfigValue<Integer> BIOFUEL_PRIMARY_CEILING_NF_PER_MB = integer("biofuel.primary_generation_ceiling_nf_per_mb", 8, 1, 1_000_000);
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
     public static final ConfigValue<Integer> AUTOMATION_PER_PASS = integer("automation.columns_per_pass", 4, 1, 81);
