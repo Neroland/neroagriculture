@@ -88,7 +88,10 @@ public final class ModBlocks {
             BLOCKS.register("pollination_beacon", key -> new za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
-    public static final RegistryEntry<FoundationMachineBlock> TERRAFORMING_CONTROLLER = machine("terraforming_controller");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.terraforming.TerraformingControllerBlock> TERRAFORMING_CONTROLLER =
+            BLOCKS.register("terraforming_controller", key -> new za.co.neroland.neroagriculture.terraforming.TerraformingControllerBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
 
     public static final List<RegistryEntry<? extends Block>> ALL = List.of(TERRAN_GROW_BED, INDUSTRIAL_GROW_BED,
             ORBITAL_GROW_BED, COLONIAL_GROW_BED, DEEPVOID_GROW_BED, RESOURCE_CROP, ENGINEERED_FOOD_CROP,

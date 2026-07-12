@@ -51,6 +51,13 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> TOWER_REVALIDATE_TICKS = integer("crop_tower.revalidate_ticks", 100, 20, 12_000);
     public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
             "Enable seasonal/stellar-cycle growth and yield modifiers");
+    public static final ConfigValue<Boolean> TERRAFORM_ENABLED = SCHEMA.bool("terraforming.enabled", true, true,
+            "Allow terraforming projects to make a region habitable in Agriculture's environment model");
+    public static final ConfigValue<Integer> TERRAFORM_RADIUS = integer("terraforming.region_radius", 8, 1, 64);
+    public static final ConfigValue<Integer> TERRAFORM_TOTAL_PROGRESS = integer("terraforming.total_progress", 6_000, 20, 1_000_000);
+    public static final ConfigValue<Integer> TERRAFORM_PROGRESS_PER_TICK = integer("terraforming.progress_per_tick", 2, 1, 10_000);
+    public static final ConfigValue<Integer> TERRAFORM_ENERGY_PER_TICK = integer("terraforming.energy_per_tick", 20, 0, 100_000);
+    public static final ConfigValue<Integer> TERRAFORM_NUTRIENT_PER_TICK = integer("terraforming.nutrient_mb_per_tick", 2, 0, 10_000);
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
     public static final ConfigValue<Integer> AUTOMATION_PER_PASS = integer("automation.columns_per_pass", 4, 1, 81);

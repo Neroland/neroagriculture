@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 14 seasonal and stellar cycles. Data-driven per-dimension seasons apply bounded,
-> deterministic growth and yield modifiers (visible in crop, greenhouse and tower diagnostics), with a
-> Nerospace/NeroEvents provider seam that defaults to 1.0.
+> **Status:** Stage 16 optional-mod compatibility. NeroAgriculture hard-depends on Neroland Core alone;
+> every other mod integrates optionally through Core capabilities, `c:` tags, and the `CompatContracts`
+> provider seams, all dormant-safe when absent.
 
 ## Contents
 
@@ -34,6 +34,8 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Biofuel and essence blocks](Biofuel-and-Essence-Blocks.md)
 - [Automated crop towers](Crop-Towers.md)
 - [Seasonal and stellar cycles](Seasonal-Cycles.md)
+- [Terraforming](Terraforming.md)
+- [Compatibility](Compatibility.md)
 
 ## See also
 
