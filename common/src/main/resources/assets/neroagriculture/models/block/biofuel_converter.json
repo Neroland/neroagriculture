@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/iron_block"}}
+{"parent":"minecraft:block/cube_bottom_top","textures":{"top":"neroagriculture:block/biofuel_converter_top","bottom":"neroagriculture:block/biofuel_converter_bottom","side":"neroagriculture:block/biofuel_converter_side"}}

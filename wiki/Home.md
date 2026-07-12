@@ -36,6 +36,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Seasonal and stellar cycles](Seasonal-Cycles.md)
 - [Terraforming](Terraforming.md)
 - [Compatibility](Compatibility.md)
+- [Art and visuals](Art-and-Visuals.md)
 - [Configuration](Configuration.md)
 - [Administration](Administration.md)
 - [Performance](Performance.md)

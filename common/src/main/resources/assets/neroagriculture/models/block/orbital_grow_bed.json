@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/iron_block"}}
+{"parent":"minecraft:block/cube_bottom_top","textures":{"top":"neroagriculture:block/orbital_grow_bed_top","bottom":"neroagriculture:block/orbital_grow_bed_bottom","side":"neroagriculture:block/orbital_grow_bed_side"}}

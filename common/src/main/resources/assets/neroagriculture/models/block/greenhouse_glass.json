@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/iron_block"}}
+{"parent":"minecraft:block/cube_all","render_type":"minecraft:cutout","textures":{"all":"neroagriculture:block/greenhouse_glass"}}

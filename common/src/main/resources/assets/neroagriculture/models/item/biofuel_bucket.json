@@ -1,1 +1,1 @@
-{"parent":"minecraft:item/generated","textures":{"layer0":"minecraft:item/lava_bucket"}}
+{"parent":"minecraft:item/generated","textures":{"layer0":"neroagriculture:item/biofuel_bucket"}}

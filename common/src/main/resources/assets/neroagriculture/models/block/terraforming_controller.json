@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/iron_block"}}
+{"parent":"minecraft:block/cube_bottom_top","textures":{"top":"neroagriculture:block/terraforming_controller_top","bottom":"neroagriculture:block/terraforming_controller_bottom","side":"neroagriculture:block/terraforming_controller_side"}}

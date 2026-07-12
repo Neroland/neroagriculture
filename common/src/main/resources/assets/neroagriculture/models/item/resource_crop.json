@@ -1,1 +1,1 @@
-{"parent":"neroagriculture:block/resource_crop"}
+{"parent":"minecraft:item/generated","textures":{"layer0":"neroagriculture:item/resource_crop"}}
