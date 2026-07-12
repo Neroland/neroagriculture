@@ -14,6 +14,7 @@ import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 public final class SpeciesCropBlockEntity extends BlockEntity {
     private Identifier species = Identifier.parse("neroagriculture:unknown");
     private int harvestCount;
+    private za.co.neroland.neroagriculture.genetics.Genetics genetics = za.co.neroland.neroagriculture.genetics.Genetics.EMPTY;
 
     public SpeciesCropBlockEntity(BlockPos pos, BlockState state) {
         this(ModBlockEntities.SPECIES_CROP.get(), pos, state);
@@ -25,6 +26,11 @@ public final class SpeciesCropBlockEntity extends BlockEntity {
 
     public Identifier species() { return species; }
     public int harvestCount() { return harvestCount; }
+    public za.co.neroland.neroagriculture.genetics.Genetics genetics() { return genetics; }
+    public void setGenetics(za.co.neroland.neroagriculture.genetics.Genetics genetics) {
+        this.genetics = genetics == null ? za.co.neroland.neroagriculture.genetics.Genetics.EMPTY : genetics;
+        setChanged();
+    }
 
     public void setSpecies(Identifier species, int harvestCount) {
         this.species = species;
@@ -41,6 +47,7 @@ public final class SpeciesCropBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         output.putString("Species", species.toString());
         output.putInt("HarvestCount", harvestCount);
+        za.co.neroland.neroagriculture.genetics.GeneticsCodecs.save(output, genetics);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
@@ -51,5 +58,6 @@ public final class SpeciesCropBlockEntity extends BlockEntity {
         } catch (RuntimeException e) {
             species = Identifier.parse("neroagriculture:unknown");
         }
+        genetics = za.co.neroland.neroagriculture.genetics.GeneticsCodecs.load(input);
     }
 }

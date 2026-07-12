@@ -69,6 +69,7 @@ public final class AreaFarming {
         }
         int harvests = seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0);
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(), harvests));
+        crop.setGenetics(seed.get(ModDataComponents.GENETICS.get()));
         seed.shrink(1);
         return true;
     }
@@ -90,6 +91,7 @@ public final class AreaFarming {
             return false;
         }
         crop.setSpecies(definition.id(), seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0));
+        crop.setGenetics(seed.get(ModDataComponents.GENETICS.get()));
         seed.shrink(1);
         return true;
     }
@@ -126,7 +128,8 @@ public final class AreaFarming {
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
         int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
                 AgricultureConfig.YIELD_MULTIPLIER.get(), cap) + Math.max(0, yieldBonus)
-                + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, cropPos.below());
+                + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, cropPos.below())
+                + za.co.neroland.neroagriculture.genetics.GeneticEffects.yieldBonus(crop.genetics());
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(cropPos, state.setValue(ResourceCropBlock.AGE, 0), 3);
@@ -143,6 +146,7 @@ public final class AreaFarming {
         level.setBlock(cropPos, state.setValue(SpeciesCropBlock.AGE, 0), 3);
         ItemStack produce = new ItemStack(alien ? ModItems.ALIEN_PRODUCE.get() : ModItems.ENGINEERED_FOOD.get());
         produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
+        if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
         sink.accept(produce);
         return true;
     }

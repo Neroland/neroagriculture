@@ -54,6 +54,7 @@ public final class SpeciesSeedItem extends MaterialVariantItem {
             return InteractionResult.FAIL;
         }
         crop.setSpecies(definition.id(), stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0));
+        crop.setGenetics(stack.get(ModDataComponents.GENETICS.get()));
         if (!serverPlayer.getAbilities().instabuild) stack.shrink(1);
         return InteractionResult.SUCCESS;
     }

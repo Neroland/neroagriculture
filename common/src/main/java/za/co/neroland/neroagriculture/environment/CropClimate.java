@@ -13,9 +13,19 @@ public final class CropClimate {
 
     public static Result evaluate(EnvironmentProfile world, boolean sealed, int tierOrdinal,
             int controlledThresholdOrdinal) {
+        return evaluate(world, sealed, tierOrdinal, controlledThresholdOrdinal, 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Hardiness may relax open-air hostility (within its configured threshold) but never the engineered
+     * high-tier greenhouse requirement — a hard tier gate is not a condition hardiness can override.
+     */
+    public static Result evaluate(EnvironmentProfile world, boolean sealed, int tierOrdinal,
+            int controlledThresholdOrdinal, int hardiness, int hostileRelaxThreshold) {
         if (sealed) return Result.OK;
         if (tierOrdinal >= controlledThresholdOrdinal) return Result.NEEDS_GREENHOUSE;
-        return world.habitable() ? Result.OK : Result.HOSTILE_ENVIRONMENT;
+        if (world.habitable()) return Result.OK;
+        return hardiness >= hostileRelaxThreshold ? Result.OK : Result.HOSTILE_ENVIRONMENT;
     }
 
     /** Parse the configured controlled-environment threshold tier to an ordinal; defaults to Orbital. */

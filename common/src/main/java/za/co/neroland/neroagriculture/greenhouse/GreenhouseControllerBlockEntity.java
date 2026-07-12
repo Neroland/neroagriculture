@@ -34,6 +34,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
     private Set<Long> interior = Set.of();
     private int volume;
     private int activeCrops;
+    private int oxygenOffset;
     @Nullable private BlockPos leak;
     private int revalidateTimer;
     private int upkeepTimer;
@@ -76,9 +77,11 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         if (result.structure() == GreenhouseValidation.Structure.FORMED) {
             this.interior = result.interior();
             this.activeCrops = countCrops(level, result.interior());
+            this.oxygenOffset = sumOxygen(level, result.interior());
         } else {
             this.interior = Set.of();
             this.activeCrops = 0;
+            this.oxygenOffset = 0;
             setStructuralState(result.structure() == GreenhouseValidation.Structure.BREACHED
                     ? GreenhouseState.BREACHED : GreenhouseState.UNFORMED);
             GreenhouseIndex.clear(level, worldPosition);
@@ -92,7 +95,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
             return;
         }
         int nfCost = AgricultureConfig.GREENHOUSE_NF_PER_VOLUME.get() * Math.max(1, (volume + 31) / 32);
-        int nutrientCost = AgricultureConfig.GREENHOUSE_NUTRIENT_PER_CROP.get() * activeCrops;
+        int nutrientCost = Math.max(0, AgricultureConfig.GREENHOUSE_NUTRIENT_PER_CROP.get() * activeCrops - oxygenOffset);
         boolean nutrientOk = nutrientCost == 0
                 || nutrient.getFluid() == ModFluids.NUTRIENT.get() && nutrient.drain(nutrientCost, true) >= nutrientCost;
         boolean powerOk = nfCost == 0 || getEnergy().extract(nfCost, true) >= nfCost;
@@ -127,6 +130,20 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
             if (block instanceof ResourceCropBlock || block instanceof SpeciesCropBlock) count++;
         }
         return count;
+    }
+
+    /** Sum the oxygen-output genetics of interior crops; this offsets the greenhouse's nutrient upkeep. */
+    private static int sumOxygen(ServerLevel level, Set<Long> interior) {
+        int sum = 0;
+        for (long key : interior) {
+            var be = level.getBlockEntity(BlockPos.of(key));
+            if (be instanceof za.co.neroland.neroagriculture.crop.ResourceCropBlockEntity crop) {
+                sum += crop.genetics().oxygenOutput();
+            } else if (be instanceof za.co.neroland.neroagriculture.crop.SpeciesCropBlockEntity crop) {
+                sum += crop.genetics().oxygenOutput();
+            }
+        }
+        return sum;
     }
 
     @Override public void setRemoved() {

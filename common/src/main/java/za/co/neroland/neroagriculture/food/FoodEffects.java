@@ -28,8 +28,16 @@ public final class FoodEffects {
 
     /** Apply the definition's signature effect, clamped to its caps. Vanilla handles renewal/removal. */
     public static void applyTo(LivingEntity entity, FoodDefinition definition) {
+        applyTo(entity, definition, za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
+    }
+
+    /** As above, but the food-potency trait may raise the amplifier up to (never past) the species cap. */
+    public static void applyTo(LivingEntity entity, FoodDefinition definition,
+            za.co.neroland.neroagriculture.genetics.Genetics genetics) {
         if (!definition.hasEffect()) return;
+        int amplifier = za.co.neroland.neroagriculture.genetics.GeneticEffects.foodAmplifier(
+                definition.effectiveAmplifier(), definition.potencyCap(), genetics);
         holder(definition.effect()).ifPresent(effect -> entity.addEffect(new MobEffectInstance(effect,
-                definition.effectiveDurationTicks(), definition.effectiveAmplifier())));
+                definition.effectiveDurationTicks(), amplifier)));
     }
 }

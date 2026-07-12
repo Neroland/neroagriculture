@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 9 automation and fertiliser. NF-powered Planter, Harvester and Fertiliser Applicator
-> work bounded 3×3–9×9 areas with Core upgrades and side configuration, and timed fertiliser doses give
-> capped speed or yield boosts on powered beds.
+> **Status:** Stage 10 genetics, breeding, and pollination. Seeds carry five capped traits with live
+> effects, the Genetics Station splices and upgrades them, and adjacency pollination (with an optional
+> beacon) breeds new strains from a data-driven tree.
 
 ## Contents
 
@@ -27,6 +27,9 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Automation (Planter & Harvester)](Automation.md)
 - [Fertiliser](Fertiliser.md)
 - [Side configuration](Side-Configuration.md)
+- [Genetics](Genetics.md)
+- [Breeding and mutations](Breeding.md)
+- [Pollination](Pollination.md)
 
 ## See also
 

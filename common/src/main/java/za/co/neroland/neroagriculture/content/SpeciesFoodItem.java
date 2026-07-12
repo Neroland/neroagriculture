@@ -28,8 +28,10 @@ public final class SpeciesFoodItem extends Item {
         if (!level.isClientSide() && entity instanceof ServerPlayer player) {
             SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
             if (variant != null) {
+                za.co.neroland.neroagriculture.genetics.Genetics genetics = stack.getOrDefault(
+                        ModDataComponents.GENETICS.get(), za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
                 FoodCatalog.lookup(player.level().getServer(), variant.species())
-                        .ifPresent(definition -> FoodEffects.applyTo(player, definition));
+                        .ifPresent(definition -> FoodEffects.applyTo(player, definition, genetics));
             }
         }
         return result;

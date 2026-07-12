@@ -29,6 +29,12 @@ public final class ModDataComponents {
                     .networkSynchronized(ByteBufCodecs.VAR_INT)
                     .build());
 
+    public static final RegistryEntry<DataComponentType<za.co.neroland.neroagriculture.genetics.Genetics>> GENETICS =
+            COMPONENTS.register("genetics", key -> DataComponentType.<za.co.neroland.neroagriculture.genetics.Genetics>builder()
+                    .persistent(za.co.neroland.neroagriculture.genetics.Genetics.CODEC)
+                    .networkSynchronized(za.co.neroland.neroagriculture.genetics.Genetics.STREAM_CODEC)
+                    .build());
+
     public static final RegistryEntry<DataComponentType<SpeciesVariant>> SPECIES_VARIANT =
             COMPONENTS.register("species_variant", key -> DataComponentType.<SpeciesVariant>builder()
                     .persistent(SpeciesVariant.CODEC)

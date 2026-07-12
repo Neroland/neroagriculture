@@ -57,7 +57,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new SpeciesCropBlockEntity(pos, state); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(AGE); }
-    @Override protected boolean isRandomlyTicking(BlockState state) { return state.getValue(AGE) < MAX_AGE; }
+    @Override protected boolean isRandomlyTicking(BlockState state) { return true; }
     @Override protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock()) != null;
     }
@@ -68,9 +68,13 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
     }
 
     @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (state.getValue(AGE) >= MAX_AGE || random.nextDouble() >= Math.min(1.0,
-                0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get())) return;
         if (!(level.getBlockEntity(pos) instanceof SpeciesCropBlockEntity crop)) return;
+        if (state.getValue(AGE) >= MAX_AGE) {
+            za.co.neroland.neroagriculture.genetics.CropPollination.attempt(level, pos,
+                    AgricultureConfig.POLLINATION_CHANCE_PERCENT.get());
+            return;
+        }
+        if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get())) return;
         FoodDefinition definition = FoodCatalog.forServer(level.getServer()).get(crop.species());
         if (definition == null) return;
         EssenceFamily tier = definition.tier();
@@ -80,11 +84,13 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         var climate = za.co.neroland.neroagriculture.environment.CropClimate.evaluate(
                 za.co.neroland.neroagriculture.environment.GrowthEnvironment.worldProfile(level, pos),
                 za.co.neroland.neroagriculture.greenhouse.GreenhouseIndex.sealedAt(level, pos), tier.ordinal(),
-                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()));
+                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()),
+                crop.genetics().hardiness(), AgricultureConfig.GENETICS_HARDINESS_RELAX.get());
         if (climate != za.co.neroland.neroagriculture.environment.CropClimate.Result.OK) return;
         if (tier != EssenceFamily.TERRAN
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) || !bed.consumeGrowthResources())) return;
-        int step = za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below());
+        int step = za.co.neroland.neroagriculture.genetics.GeneticEffects.growthStep(
+                za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below()), crop.genetics());
         level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
@@ -101,6 +107,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         ItemStack produce = new ItemStack(kind == FoodDefinition.Kind.ALIEN
                 ? ModItems.ALIEN_PRODUCE.get() : ModItems.ENGINEERED_FOOD.get());
         produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
+        if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
         if (!serverPlayer.getInventory().add(produce)) popResource(level, pos, produce);
         return InteractionResult.SUCCESS;
     }
@@ -113,6 +120,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
                     ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
             seed.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(crop.species()));
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.harvestCount());
+            if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
             popResource(level, pos, seed);
         }
     }

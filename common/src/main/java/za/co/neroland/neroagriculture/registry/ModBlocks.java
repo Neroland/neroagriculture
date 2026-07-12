@@ -64,11 +64,17 @@ public final class ModBlocks {
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> FERTILISER_APPLICATOR = areaMachine("fertiliser_applicator");
-    public static final RegistryEntry<FoundationMachineBlock> GENETICS_STATION = machine("genetics_station");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.GeneticsStationBlock> GENETICS_STATION =
+            BLOCKS.register("genetics_station", key -> new za.co.neroland.neroagriculture.genetics.GeneticsStationBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<FoundationMachineBlock> OXYGEN_PLANT = machine("oxygen_plant");
     public static final RegistryEntry<FoundationMachineBlock> BIOFUEL_CONVERTER = machine("biofuel_converter");
     public static final RegistryEntry<FoundationMachineBlock> CROP_TOWER_CONTROLLER = machine("crop_tower_controller");
-    public static final RegistryEntry<FoundationMachineBlock> POLLINATION_BEACON = machine("pollination_beacon");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock> POLLINATION_BEACON =
+            BLOCKS.register("pollination_beacon", key -> new za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<FoundationMachineBlock> TERRAFORMING_CONTROLLER = machine("terraforming_controller");
 
     public static final List<RegistryEntry<? extends Block>> ALL = List.of(TERRAN_GROW_BED, INDUSTRIAL_GROW_BED,

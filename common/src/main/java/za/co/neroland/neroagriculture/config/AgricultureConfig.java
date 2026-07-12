@@ -41,6 +41,11 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> FERTILISER_MAX_DOSE = integer("fertiliser.max_dose", 8, 1, 64);
     public static final ConfigValue<Integer> FERTILISER_DURATION_TICKS = integer("fertiliser.duration_ticks", 6_000, 20, 720_000);
     public static final ConfigValue<Integer> FERTILISER_ENERGY_PER_APPLY = integer("fertiliser.energy_per_apply", 40, 0, 100_000);
+    public static final ConfigValue<Integer> GENETICS_HARDINESS_RELAX = integer("genetics.hardiness_hostile_relax", 3, 1, 5);
+    public static final ConfigValue<Integer> POLLINATION_CHANCE_PERCENT = integer("genetics.pollination_chance_percent", 6, 0, 100);
+    public static final ConfigValue<Integer> POLLINATION_MUTATION_PERCENT = integer("genetics.mutation_chance_percent", 20, 0, 100);
+    public static final ConfigValue<Integer> POLLINATION_COOLDOWN_TICKS = integer("genetics.pollination_cooldown_ticks", 200, 20, 72_000);
+    public static final ConfigValue<Integer> POLLINATION_BEACON_RANGE = integer("genetics.beacon_range", 4, 1, 16);
     public static final ConfigValue<String> DIMENSION_ALLOWLIST = text("dimensions.allowlist", "");
     public static final ConfigValue<String> DIMENSION_DENYLIST = text("dimensions.denylist", "");
 

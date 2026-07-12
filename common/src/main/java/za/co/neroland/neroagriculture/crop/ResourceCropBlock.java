@@ -74,7 +74,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (resolvedTier != EssenceFamily.TERRAN
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed)
                         || !bed.consumeGrowthResources())) return;
-        int step = za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below());
+        int step = za.co.neroland.neroagriculture.genetics.GeneticEffects.growthStep(
+                za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below()), crop.genetics());
         level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
@@ -115,7 +116,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         }
         int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
                 AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier()))
-                + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, pos.below());
+                + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, pos.below())
+                + za.co.neroland.neroagriculture.genetics.GeneticEffects.yieldBonus(crop.genetics());
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);
@@ -153,7 +155,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 za.co.neroland.neroagriculture.environment.GrowthEnvironment.worldProfile(level, pos),
                 za.co.neroland.neroagriculture.greenhouse.GreenhouseIndex.sealedAt(level, pos),
                 materialTier.ordinal(),
-                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()));
+                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()),
+                crop.genetics().hardiness(), AgricultureConfig.GENETICS_HARDINESS_RELAX.get());
         return GrowthRules.evaluate(new GrowthRules.Conditions(lookup.status(), materialTier, bedTier, gate,
                 level.getRawBrightness(pos, 0) >= 9, dimension, climate, power, nutrient));
     }
@@ -179,6 +182,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             EssenceFamily family = lookup.material().map(material -> material.definition().tier()).orElse(crop.variant().family());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(crop.variant().material(), family));
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());
+            if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
             popResource(level, pos, seed);
         }
     }
