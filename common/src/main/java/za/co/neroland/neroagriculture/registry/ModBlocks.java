@@ -80,7 +80,10 @@ public final class ModBlocks {
             BLOCKS.register("biofuel_converter", key -> new za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
-    public static final RegistryEntry<FoundationMachineBlock> CROP_TOWER_CONTROLLER = machine("crop_tower_controller");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.tower.CropTowerControllerBlock> CROP_TOWER_CONTROLLER =
+            BLOCKS.register("crop_tower_controller", key -> new za.co.neroland.neroagriculture.tower.CropTowerControllerBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock> POLLINATION_BEACON =
             BLOCKS.register("pollination_beacon", key -> new za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)

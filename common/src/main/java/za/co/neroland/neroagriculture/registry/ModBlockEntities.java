@@ -61,6 +61,11 @@ public final class ModBlockEntities {
                     za.co.neroland.neroagriculture.genetics.PollinationBeaconBlockEntity::new,
                     java.util.Set.of(ModBlocks.POLLINATION_BEACON.get())));
 
+    public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.tower.CropTowerControllerBlockEntity>> CROP_TOWER_CONTROLLER =
+            BLOCK_ENTITIES.register("crop_tower_controller", key -> new BlockEntityType<>(
+                    za.co.neroland.neroagriculture.tower.CropTowerControllerBlockEntity::new,
+                    java.util.Set.of(ModBlocks.CROP_TOWER_CONTROLLER.get())));
+
     public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlockEntity>> BIOFUEL_CONVERTER =
             BLOCK_ENTITIES.register("biofuel_converter", key -> new BlockEntityType<>(
                     za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlockEntity::new,

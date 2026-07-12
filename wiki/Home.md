@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 12 biofuel and compacted essence. The Biofuel Converter turns biomass into a renewable,
-> below-ceiling fuel offered through a provider seam, and neutral essences compact 9↔1 into blocks and
-> decorative blocks.
+> **Status:** Stage 13 automated crop towers. A vertical multiblock farms virtual crop slots on a bounded
+> batched cycle that reuses the same growth, gate, genetics, fertiliser and yield rules as ordinary crops —
+> colony-scale automation, not a shortcut.
 
 ## Contents
 
@@ -32,6 +32,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Pollination](Pollination.md)
 - [Oxygen and life support](Oxygen-and-Life-Support.md)
 - [Biofuel and essence blocks](Biofuel-and-Essence-Blocks.md)
+- [Automated crop towers](Crop-Towers.md)
 
 ## See also
 

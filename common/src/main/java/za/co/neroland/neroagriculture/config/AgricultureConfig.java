@@ -44,6 +44,11 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> BIOFUEL_TICKS = integer("biofuel.process_ticks", 120, 1, 72_000);
     public static final ConfigValue<Integer> BIOFUEL_ENERGY_PER_MB = integer("biofuel.energy_nf_per_mb", 3, 0, 100_000);
     public static final ConfigValue<Integer> BIOFUEL_PRIMARY_CEILING_NF_PER_MB = integer("biofuel.primary_generation_ceiling_nf_per_mb", 8, 1, 1_000_000);
+    public static final ConfigValue<Integer> TOWER_MIN_HEIGHT = integer("crop_tower.min_height", 3, 1, 64);
+    public static final ConfigValue<Integer> TOWER_MAX_HEIGHT = integer("crop_tower.max_height", 12, 1, 256);
+    public static final ConfigValue<Integer> TOWER_SLOTS_PER_LAYER = integer("crop_tower.slots_per_layer", 4, 1, 64);
+    public static final ConfigValue<Integer> TOWER_SLOTS_PER_PASS = integer("crop_tower.slots_per_pass", 6, 1, 4_096);
+    public static final ConfigValue<Integer> TOWER_REVALIDATE_TICKS = integer("crop_tower.revalidate_ticks", 100, 20, 12_000);
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
     public static final ConfigValue<Integer> AUTOMATION_PER_PASS = integer("automation.columns_per_pass", 4, 1, 81);
