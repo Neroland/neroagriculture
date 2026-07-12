@@ -18,11 +18,10 @@ import za.co.neroland.neroagriculture.content.ResourceSeedItem;
 import za.co.neroland.neroagriculture.content.ChargedSeedItem;
 import za.co.neroland.neroagriculture.content.AgricultureUpgradeItem;
 import za.co.neroland.nerolandcore.upgrade.UpgradeType;
-import za.co.neroland.nerolandcore.registry.CoreCreativeTab;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 
-/** Finite items plus component-backed examples in the shared Neroland creative tab. */
+/** Finite items plus component-backed examples shown in NeroAgriculture's own creative tab. */
 public final class ModItems {
     public static final RegistrationProvider<Item> ITEMS = RegistrationProvider.get(Registries.ITEM, NeroAgricultureCommon.MOD_ID);
     private static final List<RegistryEntry<? extends Item>> TAB_ITEMS = new ArrayList<>();
@@ -96,21 +95,20 @@ public final class ModItems {
         return entry;
     }
 
-    public static void addToCreativeTab() {
-        TAB_ITEMS.forEach(CoreCreativeTab::add);
-        addExample("c:coal", EssenceFamily.TERRAN);
-        addExample("c:iron", EssenceFamily.INDUSTRIAL);
-        addExample("c:diamond", EssenceFamily.ORBITAL);
-        addExample("minecraft:nether_star", EssenceFamily.COLONIAL);
-        addExample("minecraft:echo_shard", EssenceFamily.DEEPVOID);
+    /** Populate NeroAgriculture's own creative tab: every finite item, then component-backed examples. */
+    public static void populateTab(java.util.function.Consumer<ItemStack> output) {
+        for (RegistryEntry<? extends Item> entry : TAB_ITEMS) output.accept(new ItemStack(entry.get()));
+        output.accept(example("c:coal", EssenceFamily.TERRAN));
+        output.accept(example("c:iron", EssenceFamily.INDUSTRIAL));
+        output.accept(example("c:diamond", EssenceFamily.ORBITAL));
+        output.accept(example("minecraft:nether_star", EssenceFamily.COLONIAL));
+        output.accept(example("minecraft:echo_shard", EssenceFamily.DEEPVOID));
     }
 
-    private static void addExample(String id, EssenceFamily family) {
-        CoreCreativeTab.addStack(() -> {
-            ItemStack stack = new ItemStack(RESOURCE_SEED.get());
-            stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(Identifier.parse(id), family));
-            return stack;
-        });
+    private static ItemStack example(String id, EssenceFamily family) {
+        ItemStack stack = new ItemStack(RESOURCE_SEED.get());
+        stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(Identifier.parse(id), family));
+        return stack;
     }
 
     private ModItems() { }

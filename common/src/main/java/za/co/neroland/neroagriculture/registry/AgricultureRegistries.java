@@ -12,6 +12,6 @@ public final class AgricultureRegistries {
         ModBlockEntities.init();
         ModMenuTypes.init();
         ModRecipeSerializers.init();
-        ModItems.addToCreativeTab();
+        ModCreativeTabs.init();
     }
 }
