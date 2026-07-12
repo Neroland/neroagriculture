@@ -1,0 +1,47 @@
+package za.co.neroland.neroagriculture.content;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+
+import za.co.neroland.neroagriculture.food.FoodCatalog;
+import za.co.neroland.neroagriculture.food.FoodDefinition;
+import za.co.neroland.neroagriculture.food.FoodEffects;
+import za.co.neroland.neroagriculture.registry.ModDataComponents;
+
+/**
+ * One finite edible item that carries its species in a component. Vanilla drives hunger/animation from the
+ * baseline food component; the bounded signature effect is applied server-side from the server catalog, so a
+ * forged component can never grant an out-of-cap effect.
+ */
+public final class SpeciesFoodItem extends Item {
+    public SpeciesFoodItem(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+        ItemStack result = super.finishUsingItem(stack, level, entity);
+        if (!level.isClientSide() && entity instanceof ServerPlayer player) {
+            SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+            if (variant != null) {
+                FoodCatalog.lookup(player.level().getServer(), variant.species())
+                        .ifPresent(definition -> FoodEffects.applyTo(player, definition));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+        if (variant != null) {
+            FoodDefinition definition = FoodCatalog.forServer(null).get(variant.species());
+            if (definition != null) return Component.translatable(definition.displayKey());
+        }
+        return super.getName(stack);
+    }
+}

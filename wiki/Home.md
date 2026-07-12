@@ -3,8 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 5 fabrication and research. Resource cultivation now connects to the Extractor,
-> Infuser, Synthesizer, Research Bench, and server-authoritative material conversion recipes.
+> **Status:** Stage 7 food seeds and alien crops. On top of the resource loop, NeroAgriculture now ships
+> engineered foods with bounded signature effects, planet-themed varieties, and exploration-found alien
+> crops.
 
 ## Contents
 
@@ -17,6 +18,10 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Fabrication chain](Fabrication-Chain.md)
 - [Seed research](Seed-Research.md)
 - [Material recipe datapacks](Material-Recipe-Datapacks.md)
+- [Engineered foods](Engineered-Foods.md)
+- [Food effects](Food-Effects.md)
+- [Planet varieties](Planet-Varieties.md)
+- [Alien crops](Alien-Crops.md)
 
 ## See also
 

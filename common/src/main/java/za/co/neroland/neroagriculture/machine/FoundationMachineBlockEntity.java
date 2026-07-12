@@ -302,6 +302,15 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             return false;
         }
         items.get(PRIMARY).shrink(recipe.inputCount());
+        if (milestone == MachineProgression.FOOD_RESEARCH || milestone == MachineProgression.ALIEN_RESEARCH) {
+            za.co.neroland.neroagriculture.food.FoodCatalog.lookup(level.getServer(), subject).ifPresent(definition -> {
+                ItemStack seed = new ItemStack(definition.kind() == za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN
+                        ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
+                seed.set(ModDataComponents.SPECIES_VARIANT.get(),
+                        za.co.neroland.neroagriculture.content.SpeciesVariant.of(definition.id()));
+                if (!player.getInventory().add(seed)) player.drop(seed, false);
+            });
+        }
         blockedReason = MachineBlockedReason.COMPLETE;
         setChanged();
         return true;

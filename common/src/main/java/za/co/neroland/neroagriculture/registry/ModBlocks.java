@@ -13,6 +13,7 @@ import za.co.neroland.neroagriculture.machine.FoundationMachineBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
 import za.co.neroland.neroagriculture.fluid.NutrientLiquidBlock;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
+import za.co.neroland.neroagriculture.crop.SpeciesCropBlock;
 import za.co.neroland.neroagriculture.crop.GrowBedBlock;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
@@ -30,8 +31,10 @@ public final class ModBlocks {
             key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
                     .strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
-    public static final RegistryEntry<Block> ENGINEERED_FOOD_CROP = plain("engineered_food_crop", MapColor.PLANT);
-    public static final RegistryEntry<Block> ALIEN_CROP = plain("alien_crop", MapColor.COLOR_PURPLE);
+    public static final RegistryEntry<SpeciesCropBlock> ENGINEERED_FOOD_CROP =
+            speciesCrop("engineered_food_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD, MapColor.PLANT);
+    public static final RegistryEntry<SpeciesCropBlock> ALIEN_CROP =
+            speciesCrop("alien_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN, MapColor.COLOR_PURPLE);
     public static final RegistryEntry<Block> GREENHOUSE_FRAME = plain("greenhouse_frame", MapColor.METAL);
     public static final RegistryEntry<Block> GREENHOUSE_GLASS = plain("greenhouse_glass", MapColor.COLOR_LIGHT_BLUE);
     public static final RegistryEntry<Block> CROP_TOWER_FRAME = plain("crop_tower_frame", MapColor.METAL);
@@ -79,6 +82,13 @@ public final class ModBlocks {
     private static RegistryEntry<FoundationMachineBlock> machine(String name) {
         return BLOCKS.register(name, key -> new FoundationMachineBlock(BlockBehaviour.Properties.of().setId(key)
                 .mapColor(MapColor.METAL).strength(3.5F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+    }
+
+    private static RegistryEntry<SpeciesCropBlock> speciesCrop(String name,
+            za.co.neroland.neroagriculture.food.FoodDefinition.Kind kind, MapColor color) {
+        return BLOCKS.register(name, key -> new SpeciesCropBlock(kind, BlockBehaviour.Properties.of().setId(key)
+                .mapColor(color).strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
+                .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     }
 
     private static RegistryEntry<GrowBedBlock> bed(String name,

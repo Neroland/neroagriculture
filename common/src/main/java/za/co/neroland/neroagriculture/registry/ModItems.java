@@ -37,8 +37,10 @@ public final class ModItems {
     public static final RegistryEntry<Item> CHARGED_SEED = chargedSeed();
     public static final RegistryEntry<Item> NUTRIENT_CANISTER = item("nutrient_canister");
     public static final RegistryEntry<BucketItem> NUTRIENT_BUCKET = bucket();
-    public static final RegistryEntry<Item> FOOD_SEED = item("food_seed");
-    public static final RegistryEntry<Item> ALIEN_SEED = item("alien_seed");
+    public static final RegistryEntry<Item> FOOD_SEED = speciesSeed("food_seed", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD);
+    public static final RegistryEntry<Item> ALIEN_SEED = speciesSeed("alien_seed", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN);
+    public static final RegistryEntry<Item> ENGINEERED_FOOD = foodItem("engineered_food");
+    public static final RegistryEntry<Item> ALIEN_PRODUCE = foodItem("alien_produce");
     public static final RegistryEntry<Item> FERTILISER = item("fertiliser");
     public static final RegistryEntry<Item> BIOMASS = item("biomass");
     public static final RegistryEntry<Item> CROP_WASTE = item("crop_waste");
@@ -73,6 +75,22 @@ public final class ModItems {
         return entry;
     }
 
+    private static RegistryEntry<Item> speciesSeed(String name, za.co.neroland.neroagriculture.food.FoodDefinition.Kind kind) {
+        RegistryEntry<Item> entry = ITEMS.register(name, key ->
+                new za.co.neroland.neroagriculture.content.SpeciesSeedItem(kind, new Item.Properties().setId(key)));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
+    private static RegistryEntry<Item> foodItem(String name) {
+        RegistryEntry<Item> entry = ITEMS.register(name, key ->
+                new za.co.neroland.neroagriculture.content.SpeciesFoodItem(new Item.Properties().setId(key)
+                        .food(new net.minecraft.world.food.FoodProperties.Builder()
+                                .nutrition(5).saturationModifier(0.5F).build())));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
     private static RegistryEntry<Item> chargedSeed() {
         RegistryEntry<Item> entry = ITEMS.register("charged_seed", key ->
                 new ChargedSeedItem(new Item.Properties().setId(key)));
@@ -103,6 +121,18 @@ public final class ModItems {
         output.accept(example("c:diamond", EssenceFamily.ORBITAL));
         output.accept(example("minecraft:nether_star", EssenceFamily.COLONIAL));
         output.accept(example("minecraft:echo_shard", EssenceFamily.DEEPVOID));
+        for (var definition : za.co.neroland.neroagriculture.food.BuiltinFoods.definitions()) {
+            boolean alien = definition.kind() == za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN;
+            output.accept(speciesExample(alien ? ALIEN_SEED.get() : FOOD_SEED.get(), definition.id()));
+            output.accept(speciesExample(alien ? ALIEN_PRODUCE.get() : ENGINEERED_FOOD.get(), definition.id()));
+        }
+    }
+
+    private static ItemStack speciesExample(Item item, Identifier species) {
+        ItemStack stack = new ItemStack(item);
+        stack.set(ModDataComponents.SPECIES_VARIANT.get(),
+                za.co.neroland.neroagriculture.content.SpeciesVariant.of(species));
+        return stack;
     }
 
     private static ItemStack example(String id, EssenceFamily family) {

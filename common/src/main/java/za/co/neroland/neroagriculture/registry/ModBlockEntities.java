@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.machine.FoundationMachineBlockEntity;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlockEntity;
+import za.co.neroland.neroagriculture.crop.SpeciesCropBlockEntity;
 import za.co.neroland.neroagriculture.crop.GrowBedBlockEntity;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
@@ -25,6 +26,10 @@ public final class ModBlockEntities {
     public static final RegistryEntry<BlockEntityType<ResourceCropBlockEntity>> RESOURCE_CROP =
             BLOCK_ENTITIES.register("resource_crop", key -> new BlockEntityType<>(ResourceCropBlockEntity::new,
                     java.util.Set.of(ModBlocks.RESOURCE_CROP.get())));
+
+    public static final RegistryEntry<BlockEntityType<SpeciesCropBlockEntity>> SPECIES_CROP =
+            BLOCK_ENTITIES.register("species_crop", key -> new BlockEntityType<>(SpeciesCropBlockEntity::new,
+                    java.util.Set.of(ModBlocks.ENGINEERED_FOOD_CROP.get(), ModBlocks.ALIEN_CROP.get())));
 
     public static final RegistryEntry<BlockEntityType<GrowBedBlockEntity>> GROW_BED =
             BLOCK_ENTITIES.register("grow_bed", key -> new BlockEntityType<>(GrowBedBlockEntity::new,
