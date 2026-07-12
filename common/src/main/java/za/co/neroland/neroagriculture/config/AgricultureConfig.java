@@ -34,6 +34,13 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> GREENHOUSE_NUTRIENT_PER_CROP = integer("greenhouse.nutrient_mb_per_crop", 1, 0, 10_000);
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
+    public static final ConfigValue<Integer> AUTOMATION_PER_PASS = integer("automation.columns_per_pass", 4, 1, 81);
+    public static final ConfigValue<Integer> AUTOMATION_ENERGY_PER_OP = integer("automation.energy_per_op", 60, 0, 100_000);
+    public static final ConfigValue<Boolean> AUTOMATION_TRACK_OWNER = SCHEMA.bool("automation.track_owner", true,
+            true, "Record the placing player's UUID (only) on automation machines for claim checks; opt-out");
+    public static final ConfigValue<Integer> FERTILISER_MAX_DOSE = integer("fertiliser.max_dose", 8, 1, 64);
+    public static final ConfigValue<Integer> FERTILISER_DURATION_TICKS = integer("fertiliser.duration_ticks", 6_000, 20, 720_000);
+    public static final ConfigValue<Integer> FERTILISER_ENERGY_PER_APPLY = integer("fertiliser.energy_per_apply", 40, 0, 100_000);
     public static final ConfigValue<String> DIMENSION_ALLOWLIST = text("dimensions.allowlist", "");
     public static final ConfigValue<String> DIMENSION_DENYLIST = text("dimensions.denylist", "");
 

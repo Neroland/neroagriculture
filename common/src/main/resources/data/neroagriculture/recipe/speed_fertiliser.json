@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shapeless", "ingredients": ["neroagriculture:fertiliser","minecraft:sugar","minecraft:glowstone_dust"], "result": { "id": "neroagriculture:speed_fertiliser", "count": 1 } }

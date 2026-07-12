@@ -27,6 +27,7 @@ public final class NeroAgricultureCommon {
         AgricultureConfig.init();
         AgricultureNetwork.init();
         za.co.neroland.neroagriculture.food.FoodProviders.register();
+        za.co.neroland.neroagriculture.automation.AutomationOwner.register();
         LOGGER.info("[NeroAgriculture] common init");
     }
 }

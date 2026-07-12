@@ -1,5 +1,7 @@
 {
   "itemGroup.neroagriculture": "NeroAgriculture",
+  "item.neroagriculture.speed_fertiliser": "Speed Fertiliser",
+  "item.neroagriculture.yield_fertiliser": "Yield Fertiliser",
   "item.neroagriculture.engineered_food": "Engineered Food",
   "item.neroagriculture.alien_produce": "Alien Produce",
   "effect.neroagriculture.low_gravity_adaptation": "Low-Gravity Adaptation",

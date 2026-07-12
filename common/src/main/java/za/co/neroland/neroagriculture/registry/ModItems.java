@@ -42,6 +42,8 @@ public final class ModItems {
     public static final RegistryEntry<Item> ENGINEERED_FOOD = foodItem("engineered_food");
     public static final RegistryEntry<Item> ALIEN_PRODUCE = foodItem("alien_produce");
     public static final RegistryEntry<Item> FERTILISER = item("fertiliser");
+    public static final RegistryEntry<Item> SPEED_FERTILISER = item("speed_fertiliser");
+    public static final RegistryEntry<Item> YIELD_FERTILISER = item("yield_fertiliser");
     public static final RegistryEntry<Item> BIOMASS = item("biomass");
     public static final RegistryEntry<Item> CROP_WASTE = item("crop_waste");
     public static final RegistryEntry<Item> BIOFUEL_CANISTER = item("biofuel_canister");

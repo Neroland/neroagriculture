@@ -52,15 +52,18 @@ public final class ModBlocks {
     public static final RegistryEntry<FoundationMachineBlock> ESSENCE_EXTRACTOR = machine("essence_extractor");
     public static final RegistryEntry<FoundationMachineBlock> ESSENCE_INFUSER = machine("essence_infuser");
     public static final RegistryEntry<FoundationMachineBlock> SEED_SYNTHESIZER = machine("seed_synthesizer");
-    public static final RegistryEntry<FoundationMachineBlock> PLANTER = machine("planter");
-    public static final RegistryEntry<FoundationMachineBlock> HARVESTER = machine("harvester");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> PLANTER = areaMachine("planter");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> HARVESTER = areaMachine("harvester");
     public static final RegistryEntry<FoundationMachineBlock> SEED_RESEARCH_BENCH = machine("seed_research_bench");
     public static final RegistryEntry<za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock> GREENHOUSE_CONTROLLER =
             BLOCKS.register("greenhouse_controller", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
-    public static final RegistryEntry<FoundationMachineBlock> FERTILISER_PROCESSOR = machine("fertiliser_processor");
-    public static final RegistryEntry<FoundationMachineBlock> FERTILISER_APPLICATOR = machine("fertiliser_applicator");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlock> FERTILISER_PROCESSOR =
+            BLOCKS.register("fertiliser_processor", key -> new za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+    public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> FERTILISER_APPLICATOR = areaMachine("fertiliser_applicator");
     public static final RegistryEntry<FoundationMachineBlock> GENETICS_STATION = machine("genetics_station");
     public static final RegistryEntry<FoundationMachineBlock> OXYGEN_PLANT = machine("oxygen_plant");
     public static final RegistryEntry<FoundationMachineBlock> BIOFUEL_CONVERTER = machine("biofuel_converter");
@@ -80,6 +83,12 @@ public final class ModBlocks {
     private static RegistryEntry<Block> plain(String name, MapColor color) {
         return BLOCKS.register(name, key -> new Block(BlockBehaviour.Properties.of().setId(key).mapColor(color)
                 .strength(2.0F, 6.0F).sound(SoundType.METAL)));
+    }
+
+    private static RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> areaMachine(String name) {
+        return BLOCKS.register(name, key -> new za.co.neroland.neroagriculture.automation.AreaMachineBlock(
+                BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                        .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     }
 
     private static RegistryEntry<FoundationMachineBlock> machine(String name) {

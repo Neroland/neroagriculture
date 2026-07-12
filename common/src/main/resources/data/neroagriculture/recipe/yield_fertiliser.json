@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shapeless", "ingredients": ["neroagriculture:fertiliser","minecraft:bone_meal","minecraft:melon_slice"], "result": { "id": "neroagriculture:yield_fertiliser", "count": 1 } }

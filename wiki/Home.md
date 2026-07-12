@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 8 greenhouses and environmental simulation. Crops now answer to a dimension
-> environment model, and sealed powered greenhouses maintain a controlled interior for high-tier and
-> hostile-world cultivation.
+> **Status:** Stage 9 automation and fertiliser. NF-powered Planter, Harvester and Fertiliser Applicator
+> work bounded 3×3–9×9 areas with Core upgrades and side configuration, and timed fertiliser doses give
+> capped speed or yield boosts on powered beds.
 
 ## Contents
 
@@ -24,6 +24,9 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Alien crops](Alien-Crops.md)
 - [Greenhouse construction](Greenhouse-Construction.md)
 - [Greenhouse troubleshooting](Greenhouse-Troubleshooting.md)
+- [Automation (Planter & Harvester)](Automation.md)
+- [Fertiliser](Fertiliser.md)
+- [Side configuration](Side-Configuration.md)
 
 ## See also
 

@@ -84,7 +84,8 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         if (climate != za.co.neroland.neroagriculture.environment.CropClimate.Result.OK) return;
         if (tier != EssenceFamily.TERRAN
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) || !bed.consumeGrowthResources())) return;
-        level.setBlock(pos, state.setValue(AGE, state.getValue(AGE) + 1), 3);
+        int step = za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below());
+        level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,

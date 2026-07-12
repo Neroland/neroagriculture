@@ -74,7 +74,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (resolvedTier != EssenceFamily.TERRAN
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed)
                         || !bed.consumeGrowthResources())) return;
-        level.setBlock(pos, state.setValue(AGE, state.getValue(AGE) + 1), 3);
+        int step = za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below());
+        level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
@@ -113,7 +114,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
         }
         int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
-                AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier()));
+                AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier()))
+                + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, pos.below());
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);

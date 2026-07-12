@@ -36,6 +36,16 @@ public final class ModBlockEntities {
                     java.util.Set.of(ModBlocks.INDUSTRIAL_GROW_BED.get(), ModBlocks.ORBITAL_GROW_BED.get(),
                             ModBlocks.COLONIAL_GROW_BED.get(), ModBlocks.DEEPVOID_GROW_BED.get())));
 
+    public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.automation.AreaMachineBlockEntity>> AREA_MACHINE =
+            BLOCK_ENTITIES.register("area_machine", key -> new BlockEntityType<>(
+                    za.co.neroland.neroagriculture.automation.AreaMachineBlockEntity::new,
+                    java.util.Set.of(ModBlocks.PLANTER.get(), ModBlocks.HARVESTER.get(), ModBlocks.FERTILISER_APPLICATOR.get())));
+
+    public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlockEntity>> FERTILISER_PROCESSOR =
+            BLOCK_ENTITIES.register("fertiliser_processor", key -> new BlockEntityType<>(
+                    za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlockEntity::new,
+                    java.util.Set.of(ModBlocks.FERTILISER_PROCESSOR.get())));
+
     public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlockEntity>> GREENHOUSE_CONTROLLER =
             BLOCK_ENTITIES.register("greenhouse_controller", key -> new BlockEntityType<>(
                     za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlockEntity::new,
