@@ -74,7 +74,9 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
                     AgricultureConfig.POLLINATION_CHANCE_PERCENT.get());
             return;
         }
-        if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get())) return;
+        double cycleGrowth = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
+                level.dimension().identifier(), level.getGameTime()).growth();
+        if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get() * cycleGrowth)) return;
         FoodDefinition definition = FoodCatalog.forServer(level.getServer()).get(crop.species());
         if (definition == null) return;
         EssenceFamily tier = definition.tier();

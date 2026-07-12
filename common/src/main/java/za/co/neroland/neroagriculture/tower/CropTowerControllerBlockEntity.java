@@ -176,8 +176,10 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         if (definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate()))) return;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
-        int amount = YieldCurve.scaledCapped(definition.yield(), slot.harvestCount(),
-                AgricultureConfig.YIELD_MULTIPLIER.get(), cap) + GeneticEffects.yieldBonus(slot.genetics())
+        double cycleYield = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
+                level.dimension().identifier(), level.getGameTime()).yield();
+        int amount = (int) Math.floor(YieldCurve.scaledCapped(definition.yield(), slot.harvestCount(),
+                AgricultureConfig.YIELD_MULTIPLIER.get(), cap) * cycleYield) + GeneticEffects.yieldBonus(slot.genetics())
                 + (consumeYieldFertiliser() ? AgricultureConfig.FERTILISER_MAX_DOSE.get() : 0);
         ItemStack essence = new ItemStack(ModItems.MATERIAL_ESSENCE.get(), Math.min(64, Math.max(0, amount)));
         essence.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));

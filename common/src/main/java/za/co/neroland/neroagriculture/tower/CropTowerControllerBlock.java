@@ -35,7 +35,9 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] crop tower " + tower.status()));
+            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
+                    level.dimension().identifier(), level.getGameTime());
+            player.sendSystemMessage(Component.literal("[NeroAgriculture] crop tower " + tower.status() + " cycle=" + cycle));
         }
         return InteractionResult.SUCCESS;
     }

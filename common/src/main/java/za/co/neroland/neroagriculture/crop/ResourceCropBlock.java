@@ -64,8 +64,10 @@ public final class ResourceCropBlock extends BaseEntityBlock {
     }
 
     @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (state.getValue(AGE) >= MAX_AGE || random.nextDouble() >= Math.min(1.0,
-                0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get())) return;
+        if (state.getValue(AGE) >= MAX_AGE) return;
+        double cycleGrowth = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
+                level.dimension().identifier(), level.getGameTime()).growth();
+        if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get() * cycleGrowth)) return;
         if (!(level.getBlockEntity(pos) instanceof ResourceCropBlockEntity crop)) return;
         GrowthRules.BlockedReason reason = growthReason(level, pos, crop, null);
         if (reason != GrowthRules.BlockedReason.NONE) return;
@@ -101,11 +103,13 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             String gate = definition == null || definition.gate() == null ? "none"
                     : definition.gate() + ":" + (ProgressionGates.isOpen(serverPlayer, definition.gate())
                             ? "open" : "closed");
+            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
+                    level.dimension().identifier(), level.getGameTime());
             player.sendSystemMessage(Component.literal("Material=" + crop.variant().material() + " tier="
                     + requiredBed + " gate=" + gate + " requiredBed=" + requiredBed + " bed=" + actualBed
                     + " age=" + state.getValue(AGE) + " harvests=" + harvests
                     + " yield=" + yield + " next=" + nextYield + " max=" + maxYield + " cap=" + cap
-                    + " blocked=" + reason));
+                    + " cycle=" + cycle + " blocked=" + reason));
             return InteractionResult.SUCCESS;
         }
         if (state.getValue(AGE) < MAX_AGE) return InteractionResult.PASS;
@@ -114,8 +118,10 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate())) {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
         }
-        int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
-                AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier()))
+        double cycleYield = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
+                level.dimension().identifier(), level.getGameTime()).yield();
+        int amount = (int) Math.floor(YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
+                AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier())) * cycleYield)
                 + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, pos.below())
                 + za.co.neroland.neroagriculture.genetics.GeneticEffects.yieldBonus(crop.genetics());
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),

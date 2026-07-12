@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 13 automated crop towers. A vertical multiblock farms virtual crop slots on a bounded
-> batched cycle that reuses the same growth, gate, genetics, fertiliser and yield rules as ordinary crops —
-> colony-scale automation, not a shortcut.
+> **Status:** Stage 14 seasonal and stellar cycles. Data-driven per-dimension seasons apply bounded,
+> deterministic growth and yield modifiers (visible in crop, greenhouse and tower diagnostics), with a
+> Nerospace/NeroEvents provider seam that defaults to 1.0.
 
 ## Contents
 
@@ -33,6 +33,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Oxygen and life support](Oxygen-and-Life-Support.md)
 - [Biofuel and essence blocks](Biofuel-and-Essence-Blocks.md)
 - [Automated crop towers](Crop-Towers.md)
+- [Seasonal and stellar cycles](Seasonal-Cycles.md)
 
 ## See also
 

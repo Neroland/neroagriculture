@@ -37,10 +37,12 @@ public final class GreenhouseControllerBlock extends BaseEntityBlock {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (level.getBlockEntity(pos) instanceof GreenhouseControllerBlockEntity controller) {
             String leak = controller.leak() == null ? "none" : controller.leak().toShortString();
+            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
+                    level.dimension().identifier(), level.getGameTime());
             player.sendSystemMessage(Component.literal("Greenhouse " + controller.state().name().toLowerCase()
                     + " volume=" + controller.volume() + " crops=" + controller.activeCrops()
                     + " oxygen=" + controller.oxygen() + " NF=" + controller.getEnergy().getAmount()
-                    + " nutrient=" + controller.getFluid().getAmount() + "mb leak=" + leak));
+                    + " nutrient=" + controller.getFluid().getAmount() + "mb leak=" + leak + " cycle=" + cycle));
         }
         return InteractionResult.SUCCESS;
     }

@@ -49,6 +49,8 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_LAYER = integer("crop_tower.slots_per_layer", 4, 1, 64);
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_PASS = integer("crop_tower.slots_per_pass", 6, 1, 4_096);
     public static final ConfigValue<Integer> TOWER_REVALIDATE_TICKS = integer("crop_tower.revalidate_ticks", 100, 20, 12_000);
+    public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
+            "Enable seasonal/stellar-cycle growth and yield modifiers");
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
     public static final ConfigValue<Integer> AUTOMATION_PER_PASS = integer("automation.columns_per_pass", 4, 1, 81);

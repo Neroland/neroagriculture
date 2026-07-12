@@ -1,5 +1,11 @@
 {
   "itemGroup.neroagriculture": "NeroAgriculture",
+  "cycle.neroagriculture.spring": "Spring",
+  "cycle.neroagriculture.summer": "Summer",
+  "cycle.neroagriculture.autumn": "Autumn",
+  "cycle.neroagriculture.winter": "Winter",
+  "cycle.neroagriculture.stellar_bright": "Stellar Bright",
+  "cycle.neroagriculture.stellar_dark": "Stellar Dark",
   "item.neroagriculture.biofuel_bucket": "Biofuel Bucket",
   "block.neroagriculture.biofuel": "Biofuel",
   "food.neroagriculture.earth_algae": "Earth Algae",
