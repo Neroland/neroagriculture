@@ -10,6 +10,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
+import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
 /** MinecraftForge entry point for NeroAgriculture. */
@@ -19,6 +20,8 @@ public final class NeroAgricultureForge {
     public NeroAgricultureForge(FMLJavaModLoadingContext context) {
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Forge bootstrap");
         NeroAgricultureCommon.init();
+        // Anonymous, NeroAgriculture-only crash reporting (opt-out via config/neroagriculture.properties).
+        NeroAgricultureTelemetry.init();
         za.co.neroland.neroagriculture.platform.ForgeFluidFactory.registerFluidTypes(context.getModBusGroup());
         RegistrationProvider.attach(context.getModBusGroup());
         ForgeNetwork.register();

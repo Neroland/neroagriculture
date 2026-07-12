@@ -75,7 +75,16 @@ public final class AgricultureConfig {
     public static final ConfigValue<String> DIMENSION_ALLOWLIST = text("dimensions.allowlist", "");
     public static final ConfigValue<String> DIMENSION_DENYLIST = text("dimensions.denylist", "");
 
+    // --- telemetry (anonymous crash reporting; CLIENT-LOCAL opt-out, not server-synced) -----
+    public static final ConfigValue<Boolean> TELEMETRY_ENABLED = SCHEMA.bool("telemetryEnabled", true, false,
+            "anonymous error reporting to the developers (stack trace + mod/MC/loader/OS/Java versions only — "
+            + "never names, UUIDs, IPs, or world data; POPIA/GDPR-compliant). Set false to opt out");
+
     private AgricultureConfig() { }
+
+    public static boolean telemetryEnabled() {
+        return TELEMETRY_ENABLED.get();
+    }
 
     private static ConfigValue<Integer> integer(String key, int value, int min, int max) {
         return SCHEMA.intRange(key, value, min, max, true, key);

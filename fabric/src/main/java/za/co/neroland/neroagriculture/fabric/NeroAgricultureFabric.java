@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
+import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 
 /** Fabric entry point for NeroAgriculture. */
 public final class NeroAgricultureFabric implements ModInitializer {
@@ -16,6 +17,8 @@ public final class NeroAgricultureFabric implements ModInitializer {
     public void onInitialize() {
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Fabric bootstrap");
         NeroAgricultureCommon.init();
+        // Anonymous, NeroAgriculture-only crash reporting (opt-out via config/neroagriculture.properties).
+        NeroAgricultureTelemetry.init();
         FabricNetwork.register();
         FabricCapabilities.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->

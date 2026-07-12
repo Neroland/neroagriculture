@@ -12,6 +12,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
+import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
 /** NeoForge entry point for NeroAgriculture. */
@@ -21,6 +22,8 @@ public final class NeroAgricultureNeoForge {
     public NeroAgricultureNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] NeoForge bootstrap");
         NeroAgricultureCommon.init();
+        // Anonymous, NeroAgriculture-only crash reporting (opt-out via config/neroagriculture.properties).
+        NeroAgricultureTelemetry.init();
         za.co.neroland.neroagriculture.platform.NeoForgeFluidFactory.registerFluidTypes(modEventBus);
         RegistrationProvider.attach(modEventBus);
         NeoForgeNetwork.register(modEventBus);

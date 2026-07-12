@@ -18,9 +18,24 @@ Everything else — the material catalog, greenhouse and tower state, terraforme
 
 ## What is never stored
 
-No usernames or display names, no chat, no location history, no play-time analytics, and **no telemetry**:
-this mod contains no Sentry, analytics, or network code of any kind. Aggregate world/environment data is
-never linked to a player.
+No usernames or display names, no chat, no location history, and no play-time analytics. Aggregate
+world/environment data is never linked to a player.
+
+## Anonymous crash reporting (opt-out)
+
+Like the rest of the Neroland family, NeroAgriculture includes **opt-out** crash/error reporting via
+Sentry (EU-region servers) so bugs can be fixed. It is disclosed here for the POPIA/GDPR and CurseForge
+transparency rules:
+
+- **Opt-out:** on by default, client-local. Set `telemetryEnabled = false` in
+  `config/neroagriculture.properties` to switch it off (takes effect on restart).
+- **NeroAgriculture errors only:** an event is sent only if its stack trace touches
+  `za.co.neroland.neroagriculture`; everything else is dropped before sending.
+- **No personal data:** never a name, UUID, IP, hostname or world data. Home-directory paths (which
+  contain the OS account name) are scrubbed. The payload is a stack trace plus public version strings —
+  mod / Minecraft / loader / OS / Java versions and the loaded-mod list.
+- **Bounded:** per-session de-duplication and a hard cap of 10 events per session; nothing is stored on
+  disk locally.
 
 ## Export and erasure
 
