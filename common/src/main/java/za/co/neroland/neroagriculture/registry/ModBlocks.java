@@ -68,7 +68,10 @@ public final class ModBlocks {
             BLOCKS.register("genetics_station", key -> new za.co.neroland.neroagriculture.genetics.GeneticsStationBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
                             .requiresCorrectToolForDrops().sound(SoundType.METAL)));
-    public static final RegistryEntry<FoundationMachineBlock> OXYGEN_PLANT = machine("oxygen_plant");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.lifesupport.BioreactorBlock> OXYGEN_PLANT =
+            BLOCKS.register("oxygen_plant", key -> new za.co.neroland.neroagriculture.lifesupport.BioreactorBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<FoundationMachineBlock> BIOFUEL_CONVERTER = machine("biofuel_converter");
     public static final RegistryEntry<FoundationMachineBlock> CROP_TOWER_CONTROLLER = machine("crop_tower_controller");
     public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock> POLLINATION_BEACON =

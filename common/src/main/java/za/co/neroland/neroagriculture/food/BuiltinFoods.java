@@ -51,6 +51,10 @@ public final class BuiltinFoods {
         alien(out, "hybrid_gloomvine", false, EffectCategory.NIGHT_VISION, 0, 4800, EssenceFamily.COLONIAL,
                 PlanetTheme.EARTH, 5, 0.5F, 0, 9600, 0x7A6FC0);
 
+        // Oxygen flora — low-nutrition greenhouse life-support plants that contribute oxygen.
+        oxygenFlora(out, "earth_algae", EssenceFamily.TERRAN, PlanetTheme.EARTH, 1, 3, 0x3FA66A);
+        oxygenFlora(out, "greenxertz_oxyvine", EssenceFamily.INDUSTRIAL, PlanetTheme.GREENXERTZ, 2, 5, 0x5FE08A);
+
         return List.copyOf(out);
     }
 
@@ -59,7 +63,7 @@ public final class BuiltinFoods {
             int potencyCap, int durationCap, int color) {
         Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "food/" + path);
         out.add(new FoodDefinition(id, Kind.FOOD, false, effect, amplifier, durationTicks, potencyCap, durationCap,
-                nutrition, saturation, tier, theme, true, null, "food.neroagriculture." + path, color));
+                nutrition, saturation, tier, theme, true, null, "food.neroagriculture." + path, color, 0));
     }
 
     private static void alien(List<FoodDefinition> out, String path, boolean natural, EffectCategory effect,
@@ -67,6 +71,13 @@ public final class BuiltinFoods {
             int potencyCap, int durationCap, int color) {
         Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "alien/" + path);
         out.add(new FoodDefinition(id, Kind.ALIEN, natural, effect, amplifier, durationTicks, potencyCap, durationCap,
-                nutrition, saturation, tier, theme, true, null, "alien.neroagriculture." + path, color));
+                nutrition, saturation, tier, theme, true, null, "alien.neroagriculture." + path, color, 0));
+    }
+
+    private static void oxygenFlora(List<FoodDefinition> out, String path, EssenceFamily tier, PlanetTheme theme,
+            int nutrition, int oxygenProduction, int color) {
+        Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "food/" + path);
+        out.add(new FoodDefinition(id, Kind.FOOD, false, EffectCategory.NONE, 0, 0, 0, 0, nutrition, 0.2F, tier,
+                theme, true, null, "food.neroagriculture." + path, color, oxygenProduction));
     }
 }

@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 10 genetics, breeding, and pollination. Seeds carry five capped traits with live
-> effects, the Genetics Station splices and upgrades them, and adjacency pollination (with an optional
-> beacon) breeds new strains from a data-driven tree.
+> **Status:** Stage 11 oxygen plants and closed-loop life support. Oxygen flora offset greenhouse upkeep,
+> the bioreactor turns biomass into nutrient with explicit loss, and oxygen production is published to a
+> Nerospace-ready seam.
 
 ## Contents
 
@@ -30,6 +30,7 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Genetics](Genetics.md)
 - [Breeding and mutations](Breeding.md)
 - [Pollination](Pollination.md)
+- [Oxygen and life support](Oxygen-and-Life-Support.md)
 
 ## See also
 

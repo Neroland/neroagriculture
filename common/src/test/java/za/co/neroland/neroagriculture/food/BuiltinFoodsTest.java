@@ -58,4 +58,14 @@ class BuiltinFoodsTest {
         assertFalse(ALL.stream().filter(d -> d.kind() == Kind.ALIEN && d.natural())
                 .allMatch(FoodDefinition::synthesizable), "natural alien strains must not be synthesizable");
     }
+
+    @Test
+    void atLeastOneOxygenFloraShipsWithinItsCap() {
+        assertTrue(ALL.stream().anyMatch(FoodDefinition::isOxygenFlora), "an oxygen-producing plant must exist");
+        for (FoodDefinition definition : ALL) {
+            assertTrue(definition.oxygenProduction() >= 0
+                    && definition.oxygenProduction() <= FoodDefinition.MAX_OXYGEN_PRODUCTION,
+                    definition.id() + " oxygen within cap");
+        }
+    }
 }

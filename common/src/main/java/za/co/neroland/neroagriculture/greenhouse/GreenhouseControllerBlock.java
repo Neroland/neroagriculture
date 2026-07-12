@@ -39,8 +39,8 @@ public final class GreenhouseControllerBlock extends BaseEntityBlock {
             String leak = controller.leak() == null ? "none" : controller.leak().toShortString();
             player.sendSystemMessage(Component.literal("Greenhouse " + controller.state().name().toLowerCase()
                     + " volume=" + controller.volume() + " crops=" + controller.activeCrops()
-                    + " NF=" + controller.getEnergy().getAmount() + " nutrient=" + controller.getFluid().getAmount()
-                    + "mb leak=" + leak));
+                    + " oxygen=" + controller.oxygen() + " NF=" + controller.getEnergy().getAmount()
+                    + " nutrient=" + controller.getFluid().getAmount() + "mb leak=" + leak));
         }
         return InteractionResult.SUCCESS;
     }

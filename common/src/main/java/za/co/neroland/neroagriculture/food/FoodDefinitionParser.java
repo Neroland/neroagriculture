@@ -38,8 +38,9 @@ public final class FoodDefinitionParser {
                     ? identifier(json.get("gate").getAsString(), "gate") : null;
             String displayKey = requiredString(json, "display_key");
             int color = parseColor(json);
+            int oxygenProduction = optionalInt(json, "oxygen_production", 0);
             return new Result(new FoodDefinition(id, kind, natural, effect, amplifier, durationTicks, potencyCap,
-                    durationCap, nutrition, saturation, tier, theme, genetics, gate, displayKey, color), null);
+                    durationCap, nutrition, saturation, tier, theme, genetics, gate, displayKey, color, oxygenProduction), null);
         } catch (RuntimeException e) {
             return new Result(null, id + ": " + e.getMessage());
         }

@@ -16,12 +16,14 @@ import za.co.neroland.neroagriculture.content.EssenceFamily;
  */
 public record FoodDefinition(Identifier id, Kind kind, boolean natural, EffectCategory effect, int amplifier,
         int durationTicks, int potencyCap, int durationCap, int nutrition, float saturation, EssenceFamily tier,
-        PlanetTheme theme, boolean geneticsEligible, @Nullable Identifier gate, String displayKey, int color) {
+        PlanetTheme theme, boolean geneticsEligible, @Nullable Identifier gate, String displayKey, int color,
+        int oxygenProduction) {
 
     public static final int MAX_DISPLAY_KEY_LENGTH = 128;
     public static final int MAX_NUTRITION = 20;
     public static final int MAX_AMPLIFIER = 9;
     public static final int MAX_DURATION_TICKS = 24_000;
+    public static final int MAX_OXYGEN_PRODUCTION = 16;
 
     public enum Kind {
         FOOD, ALIEN;
@@ -58,6 +60,14 @@ public record FoodDefinition(Identifier id, Kind kind, boolean natural, EffectCa
         if ((color & 0xFF000000) != 0) {
             throw new IllegalArgumentException("color must be a 24-bit RGB value");
         }
+        if (oxygenProduction < 0 || oxygenProduction > MAX_OXYGEN_PRODUCTION) {
+            throw new IllegalArgumentException("oxygen_production must be 0-" + MAX_OXYGEN_PRODUCTION);
+        }
+    }
+
+    /** True when this species is oxygen flora that contributes to greenhouse life support. */
+    public boolean isOxygenFlora() {
+        return oxygenProduction > 0;
     }
 
     /** Amplifier actually granted, never above the cap. */

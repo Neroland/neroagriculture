@@ -53,6 +53,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
     public GreenhouseState state() { return state; }
     public int volume() { return volume; }
     public int activeCrops() { return activeCrops; }
+    public int oxygen() { return oxygenOffset; }
     @Nullable public BlockPos leak() { return leak; }
     public boolean isActive() { return state == GreenhouseState.FORMED; }
 
@@ -94,8 +95,12 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
             GreenhouseIndex.clear(level, worldPosition);
             return;
         }
-        int nfCost = AgricultureConfig.GREENHOUSE_NF_PER_VOLUME.get() * Math.max(1, (volume + 31) / 32);
-        int nutrientCost = Math.max(0, AgricultureConfig.GREENHOUSE_NUTRIENT_PER_CROP.get() * activeCrops - oxygenOffset);
+        int nutrientDemand = AgricultureConfig.GREENHOUSE_NUTRIENT_PER_CROP.get() * activeCrops;
+        int oxygenForNutrient = Math.min(oxygenOffset, nutrientDemand);
+        int nutrientCost = nutrientDemand - oxygenForNutrient;
+        int leftoverOxygen = oxygenOffset - oxygenForNutrient;
+        int baseNf = AgricultureConfig.GREENHOUSE_NF_PER_VOLUME.get() * Math.max(1, (volume + 31) / 32);
+        int nfCost = Math.max(0, baseNf - leftoverOxygen * AgricultureConfig.GREENHOUSE_OXYGEN_NF_FACTOR.get());
         boolean nutrientOk = nutrientCost == 0
                 || nutrient.getFluid() == ModFluids.NUTRIENT.get() && nutrient.drain(nutrientCost, true) >= nutrientCost;
         boolean powerOk = nfCost == 0 || getEnergy().extract(nfCost, true) >= nfCost;
@@ -132,18 +137,34 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         return count;
     }
 
-    /** Sum the oxygen-output genetics of interior crops; this offsets the greenhouse's nutrient upkeep. */
-    private static int sumOxygen(ServerLevel level, Set<Long> interior) {
-        int sum = 0;
+    /**
+     * Oxygen produced by interior crops — oxygen flora scaled by maturity plus every crop's oxygen genetics —
+     * clamped to a hard per-volume cap. This offsets the greenhouse's nutrient and NF upkeep (a cost reducer;
+     * it never gates growth) and is published to the Nerospace seam for atmosphere/terraforming.
+     */
+    private int sumOxygen(ServerLevel level, Set<Long> interior) {
+        int total = 0;
         for (long key : interior) {
-            var be = level.getBlockEntity(BlockPos.of(key));
+            BlockPos cropPos = BlockPos.of(key);
+            var be = level.getBlockEntity(cropPos);
             if (be instanceof za.co.neroland.neroagriculture.crop.ResourceCropBlockEntity crop) {
-                sum += crop.genetics().oxygenOutput();
+                total += crop.genetics().oxygenOutput();
             } else if (be instanceof za.co.neroland.neroagriculture.crop.SpeciesCropBlockEntity crop) {
-                sum += crop.genetics().oxygenOutput();
+                int production = za.co.neroland.neroagriculture.food.FoodCatalog.lookup(level.getServer(), crop.species())
+                        .map(za.co.neroland.neroagriculture.food.FoodDefinition::oxygenProduction).orElse(0);
+                var state = level.getBlockState(cropPos);
+                int age = state.getBlock() instanceof za.co.neroland.neroagriculture.crop.SpeciesCropBlock
+                        ? state.getValue(za.co.neroland.neroagriculture.crop.SpeciesCropBlock.AGE) : 0;
+                total += za.co.neroland.neroagriculture.environment.OxygenContribution.perCrop(production, age,
+                        za.co.neroland.neroagriculture.crop.SpeciesCropBlock.MAX_AGE, crop.genetics().oxygenOutput());
             }
         }
-        return sum;
+        int capped = za.co.neroland.neroagriculture.environment.OxygenContribution.capped(total, volume,
+                AgricultureConfig.GREENHOUSE_OXYGEN_CAP_PER_32.get(), 32);
+        za.co.neroland.neroagriculture.environment.OxygenApi.contribute(
+                new za.co.neroland.neroagriculture.environment.OxygenApi.Contribution(
+                        level.dimension().identifier(), worldPosition.asLong(), capped));
+        return capped;
     }
 
     @Override public void setRemoved() {
