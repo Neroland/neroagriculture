@@ -77,6 +77,11 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         EssenceFamily bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
         if (bedTier == null || bedTier.ordinal() < tier.ordinal()) return;
         if (level.getRawBrightness(pos, 0) < 9) return;
+        var climate = za.co.neroland.neroagriculture.environment.CropClimate.evaluate(
+                za.co.neroland.neroagriculture.environment.GrowthEnvironment.worldProfile(level, pos),
+                za.co.neroland.neroagriculture.greenhouse.GreenhouseIndex.sealedAt(level, pos), tier.ordinal(),
+                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()));
+        if (climate != za.co.neroland.neroagriculture.environment.CropClimate.Result.OK) return;
         if (tier != EssenceFamily.TERRAN
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) || !bed.consumeGrowthResources())) return;
         level.setBlock(pos, state.setValue(AGE, state.getValue(AGE) + 1), 3);

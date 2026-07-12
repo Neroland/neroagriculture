@@ -36,6 +36,11 @@ public final class ModBlockEntities {
                     java.util.Set.of(ModBlocks.INDUSTRIAL_GROW_BED.get(), ModBlocks.ORBITAL_GROW_BED.get(),
                             ModBlocks.COLONIAL_GROW_BED.get(), ModBlocks.DEEPVOID_GROW_BED.get())));
 
+    public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlockEntity>> GREENHOUSE_CONTROLLER =
+            BLOCK_ENTITIES.register("greenhouse_controller", key -> new BlockEntityType<>(
+                    za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlockEntity::new,
+                    java.util.Set.of(ModBlocks.GREENHOUSE_CONTROLLER.get())));
+
     private ModBlockEntities() { }
     public static void init() { }
 }

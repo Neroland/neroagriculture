@@ -3,9 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 [Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
 
-> **Status:** Stage 7 food seeds and alien crops. On top of the resource loop, NeroAgriculture now ships
-> engineered foods with bounded signature effects, planet-themed varieties, and exploration-found alien
-> crops.
+> **Status:** Stage 8 greenhouses and environmental simulation. Crops now answer to a dimension
+> environment model, and sealed powered greenhouses maintain a controlled interior for high-tier and
+> hostile-world cultivation.
 
 ## Contents
 
@@ -22,6 +22,8 @@ Player- and contributor-facing documentation for **NeroAgriculture**, part of th
 - [Food effects](Food-Effects.md)
 - [Planet varieties](Planet-Varieties.md)
 - [Alien crops](Alien-Crops.md)
+- [Greenhouse construction](Greenhouse-Construction.md)
+- [Greenhouse troubleshooting](Greenhouse-Troubleshooting.md)
 
 ## See also
 

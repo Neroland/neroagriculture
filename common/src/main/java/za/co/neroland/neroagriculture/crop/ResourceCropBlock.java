@@ -147,8 +147,13 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             nutrient = nutrientCost == 0 || bed.getFluid().getFluid() == za.co.neroland.neroagriculture.fluid.ModFluids.NUTRIENT.get()
                     && bed.getFluid().drain(nutrientCost, true) >= nutrientCost;
         }
+        var climate = za.co.neroland.neroagriculture.environment.CropClimate.evaluate(
+                za.co.neroland.neroagriculture.environment.GrowthEnvironment.worldProfile(level, pos),
+                za.co.neroland.neroagriculture.greenhouse.GreenhouseIndex.sealedAt(level, pos),
+                materialTier.ordinal(),
+                za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()));
         return GrowthRules.evaluate(new GrowthRules.Conditions(lookup.status(), materialTier, bedTier, gate,
-                level.getRawBrightness(pos, 0) >= 9, dimension, power, nutrient));
+                level.getRawBrightness(pos, 0) >= 9, dimension, climate, power, nutrient));
     }
 
     private static void giveEssence(ServerPlayer player, BlockPos pos, net.minecraft.resources.Identifier material,

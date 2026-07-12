@@ -25,6 +25,13 @@ public final class AgricultureConfig {
     public static final ConfigValue<Double> YIELD_MULTIPLIER = decimal("growth.yield_multiplier", 1.0, 0.0, 100.0);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_BASE = integer("growth.tier_yield_cap_base", 3, 1, 64);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_STEP = integer("growth.tier_yield_cap_step", 1, 0, 16);
+    public static final ConfigValue<String> CONTROLLED_TIER = SCHEMA.string("growth.controlled_tier", "orbital",
+            true, "Lowest tier that always requires a sealed greenhouse (terran|industrial|orbital|colonial|deepvoid)");
+    public static final ConfigValue<Integer> GREENHOUSE_VOLUME_CAP = integer("greenhouse.volume_cap", 4_096, 27, 65_536);
+    public static final ConfigValue<Integer> GREENHOUSE_REVALIDATE_TICKS = integer("greenhouse.revalidate_ticks", 100, 20, 12_000);
+    public static final ConfigValue<Integer> GREENHOUSE_UPKEEP_TICKS = integer("greenhouse.upkeep_ticks", 20, 1, 1_200);
+    public static final ConfigValue<Integer> GREENHOUSE_NF_PER_VOLUME = integer("greenhouse.nf_per_32_volume", 2, 0, 10_000);
+    public static final ConfigValue<Integer> GREENHOUSE_NUTRIENT_PER_CROP = integer("greenhouse.nutrient_mb_per_crop", 1, 0, 10_000);
     public static final ConfigValue<Integer> AUTOMATION_INTERVAL = integer("automation.interval_ticks", 20, 1, 1_200);
     public static final ConfigValue<Integer> AUTOMATION_RANGE = integer("automation.range", 8, 1, 64);
     public static final ConfigValue<String> DIMENSION_ALLOWLIST = text("dimensions.allowlist", "");

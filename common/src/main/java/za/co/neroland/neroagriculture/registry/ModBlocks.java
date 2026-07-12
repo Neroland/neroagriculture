@@ -55,7 +55,10 @@ public final class ModBlocks {
     public static final RegistryEntry<FoundationMachineBlock> PLANTER = machine("planter");
     public static final RegistryEntry<FoundationMachineBlock> HARVESTER = machine("harvester");
     public static final RegistryEntry<FoundationMachineBlock> SEED_RESEARCH_BENCH = machine("seed_research_bench");
-    public static final RegistryEntry<FoundationMachineBlock> GREENHOUSE_CONTROLLER = machine("greenhouse_controller");
+    public static final RegistryEntry<za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock> GREENHOUSE_CONTROLLER =
+            BLOCKS.register("greenhouse_controller", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
     public static final RegistryEntry<FoundationMachineBlock> FERTILISER_PROCESSOR = machine("fertiliser_processor");
     public static final RegistryEntry<FoundationMachineBlock> FERTILISER_APPLICATOR = machine("fertiliser_applicator");
     public static final RegistryEntry<FoundationMachineBlock> GENETICS_STATION = machine("genetics_station");
