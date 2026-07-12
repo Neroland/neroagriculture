@@ -27,6 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.EssenceFamily;
@@ -85,17 +86,24 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (player.isShiftKeyDown()) {
             GrowthRules.BlockedReason reason = growthReason((ServerLevel) level, pos, crop, serverPlayer);
             var definition = lookup.material().map(material -> material.definition()).orElse(null);
-            int yield = definition == null ? 0 : YieldCurve.scaled(definition.yield(),
-                    crop.variant().harvestCount(), AgricultureConfig.YIELD_MULTIPLIER.get());
+            double multiplier = AgricultureConfig.YIELD_MULTIPLIER.get();
+            int harvests = crop.variant().harvestCount();
             EssenceFamily requiredBed = definition == null ? crop.variant().family() : definition.tier();
+            int cap = tierCap(requiredBed);
+            int yield = definition == null ? 0
+                    : YieldCurve.scaledCapped(definition.yield(), harvests, multiplier, cap);
+            int nextYield = definition == null ? 0
+                    : YieldCurve.nextCapped(definition.yield(), harvests, multiplier, cap);
+            int maxYield = definition == null ? 0 : YieldCurve.maxCapped(definition.yield(), multiplier, cap);
             EssenceFamily actualBed = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
             String gate = definition == null || definition.gate() == null ? "none"
                     : definition.gate() + ":" + (ProgressionGates.isOpen(serverPlayer, definition.gate())
                             ? "open" : "closed");
             player.sendSystemMessage(Component.literal("Material=" + crop.variant().material() + " tier="
                     + requiredBed + " gate=" + gate + " requiredBed=" + requiredBed + " bed=" + actualBed
-                    + " age=" + state.getValue(AGE) + " harvests=" + crop.variant().harvestCount()
-                    + " yield=" + yield + " blocked=" + reason));
+                    + " age=" + state.getValue(AGE) + " harvests=" + harvests
+                    + " yield=" + yield + " next=" + nextYield + " max=" + maxYield + " cap=" + cap
+                    + " blocked=" + reason));
             return InteractionResult.SUCCESS;
         }
         if (state.getValue(AGE) < MAX_AGE) return InteractionResult.PASS;
@@ -104,8 +112,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate())) {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
         }
-        int amount = YieldCurve.scaled(definition.yield(), crop.variant().harvestCount(),
-                AgricultureConfig.YIELD_MULTIPLIER.get());
+        int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
+                AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier()));
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);
@@ -166,6 +174,11 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());
             popResource(level, pos, seed);
         }
+    }
+
+    private static int tierCap(EssenceFamily tier) {
+        return TierBalance.yieldCap(tier, AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
+                AgricultureConfig.YIELD_TIER_CAP_STEP.get());
     }
 
     private static InteractionResult fail(ServerPlayer player, String key) {

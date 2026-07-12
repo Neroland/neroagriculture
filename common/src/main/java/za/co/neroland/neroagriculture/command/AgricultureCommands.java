@@ -9,7 +9,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
+import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
+import za.co.neroland.neroagriculture.config.AgricultureConfig;
+import za.co.neroland.neroagriculture.crop.YieldCurve;
 
 /** Operator-only catalog diagnostics. Output contains material metadata only, never player data. */
 public final class AgricultureCommands {
@@ -24,7 +27,36 @@ public final class AgricultureCommands {
                                 .then(Commands.argument("material", StringArgumentType.string())
                                         .executes(context -> show(context.getSource(),
                                                 StringArgumentType.getString(context, "material")))))
-                        .then(Commands.literal("errors").executes(context -> errors(context.getSource())))));
+                        .then(Commands.literal("errors").executes(context -> errors(context.getSource())))
+                        .then(Commands.literal("report").executes(context -> report(context.getSource())))));
+    }
+
+    private static int report(CommandSourceStack source) {
+        var catalog = MaterialCatalog.forServer(source.getServer());
+        int capBase = AgricultureConfig.YIELD_TIER_CAP_BASE.get();
+        int capStep = AgricultureConfig.YIELD_TIER_CAP_STEP.get();
+        double yieldMultiplier = AgricultureConfig.YIELD_MULTIPLIER.get();
+        source.sendSuccess(() -> Component.literal("[NeroAgriculture] Effective balance report ("
+                + catalog.exposed().size() + " exposed materials)"), false);
+        catalog.exposed().values().stream()
+                .sorted(java.util.Comparator.comparing(resolved -> resolved.definition().id().toString()))
+                .forEach(resolved -> {
+                    var d = resolved.definition();
+                    int cap = TierBalance.yieldCap(d.tier(), capBase, capStep);
+                    int freshYield = YieldCurve.scaledCapped(d.yield(), 0, yieldMultiplier, cap);
+                    int maxYield = YieldCurve.maxCapped(d.yield(), yieldMultiplier, cap);
+                    String overrideSource = resolved.source().name().toLowerCase()
+                            + (resolved.sourceDetail().isBlank() ? "" : ":" + resolved.sourceDetail())
+                            + (resolved.shadowedSources().isEmpty() ? "" : " over " + resolved.shadowedSources());
+                    source.sendSuccess(() -> Component.literal("  " + d.id()
+                            + " tier=" + d.tier().name().toLowerCase()
+                            + " gate=" + (d.gate() == null ? "none" : d.gate())
+                            + " yield=" + freshYield + "->" + maxYield + " (def " + d.yield().minimum() + ".."
+                            + d.yield().maximum() + "@" + d.yield().rampHarvests() + " cap " + cap + ")"
+                            + " conversion=" + d.conversion()
+                            + " source=" + overrideSource), false);
+                });
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int list(CommandSourceStack source) {
