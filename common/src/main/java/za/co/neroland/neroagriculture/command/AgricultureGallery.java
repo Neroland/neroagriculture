@@ -27,8 +27,11 @@ import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.content.EssenceFamily;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.crop.CropVariantState;
+import za.co.neroland.neroagriculture.crop.GrowBedBlockEntity;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlockEntity;
+import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.nerolandcore.fluid.FluidBuffer;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -149,6 +152,10 @@ public final class AgricultureGallery {
         // FORMED EXHIBITS (NORTH): a sealed greenhouse and a crop tower.
         buildGreenhouse(level, floor, origin.getX() - 1, origin.getZ() - 27, fy);
         buildCropTower(level, floor, origin.getX() + 12, origin.getZ() - 25, fy);
+
+        // WORKING FARM (SE): the intended per-tier setup — powered + nutrient-fed grow beds, each with a
+        // fully grown ore crop ready to right-click harvest (the crop stays planted).
+        buildFarm(level, floor, origin.getX() + 12, origin.getZ() + 8, fy);
 
         int count = blocks.size();
         source.sendSuccess(() -> Component.literal("[NeroAgriculture] Gallery built (" + count
@@ -276,6 +283,55 @@ public final class AgricultureGallery {
             container.setItem(0, resourceSeed());
         }
         label(level, controllerPos.above(7), "Crop Tower — a formed vertical farm");
+    }
+
+    /**
+     * A working demonstration farm: a 3×2 grid of tier grow beds, each powered + nutrient-fed with a fully
+     * grown ore crop on top, flanked by a Planter and Harvester. Every crop is at {@code MAX_AGE}, so
+     * right-clicking one harvests its essence and replants the seed (age resets to 0). Higher-tier ores still
+     * require their Core progression gate to be open to harvest — that is intended game behaviour.
+     */
+    private static void buildFarm(ServerLevel level, BlockState floor, int bx, int bz, int fy) {
+        int cols = 3;
+        fillFloor(level, bx - 2, bz - 1, bx + cols * 3 + 1, bz + 2 * 3, fy, floor);
+        label(level, new BlockPos(bx + 3, fy + 4, bz - 1),
+                "Farm — power + nutrient each bed; right-click a grown crop to harvest (it stays planted)");
+        Object[][] plots = {
+            {ModBlocks.TERRAN_GROW_BED.get(), "c:coal", EssenceFamily.TERRAN, "Coal — Terran (ungated)"},
+            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:iron", EssenceFamily.INDUSTRIAL, "Iron — Industrial"},
+            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:copper", EssenceFamily.INDUSTRIAL, "Copper — Industrial"},
+            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:gold", EssenceFamily.INDUSTRIAL, "Gold — Industrial"},
+            {ModBlocks.ORBITAL_GROW_BED.get(), "c:diamond", EssenceFamily.ORBITAL, "Diamond — Orbital"},
+            {ModBlocks.ORBITAL_GROW_BED.get(), "c:emerald", EssenceFamily.ORBITAL, "Emerald — Orbital"},
+        };
+        for (int i = 0; i < plots.length; i++) {
+            BlockPos bedPos = new BlockPos(bx + (i % cols) * 3, fy + 1, bz + (i / cols) * 3);
+            plantBed(level, bedPos, (Block) plots[i][0], Identifier.parse((String) plots[i][1]),
+                    (EssenceFamily) plots[i][2], (String) plots[i][3]);
+        }
+        liveMachine(level, new BlockPos(bx - 2, fy + 1, bz + 1), ModBlocks.PLANTER.get(),
+                resourceSeed(), 0, "Planter — auto-sows the beds");
+        liveMachine(level, new BlockPos(bx + cols * 3 + 1, fy + 1, bz + 1), ModBlocks.HARVESTER.get(),
+                ItemStack.EMPTY, 0, "Harvester — auto-reaps grown crops");
+    }
+
+    private static void plantBed(ServerLevel level, BlockPos bedPos, Block bed, Identifier material,
+            EssenceFamily tier, String label) {
+        level.setBlockAndUpdate(bedPos, bed.defaultBlockState());
+        battery(level, bedPos.below());
+        charge(level, bedPos);
+        if (level.getBlockEntity(bedPos) instanceof GrowBedBlockEntity growBed
+                && growBed.getFluid() instanceof FluidBuffer fluid) {
+            fluid.setRaw(ModFluids.NUTRIENT.get(), 100_000);
+            growBed.setChanged();
+        }
+        BlockPos cropPos = bedPos.above();
+        level.setBlockAndUpdate(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
+                .setValue(ResourceCropBlock.AGE, ResourceCropBlock.MAX_AGE));
+        if (level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop) {
+            crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, material, tier, 0));
+        }
+        label(level, cropPos.above(1), label);
     }
 
     private static void label(ServerLevel level, BlockPos pos, String text) {

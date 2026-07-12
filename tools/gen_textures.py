@@ -249,6 +249,72 @@ def model_cube_all_cutout(name, tex=None):
         "textures": {"all": f"{NS}:block/{tex or name}"}})
 
 
+def _faces(tex_by_dir):
+    return {d: {"texture": f"#{t}"} for d, t in tex_by_dir.items()}
+
+
+def _el(frm, to, faces):
+    return {"from": frm, "to": to, "faces": faces}
+
+
+ALLS = {"down": "side", "up": "side", "north": "side", "south": "side", "west": "side", "east": "side"}
+
+
+def model_machine(name, top, side, bottom):
+    """Layered chassis: full-width plinth + inset body + raised console + four corner posts.
+    Non-full-cube, so the block must be noOcclusion. Reads as a 3D machine from every side."""
+    tex = {"top": f"{NS}:block/{top}", "side": f"{NS}:block/{side}",
+           "bottom": f"{NS}:block/{bottom}", "particle": f"{NS}:block/{side}"}
+    sides = dict(ALLS)
+    plinth = _faces({**sides, "down": "bottom"})
+    body = _faces({**sides, "up": "top"})
+    console = _faces({**sides, "up": "top"})
+    post = _faces(sides)
+    els = [
+        _el([0, 0, 0], [16, 3, 16], plinth),          # plinth
+        _el([1, 3, 1], [15, 14, 15], body),           # inset main body
+        _el([3, 14, 3], [13, 16, 13], console),       # raised console deck
+        _el([0, 3, 0], [2, 15, 2], post),             # corner posts
+        _el([14, 3, 0], [16, 15, 2], post),
+        _el([0, 3, 14], [2, 15, 16], post),
+        _el([14, 3, 14], [16, 15, 16], post),
+    ]
+    write_json("block_model", name, {"parent": "minecraft:block/block", "textures": tex, "elements": els})
+
+
+def model_growbed(name, top, side, bottom):
+    """Open tray: plinth + four raised walls + a recessed soil bed. Non-full-cube -> noOcclusion."""
+    tex = {"top": f"{NS}:block/{top}", "side": f"{NS}:block/{side}",
+           "bottom": f"{NS}:block/{bottom}", "particle": f"{NS}:block/{side}"}
+    wall = _faces({"down": "side", "up": "side", "north": "side", "south": "side", "west": "side", "east": "side"})
+    plinth = _faces({**ALLS, "down": "bottom"})
+    soil = _faces({"up": "top", "down": "bottom", "north": "top", "south": "top", "west": "top", "east": "top"})
+    els = [
+        _el([0, 0, 0], [16, 4, 16], plinth),          # plinth
+        _el([0, 4, 0], [16, 10, 2], wall),            # north wall
+        _el([0, 4, 14], [16, 10, 16], wall),          # south wall
+        _el([0, 4, 2], [2, 10, 14], wall),            # west wall
+        _el([14, 4, 2], [16, 10, 14], wall),          # east wall
+        _el([2, 4, 2], [14, 8, 14], soil),            # recessed soil bed
+    ]
+    write_json("block_model", name, {"parent": "minecraft:block/block", "textures": tex, "elements": els})
+
+
+def model_beacon(name, top, side, bottom):
+    """Beacon: plinth + tapered column + glowing lens cap. Non-full-cube -> noOcclusion."""
+    tex = {"top": f"{NS}:block/{top}", "side": f"{NS}:block/{side}",
+           "bottom": f"{NS}:block/{bottom}", "particle": f"{NS}:block/{side}"}
+    base = _faces({**ALLS, "down": "bottom"})
+    col = _faces(ALLS)
+    lens = _faces({**ALLS, "up": "top"})
+    els = [
+        _el([2, 0, 2], [14, 3, 14], base),
+        _el([5, 3, 5], [11, 11, 11], col),
+        _el([3, 11, 3], [13, 16, 13], lens),
+    ]
+    write_json("block_model", name, {"parent": "minecraft:block/block", "textures": tex, "elements": els})
+
+
 def item_from_block(name, model=None):
     write_json("item_model", name, {"parent": f"{NS}:block/{model or name}"})
 
@@ -381,7 +447,7 @@ def gen_machine(name, kind, accent=G2, top_kind="grid"):
     img = panel_base(name + "_bottom")
     save_tex(img, "block", name + "_bottom")
 
-    model_cube_bottom_top(name, name + "_top", name + "_side", name + "_bottom")
+    model_machine(name, name + "_top", name + "_side", name + "_bottom")
     block_state_simple(name)
     item_from_block(name)
 
@@ -413,7 +479,7 @@ def gen_pollination_beacon():
     save_tex(img, "block", name + "_top")
     img = panel_base(name + "_bottom")
     save_tex(img, "block", name + "_bottom")
-    model_cube_bottom_top(name, name + "_top", name + "_side", name + "_bottom")
+    model_beacon(name, name + "_top", name + "_side", name + "_bottom")
     block_state_simple(name)
     item_from_block(name)
 
@@ -457,7 +523,7 @@ def gen_grow_bed(name, tier):
     save_tex(img, "block", name + "_top")
     img = panel_base(name + "_bottom")
     save_tex(img, "block", name + "_bottom")
-    model_cube_bottom_top(name, name + "_top", name + "_side", name + "_bottom")
+    model_growbed(name, name + "_top", name + "_side", name + "_bottom")
     block_state_simple(name)
     item_from_block(name)
 

@@ -22,7 +22,9 @@ import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 public final class ModBlocks {
     public static final RegistrationProvider<Block> BLOCKS = RegistrationProvider.get(Registries.BLOCK, NeroAgricultureCommon.MOD_ID);
 
-    public static final RegistryEntry<Block> TERRAN_GROW_BED = plain("terran_grow_bed", MapColor.PLANT);
+    public static final RegistryEntry<Block> TERRAN_GROW_BED = BLOCKS.register("terran_grow_bed",
+            key -> new Block(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
+                    .strength(2.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<GrowBedBlock> INDUSTRIAL_GROW_BED = bed("industrial_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.INDUSTRIAL, MapColor.METAL);
     public static final RegistryEntry<GrowBedBlock> ORBITAL_GROW_BED = bed("orbital_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.ORBITAL, MapColor.COLOR_LIGHT_BLUE);
     public static final RegistryEntry<GrowBedBlock> COLONIAL_GROW_BED = bed("colonial_grow_bed", za.co.neroland.neroagriculture.content.EssenceFamily.COLONIAL, MapColor.COLOR_GREEN);
@@ -36,7 +38,10 @@ public final class ModBlocks {
     public static final RegistryEntry<SpeciesCropBlock> ALIEN_CROP =
             speciesCrop("alien_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN, MapColor.COLOR_PURPLE);
     public static final RegistryEntry<Block> GREENHOUSE_FRAME = plain("greenhouse_frame", MapColor.METAL);
-    public static final RegistryEntry<Block> GREENHOUSE_GLASS = plain("greenhouse_glass", MapColor.COLOR_LIGHT_BLUE);
+    public static final RegistryEntry<za.co.neroland.neroagriculture.greenhouse.GreenhouseGlassBlock> GREENHOUSE_GLASS =
+            BLOCKS.register("greenhouse_glass", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseGlassBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()));
     public static final RegistryEntry<Block> CROP_TOWER_FRAME = plain("crop_tower_frame", MapColor.METAL);
     public static final RegistryEntry<Block> TERRAN_ESSENCE_BLOCK = plain("terran_essence_block", MapColor.GRASS);
     public static final RegistryEntry<Block> INDUSTRIAL_ESSENCE_BLOCK = plain("industrial_essence_block", MapColor.METAL);
@@ -62,36 +67,36 @@ public final class ModBlocks {
     public static final RegistryEntry<za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock> GREENHOUSE_CONTROLLER =
             BLOCKS.register("greenhouse_controller", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseControllerBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlock> FERTILISER_PROCESSOR =
             BLOCKS.register("fertiliser_processor", key -> new za.co.neroland.neroagriculture.fertiliser.FertiliserProcessorBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> FERTILISER_APPLICATOR = areaMachine("fertiliser_applicator");
     public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.GeneticsStationBlock> GENETICS_STATION =
             BLOCKS.register("genetics_station", key -> new za.co.neroland.neroagriculture.genetics.GeneticsStationBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.lifesupport.BioreactorBlock> OXYGEN_PLANT =
             BLOCKS.register("oxygen_plant", key -> new za.co.neroland.neroagriculture.lifesupport.BioreactorBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlock> BIOFUEL_CONVERTER =
             BLOCKS.register("biofuel_converter", key -> new za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.tower.CropTowerControllerBlock> CROP_TOWER_CONTROLLER =
             BLOCKS.register("crop_tower_controller", key -> new za.co.neroland.neroagriculture.tower.CropTowerControllerBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock> POLLINATION_BEACON =
             BLOCKS.register("pollination_beacon", key -> new za.co.neroland.neroagriculture.genetics.PollinationBeaconBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     public static final RegistryEntry<za.co.neroland.neroagriculture.terraforming.TerraformingControllerBlock> TERRAFORMING_CONTROLLER =
             BLOCKS.register("terraforming_controller", key -> new za.co.neroland.neroagriculture.terraforming.TerraformingControllerBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                            .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                            .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
 
     public static final List<RegistryEntry<? extends Block>> ALL = List.of(TERRAN_GROW_BED, INDUSTRIAL_GROW_BED,
             ORBITAL_GROW_BED, COLONIAL_GROW_BED, DEEPVOID_GROW_BED, RESOURCE_CROP, ENGINEERED_FOOD_CROP,
@@ -110,12 +115,12 @@ public final class ModBlocks {
     private static RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> areaMachine(String name) {
         return BLOCKS.register(name, key -> new za.co.neroland.neroagriculture.automation.AreaMachineBlock(
                 BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.5F, 8.0F)
-                        .requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                        .requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     }
 
     private static RegistryEntry<FoundationMachineBlock> machine(String name) {
         return BLOCKS.register(name, key -> new FoundationMachineBlock(BlockBehaviour.Properties.of().setId(key)
-                .mapColor(MapColor.METAL).strength(3.5F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                .mapColor(MapColor.METAL).strength(3.5F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     }
 
     private static RegistryEntry<SpeciesCropBlock> speciesCrop(String name,
@@ -128,7 +133,7 @@ public final class ModBlocks {
     private static RegistryEntry<GrowBedBlock> bed(String name,
             za.co.neroland.neroagriculture.content.EssenceFamily tier, MapColor color) {
         return BLOCKS.register(name, key -> new GrowBedBlock(tier, BlockBehaviour.Properties.of().setId(key)
-                .mapColor(color).strength(2.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+                .mapColor(color).strength(2.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
     }
 
     public static za.co.neroland.neroagriculture.content.EssenceFamily growBedTier(Block block) {
