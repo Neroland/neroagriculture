@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:terran_essence", "result": { "id": "neroagriculture:industrial_essence" }, "input_count": 4, "energy": 1200, "ticks": 80, "family": "industrial" }

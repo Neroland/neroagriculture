@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:orbital_essence", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 2400, "ticks": 100, "family": "orbital" }

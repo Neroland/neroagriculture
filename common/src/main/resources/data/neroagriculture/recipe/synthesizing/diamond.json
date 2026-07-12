@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:seed_synthesizing", "ingredient": "#c:ores/diamond", "result": { "id": "neroagriculture:resource_seed" }, "energy": 3600, "ticks": 160, "material": "c:diamond", "family": "orbital" }

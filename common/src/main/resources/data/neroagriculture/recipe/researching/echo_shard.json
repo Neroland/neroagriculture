@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:seed_researching", "ingredient": "minecraft:echo_shard", "result": { "id": "neroagriculture:resource_seed" }, "input_count": 1, "energy": 0, "ticks": 1, "material": "minecraft:echo_shard", "family": "deepvoid" }

@@ -2,7 +2,8 @@
 
 > Part of the [Neroland](../neroland-mc-ecosystem) sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** barebones multiloader skeleton — version `0.0.1-alpha.1`. No gameplay content yet.
+**Status:** Stage 5 fabrication and research — version `0.0.1-alpha.1`. The Extractor, Infuser,
+Synthesizer, Research Bench, and datapack-driven material conversion chain are functional.
 
 ## Build targets
 
@@ -22,6 +23,10 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 - `stonecutter.gradle` — the real root build script; `build.gradle` is intentionally inert
 
 ## Building
+
+Neroland Core `1.8.0` is a required dependency. Local builds prefer artifacts published by the
+sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. See
+[`USING-CORE.md`](USING-CORE.md) for setup and authentication details.
 
 ```sh
 ./gradlew :fabric:26.2:build          # one cell

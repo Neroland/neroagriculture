@@ -13,6 +13,7 @@ plugins {
 def mc = stonecutter.current.version
 def neoVersion = project.findProperty("neo_version_${mc}")
 def jeiVersion = project.findProperty("jei_version_${mc}")
+def nerolandcoreVersion = project.findProperty('nerolandcore_version')
 
 // This node's projectDir is <loader>/versions/<v>; the authoritative loader source +
 // templates live in the BRANCH root (neoforge/). Resolve branch-root paths via the parent.
@@ -30,7 +31,34 @@ repositories {
 sourceSets.main.java.srcDir rootProject.ext.commonJava
 sourceSets.main.resources.srcDir rootProject.ext.commonResources
 
+sourceSets.test.java.srcDir "${rootProject.projectDir}/common/src/test/java"
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.runtimeClasspath
+
 dependencies {
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.openjdk.jol:jol-core:0.17'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+tasks.register('cropStorageBenchmark', JavaExec) {
+    group = 'verification'
+    description = 'Gate 3 benchmark for 4096 non-ticking crop storage records.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'za.co.neroland.neroagriculture.benchmark.CropStorageBenchmark'
+    jvmArgs '-Djol.magicFieldOffset=true', '-Djdk.attach.allowAttachSelf=true'
+}
+
+dependencies {
+    // Required shared foundation. Core is a separate mod, not bundled into NeroAgriculture.
+    implementation "za.co.neroland.nerolandcore:nerolandcore-neoforge-${mc}:${nerolandcoreVersion}"
+
     // Sentry SDK embedded via NeoForge JarJar so players need no extra download (JarJar dedupes if
     // another mod also ships Sentry). Adds it to the compile classpath AND the mod jar.
     jarJar(implementation('io.sentry:sentry:8.45.0'))
@@ -56,8 +84,9 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_version            : rootProject.mod_version,
         mod_name               : rootProject.mod_name,
         mod_authors            : rootProject.mod_authors,
-        mod_license            : rootProject.mod_license,
-        minecraft_version_range: "[${mc},)",
+        mod_license                : rootProject.mod_license,
+        minecraft_version_range    : "[${mc},)",
+        nerolandcore_version_range : "[${nerolandcoreVersion},2.0)",
     ]
     inputs.properties(props)
     expand(props)

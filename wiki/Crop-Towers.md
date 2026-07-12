@@ -1,0 +1,42 @@
+# Automated Crop Towers
+
+A crop tower is a vertical multiblock that farms many crops in a compact footprint, hands-free. It is
+**colony-scale automation, not a shortcut** — every slot obeys the same rules as an ordinary crop, so a
+tower can never out-produce or duplicate compared with an equivalent farm.
+
+## Building a tower
+
+Place a **Crop Tower Controller**, then stack **Crop Tower Frame** blocks directly above it. The tower's
+**tier is its height**: it forms once the casing run reaches the minimum height and its capacity is
+`height x slots-per-layer`, up to a configured maximum (a taller stack simply caps out). The controller
+caches the formed structure and only rechecks it when a block changes or on a slow safety interval — it
+never scans the whole structure every tick.
+
+## Running a tower
+
+Feed the controller through Core [side configuration](Side-Configuration.md):
+
+- **Resource seeds** into the seed slots — the tower plants empty slots from them.
+- **Nero Flux and Nutrient** — each growth step costs the same NF and nutrient as a powered grow bed.
+- An optional **Speed or Yield Fertiliser** in the fertiliser slot boosts growth or harvest within the same
+  caps as field fertiliser.
+- **Material Essence** is deposited into the output slots on harvest; pull it with hoppers or pipes.
+
+Each cycle the controller works a bounded number of slots from a rolling cursor: it plants an empty slot,
+advances a growing one (paying NF/nutrient), or harvests a mature one. Planting, the progression gate,
+capped yield, and genetics/fertiliser bonuses all use the **same shared logic** as ordinary crops.
+
+## Genetics, contents, and safety
+
+Slots carry full [genetics](Genetics.md) and harvest history, which are preserved on save, chunk unload,
+and restart. Breaking the controller returns every stored item plus a seed for each planted slot (with its
+genetics and history), so nothing is lost when you take a tower down. Right-click the controller for its
+status (formed/height/slots/planted/NF/nutrient).
+
+## Performance
+
+Work is bounded per pass and phase-offset, contents are cached, and crops are virtual slots rather than
+thousands of blocks — so a tower stays cheap even at colony scale. Any crop-layer visuals are presentation
+only; the server logic never depends on the renderer.
+
+See also: [Resource Crops](Resource-Crops.md), [Automation](Automation.md), [Genetics](Genetics.md).

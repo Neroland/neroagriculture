@@ -3,12 +3,15 @@ package za.co.neroland.neroagriculture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import za.co.neroland.neroagriculture.config.AgricultureConfig;
+import za.co.neroland.neroagriculture.network.AgricultureNetwork;
+import za.co.neroland.neroagriculture.registry.AgricultureRegistries;
+
 /**
  * Loader-agnostic entry point for NeroAgriculture. Each loader entry point
  * (Fabric / Forge / NeoForge) calls {@link #init()} once during mod
- * construction. This is a barebones skeleton — no content is registered yet;
- * add shared blocks, items and systems here and reach loader-specific
- * behaviour through a platform seam.
+ * construction. Shared registrations and contracts live here; loader-specific
+ * networking and capability exposure are reached through narrow platform seams.
  */
 public final class NeroAgricultureCommon {
 
@@ -20,6 +23,12 @@ public final class NeroAgricultureCommon {
 
     /** Called once per loader during mod construction. */
     public static void init() {
+        AgricultureRegistries.init();
+        AgricultureConfig.init();
+        AgricultureNetwork.init();
+        za.co.neroland.neroagriculture.food.FoodProviders.register();
+        za.co.neroland.neroagriculture.automation.AutomationOwner.register();
+        za.co.neroland.neroagriculture.terraforming.TerraformingRegions.register();
         LOGGER.info("[NeroAgriculture] common init");
     }
 }

@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:seed_synthesizing", "ingredient": "#c:ores/coal", "result": { "id": "neroagriculture:resource_seed" }, "energy": 1600, "ticks": 120, "material": "c:coal", "family": "terran" }

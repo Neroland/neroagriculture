@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:material_essence", "result": { "id": "minecraft:nether_star" }, "input_count": 20, "energy": 2400, "ticks": 120, "material": "minecraft:nether_star", "family": "colonial" }

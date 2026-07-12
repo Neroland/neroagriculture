@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:industrial_essence", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 1400, "ticks": 80, "family": "industrial" }

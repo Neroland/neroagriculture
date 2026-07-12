@@ -1,0 +1,8 @@
+{
+  "period": 48000,
+  "phase_offset": 0,
+  "phases": [
+    { "display_key": "cycle.neroagriculture.stellar_bright", "growth": 1.4, "yield": 1.2, "environment": 1.0 },
+    { "display_key": "cycle.neroagriculture.stellar_dark", "growth": 0.6, "yield": 0.9, "environment": 1.0 }
+  ]
+}

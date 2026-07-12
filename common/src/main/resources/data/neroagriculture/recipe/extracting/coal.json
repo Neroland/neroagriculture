@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_extraction", "ingredient": "#c:ores/coal", "result": { "id": "neroagriculture:terran_essence", "count": 2 }, "energy": 800, "ticks": 80, "material": "c:coal", "family": "terran" }

@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:material_essence", "result": { "id": "minecraft:raw_iron" }, "input_count": 12, "energy": 800, "ticks": 60, "material": "c:iron", "family": "industrial" }

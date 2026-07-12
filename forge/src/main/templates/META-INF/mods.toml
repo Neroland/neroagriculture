@@ -21,6 +21,14 @@ versionRange = "${forge_loader_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
+# Neroland Core is the required shared foundation and must load first.
+[[dependencies.${mod_id}]]
+modId = "nerolandcore"
+mandatory = true
+versionRange = "${nerolandcore_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true

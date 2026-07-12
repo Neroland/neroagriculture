@@ -10,6 +10,7 @@ plugins {
 def mc = stonecutter.current.version
 def fabricApi = project.findProperty("fabric_api_version_${mc}")
 def jeiVersion = project.findProperty("jei_version_${mc}")
+def nerolandcoreVersion = project.findProperty('nerolandcore_version')
 
 // This node's projectDir is <loader>/versions/<v>; the authoritative loader source +
 // resources live in the BRANCH root (fabric/). Resolve branch-root paths via the parent.
@@ -30,6 +31,9 @@ dependencies {
     if (fabricApi != null) {
         implementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
     }
+
+    // Required shared foundation. Core is a separate mod, not bundled into NeroAgriculture.
+    implementation "za.co.neroland.nerolandcore:nerolandcore-fabric-${mc}:${nerolandcoreVersion}"
 
     // Sentry SDK (telemetry/NeroAgricultureTelemetry): compile against it + embed it as a jar-in-jar so the
     // shipped Fabric jar carries it. Counterpart to the NeoForge JarJar bundling.
@@ -61,6 +65,7 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_license          : rootProject.mod_license,
         fabric_loader_version: rootProject.fabric_loader_version,
         minecraft_version    : mc,
+        nerolandcore_version  : nerolandcoreVersion,
     ]
     inputs.properties(props)
     expand(props)

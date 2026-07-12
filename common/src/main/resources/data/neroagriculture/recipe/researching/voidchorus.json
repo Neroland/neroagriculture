@@ -1,0 +1,1 @@
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:chorus_fruit", "result": {"id": "neroagriculture:alien_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:alien/voidchorus", "family": "orbital"}

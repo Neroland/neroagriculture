@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:orbital_essence", "result": { "id": "neroagriculture:colonial_essence" }, "input_count": 4, "energy": 3200, "ticks": 120, "family": "colonial" }
