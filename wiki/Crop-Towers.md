@@ -20,7 +20,7 @@ Feed the controller through Core [side configuration](Side-Configuration.md):
 - **Nero Flux and Nutrient** — each growth step costs the same NF and nutrient as a powered grow bed.
 - An optional **Speed or Yield Fertiliser** in the fertiliser slot boosts growth or harvest within the same
   caps as field fertiliser.
-- **Material Essence** is deposited into the output slots on harvest; pull it with hoppers or pipes.
+- **Resource Fragment** is deposited into the output slots on harvest; pull it with hoppers or pipes.
 
 Each cycle the controller works a bounded number of slots from a rolling cursor: it plants an empty slot,
 advances a growing one (paying NF/nutrient), or harvests a mature one. Planting, the progression gate,

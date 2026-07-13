@@ -3,7 +3,7 @@
 Fabrication recipes live below `data/<namespace>/recipe/` and use one of five registered types:
 
 - `neroagriculture:material_extraction`
-- `neroagriculture:essence_infusing`
+- `neroagriculture:fragment_infusing`
 - `neroagriculture:seed_synthesizing`
 - `neroagriculture:seed_researching`
 - `neroagriculture:material_conversion`
@@ -21,7 +21,7 @@ validation.
   "energy": 2400,
   "ticks": 140,
   "material": "c:iron",
-  "family": "industrial"
+  "family": "forgite"
 }
 ```
 
@@ -31,5 +31,5 @@ entry. Conversion recipes additionally must meet the catalog conversion count an
 so a datapack cannot use forged components or an unrelated result to bypass the material definition.
 
 The shipped baseline covers Coal, Iron, Diamond, Nether Star, and Echo Shard as one standalone material per
-tier, all four essence-condensation transitions, and charging for all five tiers. Packs can add recipes for
+tier, all four fragment-condensation transitions, and charging for all five tiers. Packs can add recipes for
 new catalog materials without registering new items.

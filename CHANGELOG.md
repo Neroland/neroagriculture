@@ -59,6 +59,67 @@ NeroAgriculture-native progression. In progress; each stage is build-verified ac
 > Fragments; Territe is already obtainable via tier-1 extraction, so nothing is blocked) and explicit
 > seed-return-chance tuning on the harvest→resource loop.
 
+**Stage 4 — fusion / alloy seeds**
+
+- New **data-driven fusion recipe type** `neroagriculture:fragment_fusion`, run on the Fragment
+  Infuser: it combines a primary Resource Fragment with a second input (item or tag) into a combined
+  **alloy seed**, without requiring the alloy resource itself. Fields: `material` (primary fragment's
+  resource), `input_count`, `secondary` + `secondary_count`, and `result_material` (the alloy). Fully
+  datapack-extendable.
+- **Curated built-in alloys:** Steel (Iron Fragment + Coal), Energized Steel (Steel Fragment +
+  Redstone), and a Core-native **Nero Alloy** (Iron Fragment + Redstone) that works standalone since
+  Core always provides Nero Alloy. Steel/Energized Steel are **dormant-safe** — they only activate when
+  a mod supplies the alloy resource, and produce no broken recipe when absent.
+- The alloy seed inherits the alloy resource's **own catalog tier**, so the downstream grow → Resource
+  Fragments → resource loop stays consistent; a `fusion.max_tier` config clamp (plus `fusion.enabled`)
+  bounds which alloys may be fused. Multiple alloys sharing a primary fragment are disambiguated by
+  their second input.
+
+**Stage 5 — optional cross-mod sibling overlays**
+
+- Higher tiers can now *additionally* require the matching Neroland arc gate that a sibling mod drives
+  open — Forgite/Refinement ↔ `industrial_power` (Nerotech), Orbite/Synthesis ↔ `reached_orbit`
+  (Nerospace), Colonite/Transmutation ↔ `first_colony` (NeroColonies), Voidite/Ascension ↔
+  `deep_space` (Nerospace) — giving modpacks the cross-mod "link" feel.
+- Controlled by `progression.sibling_overlays` = **auto** (default) / on / off. In auto, an overlay
+  applies **only when the sibling mod that can open that arc gate is loaded**, so a Core-only game is
+  never gated by an arc gate nothing could open — standalone play is never blocked. The overlay is
+  layered onto every resource-tier gate check (machines, planting, growth, harvest, automation, towers)
+  and is dormant-safe when the sibling is absent.
+
+**Stage 6 — resource-colour tinting (functional core)**
+
+- Resource **seeds and fragments now tint to their resource's ingot colour**. The colour is baked into
+  the vanilla `custom_model_data` component when each stack is created (extraction, synthesis, fusion,
+  harvest, crop-return, towers, creative tab), and the item model's `tints` reads it through the
+  built-in `minecraft:custom_model_data` tint source — so tinting is **loader-agnostic** (no per-loader
+  colour handler) and behaves identically on Fabric, Forge and NeoForge. Colour comes from the shared
+  `MaterialColors` resolver, matching the catalog.
+
+- **Texture repaint applied.** `tools/gen_textures.py` was resynced to the fragment/Cosmic-ascent
+  naming, its lab palette **darkened ~15%** (kept the clean look), and it now emits **neutral greyscale
+  bases** for the tinted resource seed and fragment so their `custom_model_data` tint multiplies to the
+  resource colour cleanly; the full set was regenerated. Verified programmatically (palette luminance
+  dropped as intended, tint bases have zero channel spread, no old-named assets produced).
+
+> Still deferred to a dev-machine step (needs a running client — a custom block tint source can't be
+> introspected or rendered here): the **in-world crop block tint** so placed crops show the resource
+> colour. Tracked in the follow-on task, alongside the optional Prospora base crop and seed-return
+> tuning.
+
+**Stage 7 — balance, food de-emphasis, docs, verification**
+
+- **Wiki updated** to the fragment/Cosmic-ascent terminology throughout (the two "Essence"-named pages
+  became `Resource-Fragment.md` and `Biofuel-and-Fragment-Blocks.md`), with new pages for the
+  resource-seed economy, fusion and alloy seeds, and sibling overlays, and a rewritten `Home.md`
+  that leads with the core loop. Old sibling gate ids in doc examples were replaced with the native
+  gates. The word "essence" now appears nowhere in the mod's code or wiki.
+- **Food & alien** content is de-emphasised to a clearly-labelled secondary side-system in the docs and
+  ordered after resource seeds in the creative tab; nothing was removed.
+- **Balance** was kept conservative: the ladder's steep per-tier NeroFlux/time costs, the tier-scaled
+  seed fragment cost, and the fusion costs all preserve Core's net-conservation invariant (no single
+  harvest can mint a resource), which the `TierBalance` tests continue to assert.
+
 ## [0.0.1-alpha.2] - 2026-07-13
 
 First consolidated alpha of NeroAgriculture — a sci-fi farming mod built on **Neroland Core**,

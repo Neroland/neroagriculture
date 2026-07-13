@@ -1,0 +1,12 @@
+{
+  "type": "neroagriculture:fragment_fusion",
+  "ingredient": "neroagriculture:resource_fragment",
+  "material": "c:iron",
+  "input_count": 4,
+  "secondary": "minecraft:coal",
+  "secondary_count": 4,
+  "result_material": "c:steel",
+  "result": { "id": "neroagriculture:resource_seed" },
+  "energy": 4000,
+  "ticks": 160
+}

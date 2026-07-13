@@ -21,6 +21,7 @@ public final class ModRecipeSerializers {
     public static final RegistryEntry<RecipeType<FabricationRecipe>> SYNTHESIZING = type("seed_synthesizing");
     public static final RegistryEntry<RecipeType<FabricationRecipe>> RESEARCHING = type("seed_researching");
     public static final RegistryEntry<RecipeType<FabricationRecipe>> CONVERSION = type("material_conversion");
+    public static final RegistryEntry<RecipeType<FabricationRecipe>> FUSION = type("fragment_fusion");
 
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> EXTRACTION_SERIALIZER =
             serializer("material_extraction", EXTRACTION);
@@ -32,6 +33,8 @@ public final class ModRecipeSerializers {
             serializer("seed_researching", RESEARCHING);
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> CONVERSION_SERIALIZER =
             serializer("material_conversion", CONVERSION);
+    public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> FUSION_SERIALIZER =
+            serializer("fragment_fusion", FUSION);
 
     private static RegistryEntry<RecipeType<FabricationRecipe>> type(String name) {
         return TYPES.register(name, key -> new RecipeType<FabricationRecipe>() {

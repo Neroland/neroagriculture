@@ -223,6 +223,7 @@ public final class AgricultureGallery {
     private static ItemStack resourceSeed() {
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get(), 16);
         seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(SHOWCASE_MATERIAL, FragmentTier.FORGITE));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, SHOWCASE_MATERIAL);
         return seed;
     }
 

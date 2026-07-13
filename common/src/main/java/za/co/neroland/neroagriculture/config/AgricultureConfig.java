@@ -49,6 +49,14 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_LAYER = integer("crop_tower.slots_per_layer", 4, 1, 64);
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_PASS = integer("crop_tower.slots_per_pass", 6, 1, 4_096);
     public static final ConfigValue<Integer> TOWER_REVALIDATE_TICKS = integer("crop_tower.revalidate_ticks", 100, 20, 12_000);
+    public static final ConfigValue<Boolean> FUSION_ENABLED = SCHEMA.bool("fusion.enabled", true, true,
+            "Enable fragment-fusion (alloy) recipes that combine two resources into an alloy seed");
+    public static final ConfigValue<String> FUSION_MAX_TIER = SCHEMA.string("fusion.max_tier", "voidite", true,
+            "Highest tier an alloy seed may be fused at (territe|forgite|orbite|colonite|voidite); "
+            + "alloys whose resource sits above this tier cannot be fused");
+    public static final ConfigValue<String> SIBLING_OVERLAYS = SCHEMA.string("progression.sibling_overlays", "auto",
+            true, "Whether higher tiers ALSO require a sibling mod's Core arc gate: auto (only when the "
+            + "opener mod is loaded), on (always), or off. Standalone play is never blocked by this");
     public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
             "Enable seasonal/stellar-cycle growth and yield modifiers");
     public static final ConfigValue<Boolean> TERRAFORM_ENABLED = SCHEMA.bool("terraforming.enabled", true, true,

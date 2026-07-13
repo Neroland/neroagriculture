@@ -115,7 +115,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (state.getValue(AGE) < MAX_AGE) return InteractionResult.PASS;
         if (!lookup.permitsGrowth()) return fail(serverPlayer, lookup.warningKey());
         var definition = lookup.material().orElseThrow().definition();
-        if (definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate())) {
+        if ((definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate()))
+                || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(serverPlayer, definition.tier())) {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
         }
         double cycleYield = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
@@ -144,8 +145,10 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                     32.0, false);
             if (nearest instanceof ServerPlayer serverPlayer) player = serverPlayer;
         }
-        boolean gate = definition == null || definition.gate() == null
-                || player != null && ProgressionGates.isOpen(player, definition.gate());
+        boolean gate = (definition == null || definition.gate() == null
+                || player != null && ProgressionGates.isOpen(player, definition.gate()))
+                && (definition == null || player == null
+                || za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()));
         boolean dimension = definition == null || definition.worldRestriction() == null
                 || definition.worldRestriction().dimension().equals(level.dimension().identifier());
         boolean power = materialTier == FragmentTier.TERRITE;
@@ -173,6 +176,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         while (remaining > 0) {
             ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
             stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, material);
             remaining -= stack.getCount();
             if (!player.getInventory().add(stack)) popResource(player.level(), pos, stack);
         }
@@ -187,6 +191,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                     : MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
             FragmentTier family = lookup.material().map(material -> material.definition().tier()).orElse(crop.variant().family());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(crop.variant().material(), family));
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, crop.variant().material());
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());
             if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
             popResource(level, pos, seed);

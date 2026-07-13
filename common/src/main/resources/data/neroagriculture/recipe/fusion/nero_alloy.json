@@ -1,0 +1,12 @@
+{
+  "type": "neroagriculture:fragment_fusion",
+  "ingredient": "neroagriculture:resource_fragment",
+  "material": "c:iron",
+  "input_count": 4,
+  "secondary": "minecraft:redstone",
+  "secondary_count": 4,
+  "result_material": "nerolandcore:nero_alloy",
+  "result": { "id": "neroagriculture:resource_seed" },
+  "energy": 3600,
+  "ticks": 150
+}

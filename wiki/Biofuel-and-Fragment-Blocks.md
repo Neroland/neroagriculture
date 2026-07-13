@@ -1,6 +1,6 @@
-# Biofuel and Essence Blocks
+# Biofuel and Fragment Blocks
 
-Stage 12 turns farm surplus into power and compacts essences into storage and decoration.
+Stage 12 turns farm surplus into power and compacts fragments into storage and decoration.
 
 ## Biofuel
 
@@ -20,11 +20,11 @@ seam — Nerotech or NeroPower register a consumer and pull fuel; no consumer in
 and its bucket are tagged under `c:` common fluid/item tags so other mods can find them. Standalone, the
 biofuel simply accumulates as a fluid you can pipe or bucket out.
 
-## Compacted essence and decorative blocks
+## Compacted fragment and decorative blocks
 
-Each of the five neutral essences (Terran, Industrial, Orbital, Colonial, Deepvoid) compacts **9 essence →
-1 block** and back **1 block → 9 essence**, with exact, lossless accounting — handy for compact storage.
-Material Essence can also be crafted into a generic **Essence Decor** block for building. The essence blocks
+Each of the five neutral fragments (Territe, Forgite, Orbite, Colonite, Voidite) compacts **9 fragment →
+1 block** and back **1 block → 9 fragment**, with exact, lossless accounting — handy for compact storage.
+Resource Fragment can also be crafted into a generic **Fragment Decor** block for building. The fragment blocks
 and decor are tagged under `c:` common block tags for NeroDecor compatibility, with no hard dependency on it.
 
-See also: [Material Essence](Material-Essence.md), [Oxygen and Life Support](Oxygen-and-Life-Support.md).
+See also: [Resource Fragment](Resource-Fragment.md), [Oxygen and Life Support](Oxygen-and-Life-Support.md).

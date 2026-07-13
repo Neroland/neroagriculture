@@ -1,0 +1,12 @@
+{
+  "type": "neroagriculture:fragment_fusion",
+  "ingredient": "neroagriculture:resource_fragment",
+  "material": "c:steel",
+  "input_count": 4,
+  "secondary": "minecraft:redstone",
+  "secondary_count": 8,
+  "result_material": "c:energized_steel",
+  "result": { "id": "neroagriculture:resource_seed" },
+  "energy": 6400,
+  "ticks": 200
+}

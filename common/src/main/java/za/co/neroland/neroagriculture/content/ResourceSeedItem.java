@@ -36,7 +36,8 @@ public final class ResourceSeedItem extends MaterialVariantItem {
         if (bedTier == null || bedTier.ordinal() < definition.tier().ordinal()) {
             return fail(serverPlayer, "warning.neroagriculture.wrong_bed");
         }
-        if (definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate())) {
+        if ((definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate()))
+                || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(serverPlayer, definition.tier())) {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
         }
         if (definition.worldRestriction() != null

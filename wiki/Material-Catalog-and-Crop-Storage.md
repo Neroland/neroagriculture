@@ -7,7 +7,7 @@ datapacks load. The precedence is:
 2. server blacklist and overrides
 3. Neroland Core meteor-material metadata
 4. explicit vanilla/Core defaults
-5. discovered `c:ores/*` tags; unknown third-party ores default to Orbital
+5. discovered `c:ores/*` tags; unknown third-party ores default to Orbite
 
 Core metadata is adapted read-only. Conflicts and validation failures are retained for operator
 diagnostics rather than silently discarded.
@@ -21,7 +21,7 @@ The file path defines the material id. For example,
 {
   "input": { "tag": "c:ores/osmium" },
   "output": "example:raw_osmium",
-  "tier": "orbital",
+  "tier": "orbite",
   "yield": { "minimum": 1, "maximum": 5, "ramp_harvests": 96 },
   "conversion": 16,
   "display_key": "material.example.osmium",
@@ -39,7 +39,7 @@ actionable catalog error.
 The blacklist is a comma-separated material-id list. Overrides use semicolon-separated entries:
 
 ```text
-example:osmium|tier=colonial|gate=nerolandcore:first_colony|yield=1:6:128|conversion=20|enabled=true
+example:osmium|tier=colonite|gate=neroagriculture:transmutation|yield=1:6:128|conversion=20|enabled=true
 ```
 
 Use `/neroagriculture catalog list`, `show <material>`, or `errors` as an operator. These commands expose

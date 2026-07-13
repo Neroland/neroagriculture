@@ -59,7 +59,8 @@ public final class AreaFarming {
         if (!lookup.permitsGrowth()) return false;
         var definition = lookup.material().orElseThrow().definition();
         if (bedTier.ordinal() < definition.tier().ordinal()) return false;
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         if (definition.worldRestriction() != null
                 && !definition.worldRestriction().dimension().equals(level.dimension().identifier())) return false;
         if (!level.setBlock(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState(), 3)) return false;
@@ -83,7 +84,8 @@ public final class AreaFarming {
         boolean alien = definition.kind() == FoodDefinition.Kind.ALIEN;
         if (seed.is(ModItems.ALIEN_SEED.get()) != alien) return false;
         if (bedTier.ordinal() < definition.tier().ordinal()) return false;
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         BlockState cropState = (alien ? ModBlocks.ALIEN_CROP.get() : ModBlocks.ENGINEERED_FOOD_CROP.get()).defaultBlockState();
         if (!level.setBlock(cropPos, cropState, 3)) return false;
         if (!(level.getBlockEntity(cropPos) instanceof SpeciesCropBlockEntity crop)) {
@@ -123,7 +125,8 @@ public final class AreaFarming {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
         if (!lookup.permitsGrowth()) return false;
         var definition = lookup.material().orElseThrow().definition();
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
         int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),

@@ -167,6 +167,7 @@ public final class ModItems {
     private static ItemStack resourceSeed(Identifier material, FragmentTier family) {
         ItemStack stack = new ItemStack(RESOURCE_SEED.get());
         stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, material);
         return stack;
     }
 

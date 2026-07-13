@@ -182,11 +182,15 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 recipe.resultTemplate().count());
         ItemStack material = new ItemStack(ModItems.RESOURCE_FRAGMENT.get());
         material.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(material, definition.id());
         Operation operation = operation(recipe, recipe.inputCount(), 0, 0, neutral, material);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
     }
 
     private Resolution resolveInfusion(ServerLevel level) {
+        // A Resource Fragment in the primary slot means the player is fusing an alloy seed; a Tier
+        // Fragment means the ordinary upgrade/charge step. Fusion owns the outcome once it starts.
+        if (items.get(PRIMARY).is(ModItems.RESOURCE_FRAGMENT.get())) return resolveFusion(level);
         boolean charging = items.get(SECONDARY).is(ModItems.BLANK_SEED.get());
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.INFUSING.get(), candidate ->
                 candidate.resultTemplate().create().is(ModItems.CHARGED_SEED.get()) == charging);
@@ -202,6 +206,46 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         }
         Operation operation = operation(recipe, recipe.inputCount(), secondary, 0, result, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
+    }
+
+    /**
+     * Fuse two resources into a combined/alloy seed (e.g. Iron Fragment + Coal → Steel Seed). Unlike
+     * ordinary synthesis, fusion does not require the alloy resource as an input — it invents the seed —
+     * but the alloy must exist in the catalog (a mod provides it) for the seed to grow and convert, so
+     * fusion is dormant-safe when the alloy is absent. The alloy seed inherits the alloy resource's own
+     * catalog tier so the downstream grow → fragments → resource loop stays consistent.
+     */
+    private Resolution resolveFusion(ServerLevel level) {
+        if (!AgricultureConfig.FUSION_ENABLED.get()) return fail(MachineBlockedReason.NO_RECIPE);
+        MaterialVariant primary = items.get(PRIMARY).get(ModDataComponents.MATERIAL_VARIANT.get());
+        if (primary == null) return fail(MachineBlockedReason.INVALID_COMPONENT);
+        FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.FUSION.get(), candidate ->
+                candidate.material().isPresent() && candidate.material().get().equals(primary.material())
+                        && candidate.resultMaterial().isPresent() && candidate.secondary().isPresent()
+                        && candidate.secondary().get().test(items.get(SECONDARY)));
+        if (recipe == null) return fail(MachineBlockedReason.NO_RECIPE);
+        if (items.get(SECONDARY).getCount() < recipe.secondaryCount()) {
+            return fail(MachineBlockedReason.INVALID_COMPONENT);
+        }
+        var alloy = recipe.resultMaterial().get();
+        var lookup = MaterialCatalog.forServer(level.getServer()).lookup(alloy);
+        if (!lookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
+        FragmentTier tier = lookup.material().orElseThrow().definition().tier();
+        if (tier.ordinal() > fusionMaxTier().ordinal()) return fail(MachineBlockedReason.CATALOG_DISABLED);
+        if (!gateOpen(level, tier)) return fail(MachineBlockedReason.GATE_CLOSED);
+        ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
+        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(alloy, tier));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, alloy);
+        Operation operation = operation(recipe, recipe.inputCount(), recipe.secondaryCount(), 0, seed, ItemStack.EMPTY);
+        return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
+    }
+
+    private static FragmentTier fusionMaxTier() {
+        try {
+            return FragmentTier.valueOf(AgricultureConfig.FUSION_MAX_TIER.get().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return FragmentTier.VOIDITE;
+        }
     }
 
     private Resolution resolveSynthesis(ServerLevel level) {
@@ -232,6 +276,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
         seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.id());
         Operation operation = operation(recipe, recipe.inputCount(), fragmentCost, 1, seed, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
     }
@@ -365,7 +410,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
 
     private static boolean gateOpen(ServerPlayer player, FragmentTier family) {
         var gate = MachineProgression.gate(family);
-        return gate == null || ProgressionGates.isOpen(player, gate);
+        return (gate == null || ProgressionGates.isOpen(player, gate))
+                && za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, family);
     }
 
     @Nullable

@@ -5,7 +5,7 @@ in the shared Neroland family pipeline (cf. nerotech/tools/gen_textures.py).
 
 Deterministic 32x32 pixel art (Nerospace's 16x recipes scaled x2). White / light-grey
 composite housing with a bio-green accent (keyed to the mod logo's green), soil + foliage
-organics for beds and crops, and the five essence tiers coloured from the material catalog
+organics for beds and crops, and the five fragment tiers coloured from the material catalog
 (BuiltinMaterials.java) so textures stay in lockstep with the data.
 
 This tool is the single source of truth for BOTH the PNG textures AND their block/blockstate/
@@ -54,6 +54,14 @@ LAB = [(226, 233, 238, 255), (212, 221, 227, 255),
 LAB_LIGHT = (248, 252, 255, 255)
 LAB_DARK = (150, 163, 173, 255)
 LAB_SEAM = (120, 133, 143, 255)
+
+# Stage 6: darken the lab palette a touch (keep the clean look, less stark white).
+def _dk(_c, _f=0.85):
+    return (int(_c[0] * _f), int(_c[1] * _f), int(_c[2] * _f)) + (tuple(_c[3:]) if len(_c) > 3 else (255,))
+LAB = [_dk(_c) for _c in LAB]
+LAB_LIGHT = _dk(LAB_LIGHT)
+LAB_DARK = _dk(LAB_DARK)
+LAB_SEAM = _dk(LAB_SEAM)
 RECESS_FILL = (34, 44, 50, 255)
 RECESS_EDGE = (16, 22, 26, 255)
 
@@ -77,17 +85,17 @@ GLASS_FRAME = (214, 224, 228, 255)
 # Amber (biofuel).
 AMBER = [(120, 78, 28, 255), (170, 116, 44, 255), (216, 168, 74, 255), (244, 208, 120, 255)]
 
-# ---- essence tiers, derived from BuiltinMaterials.java (tier -> [material RGB]) ----
+# ---- fragment tiers, derived from BuiltinMaterials.java (tier -> [material RGB]) ----
 # Keep this table mirroring catalog/BuiltinMaterials.java; the tier colour is the mean of
 # its materials, so a catalog colour change + re-run repaints the tier to match.
 CATALOG = {
-    "terran": [0x343434],
-    "industrial": [0xC46B48, 0xD8D8D8, 0xF4D03F, 0xAA0000, 0x3154B5, 0xE8E1D4, 0x5E7C8C],
-    "orbital": [0x55D6C8, 0x24C862, 0x82E6FF],
-    "colonial": [0xDDEEFF],
-    "deepvoid": [0x24545A, 0x5D347A, 0xC8D1E8],
+    "territe": [0x343434],
+    "forgite": [0xC46B48, 0xD8D8D8, 0xF4D03F, 0xAA0000, 0x3154B5, 0xE8E1D4, 0x5E7C8C],
+    "orbite": [0x55D6C8, 0x24C862, 0x82E6FF],
+    "colonite": [0xDDEEFF],
+    "voidite": [0x24545A, 0x5D347A, 0xC8D1E8],
 }
-TIER_ORDER = ["terran", "industrial", "orbital", "colonial", "deepvoid"]
+TIER_ORDER = ["territe", "forgite", "orbite", "colonite", "voidite"]
 
 
 def _hex_rgb(v):
@@ -216,6 +224,25 @@ def save_tex(img, folder, name):
         return
     img.save(path)
 
+
+
+def greyscale_tint_base(name):
+    """Convert an item texture to neutral luminance (keeping alpha) so the item's custom_model_data
+    tint multiplies to the resource's ingot colour cleanly. Used for the component-tinted seed/fragment."""
+    from PIL import Image
+    path = os.path.join(ITEM_TEX, name + ".png")
+    img = Image.open(path).convert("RGBA")
+    px = img.load()
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            # perceptual luminance, lifted slightly so the tint has headroom to read
+            lum = int(0.299 * r + 0.587 * g + 0.114 * b)
+            lum = min(255, int(lum * 0.6 + 150 * 0.4))
+            px[x, y] = (lum, lum, lum, a)
+    img.save(path)
 
 def write_json(folder, name, obj):
     d = {"block_model": BLOCK_MODEL, "item_model": ITEM_MODEL, "blockstate": BLOCKSTATE}[folder]
@@ -528,8 +555,8 @@ def gen_grow_bed(name, tier):
     item_from_block(name)
 
 
-# ================= ESSENCE BLOCKS (tier) =================
-def gen_essence_block(name, tier):
+# ================= FRAGMENT BLOCKS (tier) =================
+def gen_fragment_block(name, tier):
     tc = TIER[tier]
     rng = rng_for(name)
     img = new_img()
@@ -549,7 +576,7 @@ def gen_essence_block(name, tier):
             px[i, xx] = mix(lite, tc, 0.5)
     bevel(img, light=lite, dark=dark, base=tc)
     for (cx, cy) in ((8, 8), (24, 10), (12, 24), (23, 23)):
-        px[cx, cy] = G4 if tier == "terran" else mix(lite, (255, 255, 255, 255), 0.6)
+        px[cx, cy] = G4 if tier == "territe" else mix(lite, (255, 255, 255, 255), 0.6)
     save_tex(img, "block", name)
     model_cube_all(name)
     block_state_simple(name)
@@ -633,8 +660,8 @@ def gen_crop_tower_frame():
     item_from_block(name)
 
 
-def gen_essence_decor():
-    name = "essence_decor"
+def gen_fragment_decor():
+    name = "fragment_decor"
     rng = rng_for(name)
     img = new_img()
     px = img.load()
@@ -670,7 +697,7 @@ def gen_crop(name, family):
         height = int(6 + t * 20)
         top = base_y - height
         if family == "resource":
-            stalk, leaf, glow = mix(G1, TIER["industrial"], 0.3), G2, LED_CORE
+            stalk, leaf, glow = mix(G1, TIER["forgite"], 0.3), G2, LED_CORE
             for cx in (13, 16, 19):
                 _stalk(px, cx, top, base_y, stalk, mix(stalk, (0, 0, 0, 255), 0.4))
             if age >= 3:
@@ -683,7 +710,7 @@ def gen_crop(name, family):
             if age >= 5:  # crystalline resource nodes near maturity
                 for cx in (13, 16, 19):
                     px[cx, top] = glow
-                    px[cx, top + 1] = mix(TIER["orbital"], glow, 0.4)
+                    px[cx, top + 1] = mix(TIER["orbite"], glow, 0.4)
         elif family == "food":
             stalk, leaf, grain = G1, G2, (226, 208, 120, 255)
             for cx in (13, 16, 19):
@@ -738,7 +765,7 @@ def _gen_crop_item_sprite(name, family):
         px[x, 28] = SOIL_DAMP
     if family == "resource":
         for cx in (13, 16, 19):
-            _stalk(px, cx, 8, 27, mix(G1, TIER["industrial"], 0.3), G0)
+            _stalk(px, cx, 8, 27, mix(G1, TIER["forgite"], 0.3), G0)
             px[cx, 8] = LED_CORE
             px[cx - 1, 12] = G2
             px[cx + 1, 16] = G2
@@ -807,11 +834,11 @@ def gen_seed_item(name, hull, core, glow=None):
     item_generated(name)
 
 
-def gen_essence_item(name, tier):
+def gen_fragment_item(name, tier):
     tc = TIER[tier]
     img = new_img()
     px = img.load()
-    # a stoppered vial of tier essence
+    # a stoppered vial of tier fragment
     glass = (206, 224, 230, 255)
     for y in range(6, 27):
         for x in range(11, 21):
@@ -830,7 +857,7 @@ def gen_essence_item(name, tier):
     # highlight + tier spark
     for y in range(8, 25):
         px[13, y] = (245, 252, 255, 200)
-    px[16, 16] = G4 if tier == "terran" else mix(tc, (255, 255, 255, 255), 0.7)
+    px[16, 16] = G4 if tier == "territe" else mix(tc, (255, 255, 255, 255), 0.7)
     save_tex(img, "item", name)
     item_generated(name)
 
@@ -985,9 +1012,9 @@ def gen_module(name, glyph, accent):
     item_generated(name)
 
 
-def gen_variant_essence():
-    # material_essence — a component-tinted generic essence mote (neutral green)
-    name = "material_essence"
+def gen_variant_fragment():
+    # resource_fragment — a component-tinted generic fragment mote (neutral green)
+    name = "resource_fragment"
     img = new_img()
     px = img.load()
     for y in range(S):
@@ -1007,7 +1034,7 @@ def gen_variant_essence():
 
 
 def gen_module_wrappers():
-    gen_module("speed_module", "speed", TIER["orbital"])
+    gen_module("speed_module", "speed", TIER["orbite"])
     gen_module("efficiency_module", "gear", G2)
 
 
@@ -1067,31 +1094,31 @@ def gen_gui():
 
 # ---------------- catalogues ----------------
 MACHINES = [
-    ("essence_extractor", "extractor", G2, "grid"),
-    ("essence_infuser", "infuser", G2, "grid"),
+    ("fragment_extractor", "extractor", G2, "grid"),
+    ("fragment_infuser", "infuser", G2, "grid"),
     ("seed_synthesizer", "synthesizer", G2, "grid"),
-    ("seed_research_bench", "research", TIER["orbital"], "grid"),
+    ("seed_research_bench", "research", TIER["orbite"], "grid"),
     ("planter", "leaf", G2, "vent"),
     ("harvester", "blade", G2, "vent"),
     ("fertiliser_applicator", "drop", G2, "vent"),
     ("fertiliser_processor", "drop", G2, "grid"),
-    ("genetics_station", "dna", TIER["orbital"], "grid"),
+    ("genetics_station", "dna", TIER["orbite"], "grid"),
     ("greenhouse_controller", "leaf", G2, "grid"),
-    ("oxygen_plant", "drop", TIER["orbital"], "vent"),
+    ("oxygen_plant", "drop", TIER["orbite"], "vent"),
     ("biofuel_converter", "flame", AMBER[2], "vent"),
     ("crop_tower_controller", "tower", G2, "grid"),
-    ("terraforming_controller", "globe", TIER["colonial"], "grid"),
+    ("terraforming_controller", "globe", TIER["colonite"], "grid"),
 ]
-BEDS = [("terran_grow_bed", "terran"), ("industrial_grow_bed", "industrial"),
-        ("orbital_grow_bed", "orbital"), ("colonial_grow_bed", "colonial"),
-        ("deepvoid_grow_bed", "deepvoid")]
-ESSENCE_BLOCKS = [(f"{t}_essence_block", t) for t in TIER_ORDER]
+BEDS = [("territe_grow_bed", "territe"), ("forgite_grow_bed", "forgite"),
+        ("orbite_grow_bed", "orbite"), ("colonite_grow_bed", "colonite"),
+        ("voidite_grow_bed", "voidite")]
+FRAGMENT_BLOCKS = [(f"{t}_fragment_block", t) for t in TIER_ORDER]
 CROPS = [("resource_crop", "resource"), ("engineered_food_crop", "food"), ("alien_crop", "alien")]
 
 # every registered block, for coverage
-ALL_BLOCKS = ([m[0] for m in MACHINES] + [b[0] for b in BEDS] + [e[0] for e in ESSENCE_BLOCKS]
+ALL_BLOCKS = ([m[0] for m in MACHINES] + [b[0] for b in BEDS] + [e[0] for e in FRAGMENT_BLOCKS]
               + [c[0] for c in CROPS] + ["pollination_beacon", "greenhouse_frame",
-              "greenhouse_glass", "crop_tower_frame", "essence_decor", "nutrient", "biofuel"])
+              "greenhouse_glass", "crop_tower_frame", "fragment_decor", "nutrient", "biofuel"])
 
 
 def main():
@@ -1100,27 +1127,27 @@ def main():
     gen_pollination_beacon()
     for (name, tier) in BEDS:
         gen_grow_bed(name, tier)
-    for (name, tier) in ESSENCE_BLOCKS:
-        gen_essence_block(name, tier)
+    for (name, tier) in FRAGMENT_BLOCKS:
+        gen_fragment_block(name, tier)
     for (name, family) in CROPS:
         gen_crop(name, family)
     gen_greenhouse_frame()
     gen_greenhouse_glass()
     gen_crop_tower_frame()
-    gen_essence_decor()
+    gen_fragment_decor()
     gen_fluid_block("nutrient", WATER + [mix(WATER[2], (255, 255, 255, 255), 0.4)])
     gen_fluid_block("biofuel", AMBER)
 
     # ---- items ----
-    gen_seed_item("resource_seed", mix(G1, TIER["industrial"], 0.3), G2, LED_CORE)
+    gen_seed_item("resource_seed", mix(G1, TIER["forgite"], 0.3), G2, LED_CORE)
     gen_seed_item("food_seed", (150, 120, 66, 255), G2, None)
     gen_seed_item("alien_seed", (78, 54, 110, 255), (150, 70, 178, 255), (214, 150, 255, 255))
     gen_seed_item("blank_seed", (196, 200, 190, 255), (168, 174, 160, 255), None)
     gen_seed_item("charged_seed", (60, 140, 100, 255), G3, G4)
-    gen_seed_item("terraforming_seed", TIER["colonial"], (170, 210, 255, 255), (245, 252, 255, 255))
-    gen_variant_essence()
+    gen_seed_item("terraforming_seed", TIER["colonite"], (170, 210, 255, 255), (245, 252, 255, 255))
+    gen_variant_fragment()
     for t in TIER_ORDER:
-        gen_essence_item(f"{t}_essence", t)
+        gen_fragment_item(f"{t}_fragment", t)
     gen_canister("nutrient_canister", WATER + [mix(WATER[2], (255, 255, 255, 255), 0.4)])
     gen_canister("biofuel_canister", AMBER)
     gen_bucket("nutrient_bucket", WATER + [mix(WATER[2], (255, 255, 255, 255), 0.4)])
@@ -1128,12 +1155,14 @@ def main():
     gen_produce("engineered_food", (210, 150, 70, 255), (245, 210, 120, 255), leaf=True)
     gen_produce("alien_produce", (150, 70, 178, 255), (214, 150, 255, 255), leaf=False)
     gen_fertiliser("fertiliser", G2)
-    gen_fertiliser("speed_fertiliser", TIER["orbital"])
+    gen_fertiliser("speed_fertiliser", TIER["orbite"])
     gen_fertiliser("yield_fertiliser", (226, 208, 120, 255))
     gen_lump("biomass", [G0, G1, mix(G1, SOIL[0], 0.5)])
     gen_lump("crop_waste", [SOIL[1], SOIL[0], (96, 92, 60, 255)])
     gen_module_wrappers()
 
+    greyscale_tint_base("resource_seed")
+    greyscale_tint_base("resource_fragment")
     gen_gui()
 
     # ---- coverage ----

@@ -159,7 +159,8 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(slot.material());
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
-        if (definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate()))) return;
+        if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
+                || (player != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()))) return;
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
         int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
         if (energyCost > 0 && getEnergy().extract(energyCost, true) < energyCost) return;
@@ -173,7 +174,8 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(slot.material());
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
-        if (definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate()))) return;
+        if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
+                || (player != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()))) return;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
         double cycleYield = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
@@ -183,6 +185,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
                 + (consumeYieldFertiliser() ? AgricultureConfig.FERTILISER_MAX_DOSE.get() : 0);
         ItemStack fragment = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, Math.max(0, amount)));
         fragment.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(fragment, slot.material());
         if (amount <= 0 || !insertOutput(fragment)) return;
         slot.harvested();
     }
@@ -234,6 +237,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             if (slot.isEmpty()) continue;
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material());
             seed.set(ModDataComponents.HARVEST_COUNT.get(), slot.harvestCount());
             if (!slot.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), slot.genetics());
             net.minecraft.world.level.block.Block.popResource(level, worldPosition, seed);

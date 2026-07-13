@@ -11,7 +11,7 @@ independent formulations, and each is capped so effects can never stack out of c
 Doses are stored compactly on the bed itself with an amount and an expiry time — there is no per-tick
 full-farm scan. Speed and yield are tracked separately, so applying one never inflates the other, and
 re-applying refreshes the timer without exceeding the cap. Fertiliser affects **powered** grow beds
-(Industrial and above); the passive Terran bed is unaffected.
+(Forgite and above); the passive Territe bed is unaffected.
 
 ## Making fertiliser
 
