@@ -12,13 +12,13 @@ import net.minecraft.resources.Identifier;
 
 import org.junit.jupiter.api.Test;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 class MaterialCatalogSyncPayloadTest {
     @Test
     void minimalMetadataRoundTrips() {
         MaterialCatalogSyncPayload payload = new MaterialCatalogSyncPayload(List.of(
-                new MaterialCatalogSyncPayload.Entry(Identifier.parse("test:iron"), EssenceFamily.INDUSTRIAL,
+                new MaterialCatalogSyncPayload.Entry(Identifier.parse("test:iron"), FragmentTier.FORGITE,
                         "material.test.iron", 0xAABBCC)));
         RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
         MaterialCatalogSyncPayload.STREAM_CODEC.encode(buffer, payload);
@@ -29,6 +29,6 @@ class MaterialCatalogSyncPayloadTest {
     @Test
     void rejectsOversizedMetadata() {
         assertThrows(IllegalArgumentException.class, () -> new MaterialCatalogSyncPayload.Entry(
-                Identifier.parse("test:iron"), EssenceFamily.ORBITAL, "x".repeat(129), 0));
+                Identifier.parse("test:iron"), FragmentTier.ORBITE, "x".repeat(129), 0));
     }
 }

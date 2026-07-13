@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.BucketItem;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.content.MaterialVariantItem;
 import za.co.neroland.neroagriculture.content.ResourceSeedItem;
@@ -27,12 +27,13 @@ public final class ModItems {
     private static final List<RegistryEntry<? extends Item>> TAB_ITEMS = new ArrayList<>();
 
     public static final RegistryEntry<Item> RESOURCE_SEED = seedItem("resource_seed");
-    public static final RegistryEntry<Item> MATERIAL_ESSENCE = variantItem("material_essence");
-    public static final RegistryEntry<Item> TERRAN_ESSENCE = item("terran_essence");
-    public static final RegistryEntry<Item> INDUSTRIAL_ESSENCE = item("industrial_essence");
-    public static final RegistryEntry<Item> ORBITAL_ESSENCE = item("orbital_essence");
-    public static final RegistryEntry<Item> COLONIAL_ESSENCE = item("colonial_essence");
-    public static final RegistryEntry<Item> DEEPVOID_ESSENCE = item("deepvoid_essence");
+    public static final RegistryEntry<Item> RESOURCE_FRAGMENT = variantItem("resource_fragment");
+    public static final RegistryEntry<Item> TERRITE_FRAGMENT = item("territe_fragment");
+    public static final RegistryEntry<Item> FORGITE_FRAGMENT = item("forgite_fragment");
+    public static final RegistryEntry<Item> ORBITE_FRAGMENT = item("orbite_fragment");
+    public static final RegistryEntry<Item> COLONITE_FRAGMENT = item("colonite_fragment");
+    public static final RegistryEntry<Item> VOIDITE_FRAGMENT = item("voidite_fragment");
+    public static final RegistryEntry<Item> PROSPORA_SEED = item("prospora_seed");
     public static final RegistryEntry<Item> BLANK_SEED = item("blank_seed");
     public static final RegistryEntry<Item> CHARGED_SEED = chargedSeed();
     public static final RegistryEntry<Item> NUTRIENT_CANISTER = item("nutrient_canister");
@@ -124,14 +125,27 @@ public final class ModItems {
         return entry;
     }
 
-    /** Populate NeroAgriculture's own creative tab: every finite item, then component-backed examples. */
+    /**
+     * Populate NeroAgriculture's own creative tab: every finite item, then one Resource Seed per known
+     * resource. The per-resource list is driven by the client's synced material catalog, so it reads
+     * like a distinct seed per resource (vanilla + any modded resource discovered through tags) without
+     * registering thousands of items. Before the catalog has synced (e.g. on the title screen) it falls
+     * back to the curated built-in examples so the tab is never empty.
+     */
     public static void populateTab(java.util.function.Consumer<ItemStack> output) {
         for (RegistryEntry<? extends Item> entry : TAB_ITEMS) output.accept(new ItemStack(entry.get()));
-        output.accept(example("c:coal", EssenceFamily.TERRAN));
-        output.accept(example("c:iron", EssenceFamily.INDUSTRIAL));
-        output.accept(example("c:diamond", EssenceFamily.ORBITAL));
-        output.accept(example("minecraft:nether_star", EssenceFamily.COLONIAL));
-        output.accept(example("minecraft:echo_shard", EssenceFamily.DEEPVOID));
+        var catalog = za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog.entries();
+        if (catalog.isEmpty()) {
+            output.accept(example("c:coal", FragmentTier.TERRITE));
+            output.accept(example("c:iron", FragmentTier.FORGITE));
+            output.accept(example("c:diamond", FragmentTier.ORBITE));
+            output.accept(example("minecraft:nether_star", FragmentTier.COLONITE));
+            output.accept(example("minecraft:echo_shard", FragmentTier.VOIDITE));
+        } else {
+            catalog.values().stream()
+                    .sorted(java.util.Comparator.comparing(entry -> entry.id().toString()))
+                    .forEach(entry -> output.accept(resourceSeed(entry.id(), entry.tier())));
+        }
         for (var definition : za.co.neroland.neroagriculture.food.BuiltinFoods.definitions()) {
             boolean alien = definition.kind() == za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN;
             output.accept(speciesExample(alien ? ALIEN_SEED.get() : FOOD_SEED.get(), definition.id()));
@@ -146,9 +160,13 @@ public final class ModItems {
         return stack;
     }
 
-    private static ItemStack example(String id, EssenceFamily family) {
+    private static ItemStack example(String id, FragmentTier family) {
+        return resourceSeed(Identifier.parse(id), family);
+    }
+
+    private static ItemStack resourceSeed(Identifier material, FragmentTier family) {
         ItemStack stack = new ItemStack(RESOURCE_SEED.get());
-        stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(Identifier.parse(id), family));
+        stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
         return stack;
     }
 

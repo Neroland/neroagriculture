@@ -8,14 +8,14 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /**
  * Immutable server-side definition of one engineered-food or alien crop species. All potency/duration
  * values are clamped to explicit caps so a forged or over-tuned datapack entry can never exceed them.
  */
 public record FoodDefinition(Identifier id, Kind kind, boolean natural, EffectCategory effect, int amplifier,
-        int durationTicks, int potencyCap, int durationCap, int nutrition, float saturation, EssenceFamily tier,
+        int durationTicks, int potencyCap, int durationCap, int nutrition, float saturation, FragmentTier tier,
         PlanetTheme theme, boolean geneticsEligible, @Nullable Identifier gate, String displayKey, int color,
         int oxygenProduction) {
 

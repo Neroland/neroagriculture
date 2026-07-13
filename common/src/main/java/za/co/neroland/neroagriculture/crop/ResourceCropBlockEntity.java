@@ -52,8 +52,8 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         try {
             variant = new CropVariantState(format,
                     Identifier.parse(input.getStringOr("Material", "neroagriculture:unknown")),
-                    za.co.neroland.neroagriculture.content.EssenceFamily.valueOf(
-                            input.getStringOr("Family", "ORBITAL")), harvests);
+                    za.co.neroland.neroagriculture.content.FragmentTier.valueOf(
+                            input.getStringOr("Family", "ORBITE")), harvests);
         } catch (RuntimeException e) {
             // Preserve the block and fail closed; malformed legacy data becomes an explicit unknown id.
             variant = CropVariantState.fresh(Identifier.parse("neroagriculture:unknown"));

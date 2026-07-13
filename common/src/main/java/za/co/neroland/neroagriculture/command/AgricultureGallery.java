@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.crop.CropVariantState;
 import za.co.neroland.neroagriculture.crop.GrowBedBlockEntity;
@@ -53,7 +53,7 @@ public final class AgricultureGallery {
     private static final int SPACING = 3;
     private static final int FLOAT_ABOVE = 3;
     private static final int EXHIBIT_STEP = 5;
-    private static final Identifier SHOWCASE_MATERIAL = Identifier.parse("c:coal"); // Terran, ungated
+    private static final Identifier SHOWCASE_MATERIAL = Identifier.parse("c:coal"); // Territe, ungated
 
     private AgricultureGallery() { }
 
@@ -89,17 +89,17 @@ public final class AgricultureGallery {
                     blocks.get(i).defaultBlockState());
         }
 
-        // GROWING CROP (centre): an Industrial Grow Bed, powered, with a mid-growth resource crop on top.
+        // GROWING CROP (centre): an Forgite Grow Bed, powered, with a mid-growth resource crop on top.
         BlockPos bedPos = new BlockPos(origin.getX() + 4, fy + 1, origin.getZ() - 5);
         fillFloor(level, bedPos.getX() - 1, bedPos.getZ() - 1, bedPos.getX() + 1, bedPos.getZ() + 1, fy, floor);
-        level.setBlockAndUpdate(bedPos, ModBlocks.INDUSTRIAL_GROW_BED.get().defaultBlockState());
+        level.setBlockAndUpdate(bedPos, ModBlocks.FORGITE_GROW_BED.get().defaultBlockState());
         battery(level, bedPos.below());
         charge(level, bedPos);
         BlockPos cropPos = bedPos.above();
         level.setBlockAndUpdate(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
                 .setValue(ResourceCropBlock.AGE, 5));
         if (level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop) {
-            crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, SHOWCASE_MATERIAL, EssenceFamily.INDUSTRIAL, 3));
+            crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, SHOWCASE_MATERIAL, FragmentTier.FORGITE, 3));
         }
         label(level, cropPos.above(2), "Grow Bed — a resource crop mid-growth");
 
@@ -107,10 +107,10 @@ public final class AgricultureGallery {
         int px = origin.getX() - 8;
         int pz = origin.getZ() + 24;
         fillFloor(level, px - 1, pz - 1, px + 3 * EXHIBIT_STEP + 1, pz + 1, fy, floor);
-        liveMachine(level, new BlockPos(px, fy + 1, pz), ModBlocks.ESSENCE_EXTRACTOR.get(),
-                new ItemStack(Items.COAL, 64), 0, "Essence Extractor — sample → essence");
-        liveMachine(level, new BlockPos(px + EXHIBIT_STEP, fy + 1, pz), ModBlocks.ESSENCE_INFUSER.get(),
-                new ItemStack(ModItems.TERRAN_ESSENCE.get(), 64), 0, "Essence Infuser — condensing essence");
+        liveMachine(level, new BlockPos(px, fy + 1, pz), ModBlocks.FRAGMENT_EXTRACTOR.get(),
+                new ItemStack(Items.COAL, 64), 0, "Fragment Extractor — sample → fragment");
+        liveMachine(level, new BlockPos(px + EXHIBIT_STEP, fy + 1, pz), ModBlocks.FRAGMENT_INFUSER.get(),
+                new ItemStack(ModItems.TERRITE_FRAGMENT.get(), 64), 0, "Fragment Infuser — condensing fragment");
         liveMachine(level, new BlockPos(px + EXHIBIT_STEP * 2, fy + 1, pz), ModBlocks.SEED_SYNTHESIZER.get(),
                 new ItemStack(Items.COAL, 64), 0, "Seed Synthesizer — fabricating a seed");
         liveMachine(level, new BlockPos(px + EXHIBIT_STEP * 3, fy + 1, pz), ModBlocks.SEED_RESEARCH_BENCH.get(),
@@ -222,7 +222,7 @@ public final class AgricultureGallery {
 
     private static ItemStack resourceSeed() {
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get(), 16);
-        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(SHOWCASE_MATERIAL, EssenceFamily.INDUSTRIAL));
+        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(SHOWCASE_MATERIAL, FragmentTier.FORGITE));
         return seed;
     }
 
@@ -288,7 +288,7 @@ public final class AgricultureGallery {
     /**
      * A working demonstration farm: a 3×2 grid of tier grow beds, each powered + nutrient-fed with a fully
      * grown ore crop on top, flanked by a Planter and Harvester. Every crop is at {@code MAX_AGE}, so
-     * right-clicking one harvests its essence and replants the seed (age resets to 0). Higher-tier ores still
+     * right-clicking one harvests its fragment and replants the seed (age resets to 0). Higher-tier ores still
      * require their Core progression gate to be open to harvest — that is intended game behaviour.
      */
     private static void buildFarm(ServerLevel level, BlockState floor, int bx, int bz, int fy) {
@@ -297,17 +297,17 @@ public final class AgricultureGallery {
         label(level, new BlockPos(bx + 3, fy + 4, bz - 1),
                 "Farm — power + nutrient each bed; right-click a grown crop to harvest (it stays planted)");
         Object[][] plots = {
-            {ModBlocks.TERRAN_GROW_BED.get(), "c:coal", EssenceFamily.TERRAN, "Coal — Terran (ungated)"},
-            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:iron", EssenceFamily.INDUSTRIAL, "Iron — Industrial"},
-            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:copper", EssenceFamily.INDUSTRIAL, "Copper — Industrial"},
-            {ModBlocks.INDUSTRIAL_GROW_BED.get(), "c:gold", EssenceFamily.INDUSTRIAL, "Gold — Industrial"},
-            {ModBlocks.ORBITAL_GROW_BED.get(), "c:diamond", EssenceFamily.ORBITAL, "Diamond — Orbital"},
-            {ModBlocks.ORBITAL_GROW_BED.get(), "c:emerald", EssenceFamily.ORBITAL, "Emerald — Orbital"},
+            {ModBlocks.TERRITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe (ungated)"},
+            {ModBlocks.FORGITE_GROW_BED.get(), "c:iron", FragmentTier.FORGITE, "Iron — Forgite"},
+            {ModBlocks.FORGITE_GROW_BED.get(), "c:copper", FragmentTier.FORGITE, "Copper — Forgite"},
+            {ModBlocks.FORGITE_GROW_BED.get(), "c:gold", FragmentTier.FORGITE, "Gold — Forgite"},
+            {ModBlocks.ORBITE_GROW_BED.get(), "c:diamond", FragmentTier.ORBITE, "Diamond — Orbite"},
+            {ModBlocks.ORBITE_GROW_BED.get(), "c:emerald", FragmentTier.ORBITE, "Emerald — Orbite"},
         };
         for (int i = 0; i < plots.length; i++) {
             BlockPos bedPos = new BlockPos(bx + (i % cols) * 3, fy + 1, bz + (i / cols) * 3);
             plantBed(level, bedPos, (Block) plots[i][0], Identifier.parse((String) plots[i][1]),
-                    (EssenceFamily) plots[i][2], (String) plots[i][3]);
+                    (FragmentTier) plots[i][2], (String) plots[i][3]);
         }
         liveMachine(level, new BlockPos(bx - 2, fy + 1, bz + 1), ModBlocks.PLANTER.get(),
                 resourceSeed(), 0, "Planter — auto-sows the beds");
@@ -316,7 +316,7 @@ public final class AgricultureGallery {
     }
 
     private static void plantBed(ServerLevel level, BlockPos bedPos, Block bed, Identifier material,
-            EssenceFamily tier, String label) {
+            FragmentTier tier, String label) {
         level.setBlockAndUpdate(bedPos, bed.defaultBlockState());
         battery(level, bedPos.below());
         charge(level, bedPos);

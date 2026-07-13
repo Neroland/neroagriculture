@@ -28,7 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.SpeciesVariant;
 import za.co.neroland.neroagriculture.food.FoodCatalog;
 import za.co.neroland.neroagriculture.food.FoodDefinition;
@@ -79,8 +79,8 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get() * cycleGrowth)) return;
         FoodDefinition definition = FoodCatalog.forServer(level.getServer()).get(crop.species());
         if (definition == null) return;
-        EssenceFamily tier = definition.tier();
-        EssenceFamily bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
+        FragmentTier tier = definition.tier();
+        FragmentTier bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
         if (bedTier == null || bedTier.ordinal() < tier.ordinal()) return;
         if (level.getRawBrightness(pos, 0) < 9) return;
         var climate = za.co.neroland.neroagriculture.environment.CropClimate.evaluate(
@@ -89,7 +89,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
                 za.co.neroland.neroagriculture.environment.CropClimate.thresholdOrdinal(AgricultureConfig.CONTROLLED_TIER.get()),
                 crop.genetics().hardiness(), AgricultureConfig.GENETICS_HARDINESS_RELAX.get());
         if (climate != za.co.neroland.neroagriculture.environment.CropClimate.Result.OK) return;
-        if (tier != EssenceFamily.TERRAN
+        if (tier != FragmentTier.TERRITE
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) || !bed.consumeGrowthResources())) return;
         int step = za.co.neroland.neroagriculture.genetics.GeneticEffects.growthStep(
                 za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below()), crop.genetics());

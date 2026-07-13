@@ -42,7 +42,7 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
 
     // Per-kind accents.
     private static final int ACCENT_GREEN = 0xFF78C860;
-    private static final int ACCENT_ORBITAL = 0xFF53D6B8;
+    private static final int ACCENT_ORBITE = 0xFF53D6B8;
 
     @Nullable private BlockPos machinePos;
 
@@ -54,7 +54,7 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
     }
 
     private int accent() {
-        return menu.machineKind() == MachineKind.RESEARCH_BENCH ? ACCENT_ORBITAL : ACCENT_GREEN;
+        return menu.machineKind() == MachineKind.RESEARCH_BENCH ? ACCENT_ORBITE : ACCENT_GREEN;
     }
 
     @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
@@ -105,9 +105,9 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         // Research bench: a clickable "discover" pill (unchanged behaviour, restyled).
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH) {
             g.fill(x + 112, y + 43, x + 168, y + 56, TROUGH);
-            g.fill(x + 112, y + 43, x + 168, y + 44, ACCENT_ORBITAL);
+            g.fill(x + 112, y + 43, x + 168, y + 44, ACCENT_ORBITE);
             Component research = Component.translatable("screen.neroagriculture.research");
-            g.text(font, research, x + 140 - font.width(research) / 2, y + 47, ACCENT_ORBITAL, false);
+            g.text(font, research, x + 140 - font.width(research) / 2, y + 47, ACCENT_ORBITE, false);
         }
 
         super.extractContents(g, mouseX, mouseY, partialTick);

@@ -1,1 +1,1 @@
-{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:nether_wart", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/cindara_emberroot", "family": "orbital"}
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:nether_wart", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/cindara_emberroot", "family": "orbite"}

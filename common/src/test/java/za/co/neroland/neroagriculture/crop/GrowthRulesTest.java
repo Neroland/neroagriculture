@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import za.co.neroland.neroagriculture.catalog.ResolvedCatalog;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason;
 import za.co.neroland.neroagriculture.crop.GrowthRules.Conditions;
 import za.co.neroland.neroagriculture.environment.CropClimate;
@@ -13,9 +13,9 @@ import za.co.neroland.neroagriculture.environment.CropClimate;
 class GrowthRulesTest {
     @Test
     void oneMaterialPerTierRequiresItsBedAndPoweredTiersRequireResources() {
-        for (EssenceFamily tier : EssenceFamily.values()) {
+        for (FragmentTier tier : FragmentTier.values()) {
             assertEquals(BlockedReason.NONE, GrowthRules.evaluate(valid(tier)));
-            EssenceFamily lower = tier == EssenceFamily.TERRAN ? null : EssenceFamily.values()[tier.ordinal() - 1];
+            FragmentTier lower = tier == FragmentTier.TERRITE ? null : FragmentTier.values()[tier.ordinal() - 1];
             if (lower != null) {
                 assertEquals(BlockedReason.WRONG_BED, GrowthRules.evaluate(new Conditions(
                         ResolvedCatalog.Status.ACTIVE, tier, lower, true, true, true, CropClimate.Result.OK, true, true)));
@@ -29,7 +29,7 @@ class GrowthRulesTest {
 
     @Test
     void catalogGateLightAndDimensionFailClosedInStableOrder() {
-        Conditions valid = valid(EssenceFamily.ORBITAL);
+        Conditions valid = valid(FragmentTier.ORBITE);
         assertEquals(BlockedReason.UNKNOWN_MATERIAL, GrowthRules.evaluate(new Conditions(
                 ResolvedCatalog.Status.UNKNOWN, valid.materialTier(), valid.bedTier(), true, true, true,
                 CropClimate.Result.OK, true, true)));
@@ -49,7 +49,7 @@ class GrowthRulesTest {
 
     @Test
     void hostileEnvironmentAndGreenhouseRequirementFailClosedAfterDimension() {
-        Conditions base = valid(EssenceFamily.INDUSTRIAL);
+        Conditions base = valid(FragmentTier.FORGITE);
         assertEquals(BlockedReason.HOSTILE_ENVIRONMENT, GrowthRules.evaluate(new Conditions(
                 base.catalogStatus(), base.materialTier(), base.bedTier(), true, true, true,
                 CropClimate.Result.HOSTILE_ENVIRONMENT, true, true)));
@@ -58,7 +58,7 @@ class GrowthRulesTest {
                 CropClimate.Result.NEEDS_GREENHOUSE, true, true)));
     }
 
-    private static Conditions valid(EssenceFamily tier) {
+    private static Conditions valid(FragmentTier tier) {
         return new Conditions(ResolvedCatalog.Status.ACTIVE, tier, tier, true, true, true,
                 CropClimate.Result.OK, true, true);
     }

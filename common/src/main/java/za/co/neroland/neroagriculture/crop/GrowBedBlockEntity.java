@@ -15,7 +15,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.fertiliser.FertilisableBed;
 import za.co.neroland.neroagriculture.fertiliser.FertiliserDose;
 import za.co.neroland.neroagriculture.fertiliser.FertiliserType;
@@ -44,8 +44,8 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity impleme
                 .withFluid(this::getFluid);
     }
 
-    public EssenceFamily tier() {
-        return getBlockState().getBlock() instanceof GrowBedBlock bed ? bed.tier() : EssenceFamily.INDUSTRIAL;
+    public FragmentTier tier() {
+        return getBlockState().getBlock() instanceof GrowBedBlock bed ? bed.tier() : FragmentTier.FORGITE;
     }
     public NeroFluidStorage getFluid() { return nutrient; }
     public boolean hasGrowthResources() {

@@ -23,7 +23,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Datapack fabrication recipe with bounded costs and optional material/tier identity. */
 public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
@@ -35,13 +35,13 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
     private final int inputCount;
     private final int energy;
     private final int ticks;
-    private final Optional<EssenceFamily> family;
+    private final Optional<FragmentTier> family;
     private final Optional<Identifier> material;
 
     public FabricationRecipe(Supplier<RecipeType<FabricationRecipe>> type,
             Supplier<RecipeSerializer<FabricationRecipe>> serializer, CommonInfo commonInfo,
             Ingredient ingredient, ItemStackTemplate result, int inputCount, int energy, int ticks,
-            Optional<EssenceFamily> family, Optional<Identifier> material) {
+            Optional<FragmentTier> family, Optional<Identifier> material) {
         if (inputCount < 1 || inputCount > 64) throw new IllegalArgumentException("input_count outside 1-64");
         if (energy < 0 || energy > 1_000_000) throw new IllegalArgumentException("energy outside 0-1000000");
         if (ticks < 1 || ticks > 72_000) throw new IllegalArgumentException("ticks outside 1-72000");
@@ -66,7 +66,7 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
                 Codec.intRange(1, 64).optionalFieldOf("input_count", 1).forGetter(FabricationRecipe::inputCount),
                 Codec.intRange(0, 1_000_000).optionalFieldOf("energy", 800).forGetter(FabricationRecipe::energy),
                 Codec.intRange(1, 72_000).optionalFieldOf("ticks", 100).forGetter(FabricationRecipe::ticks),
-                EssenceFamily.CODEC.optionalFieldOf("family").forGetter(FabricationRecipe::family),
+                FragmentTier.CODEC.optionalFieldOf("family").forGetter(FabricationRecipe::family),
                 Identifier.CODEC.optionalFieldOf("material").forGetter(FabricationRecipe::material)
         ).apply(instance, (common, ingredient, result, count, energy, ticks, family, material) ->
                 new FabricationRecipe(type, serializer, common, ingredient, result, count, energy, ticks,
@@ -83,14 +83,14 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
             buffer.writeVarInt(recipe.inputCount);
             buffer.writeVarInt(recipe.energy);
             buffer.writeVarInt(recipe.ticks);
-            ByteBufCodecs.optional(ByteBufCodecs.fromCodecWithRegistries(EssenceFamily.CODEC))
+            ByteBufCodecs.optional(ByteBufCodecs.fromCodecWithRegistries(FragmentTier.CODEC))
                     .encode(buffer, recipe.family);
             ByteBufCodecs.optional(Identifier.STREAM_CODEC).encode(buffer, recipe.material);
         }, buffer -> new FabricationRecipe(type, serializer,
                 CommonInfo.STREAM_CODEC.decode(buffer), Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
                 ItemStackTemplate.STREAM_CODEC.decode(buffer), buffer.readVarInt(), buffer.readVarInt(),
                 buffer.readVarInt(),
-                ByteBufCodecs.optional(ByteBufCodecs.fromCodecWithRegistries(EssenceFamily.CODEC)).decode(buffer),
+                ByteBufCodecs.optional(ByteBufCodecs.fromCodecWithRegistries(FragmentTier.CODEC)).decode(buffer),
                 ByteBufCodecs.optional(Identifier.STREAM_CODEC).decode(buffer)));
     }
 
@@ -111,6 +111,6 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
     public int inputCount() { return inputCount; }
     public int energy() { return energy; }
     public int ticks() { return ticks; }
-    public Optional<EssenceFamily> family() { return family; }
+    public Optional<FragmentTier> family() { return family; }
     public Optional<Identifier> material() { return material; }
 }

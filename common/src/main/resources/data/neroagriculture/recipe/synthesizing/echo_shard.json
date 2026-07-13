@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:seed_synthesizing", "ingredient": "minecraft:echo_shard", "result": { "id": "neroagriculture:resource_seed" }, "energy": 8000, "ticks": 240, "material": "minecraft:echo_shard", "family": "deepvoid" }
+{ "type": "neroagriculture:seed_synthesizing", "ingredient": "minecraft:echo_shard", "result": { "id": "neroagriculture:resource_seed" }, "energy": 8000, "ticks": 240, "material": "minecraft:echo_shard", "family": "voidite" }

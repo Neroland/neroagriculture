@@ -27,7 +27,7 @@ import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /**
  * NF-powered Genetics Station. Two seeds splice into one (per-trait max, total-capped); a seed plus material
- * essence upgrades the seed's lowest trait by one. All genetics maths is the deterministic, capped
+ * fragment upgrades the seed's lowest trait by one. All genetics maths is the deterministic, capped
  * {@link Genetics} logic, so no operation can exceed the caps.
  */
 public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
@@ -83,7 +83,7 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
         Genetics resultGenetics;
         if (isSeed(b)) {
             resultGenetics = Genetics.splice(genA, b.getOrDefault(ModDataComponents.GENETICS.get(), Genetics.EMPTY));
-        } else if (b.is(ModItems.MATERIAL_ESSENCE.get())) {
+        } else if (b.is(ModItems.RESOURCE_FRAGMENT.get())) {
             resultGenetics = genA.upgradedLowest();
         } else {
             return ItemStack.EMPTY;
@@ -125,7 +125,7 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
     }
     @Override public boolean canPlaceItem(int slot, ItemStack stack) {
         return slot == INPUT_A && isSeed(stack)
-                || slot == INPUT_B && (isSeed(stack) || stack.is(ModItems.MATERIAL_ESSENCE.get()));
+                || slot == INPUT_B && (isSeed(stack) || stack.is(ModItems.RESOURCE_FRAGMENT.get()));
     }
     @Override public int[] getSlotsForFace(Direction side) { return SLOTS.clone(); }
     @Override public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) { return canPlaceItem(slot, stack); }

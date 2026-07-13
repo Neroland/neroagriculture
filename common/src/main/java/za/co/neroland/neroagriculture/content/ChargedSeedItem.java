@@ -17,7 +17,7 @@ public final class ChargedSeedItem extends Item {
     @Override public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
             Consumer<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, display, tooltip, flag);
-        EssenceCharge charge = stack.get(ModDataComponents.ESSENCE_CHARGE.get());
+        FragmentCharge charge = stack.get(ModDataComponents.FRAGMENT_CHARGE.get());
         if (charge == null) {
             tooltip.accept(Component.translatable("warning.neroagriculture.invalid_charge")
                     .withStyle(ChatFormatting.RED));

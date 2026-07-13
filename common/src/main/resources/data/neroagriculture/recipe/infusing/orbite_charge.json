@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:orbite_fragment", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 2400, "ticks": 100, "family": "orbite" }

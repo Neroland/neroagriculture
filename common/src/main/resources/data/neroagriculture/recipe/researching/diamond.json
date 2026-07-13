@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:seed_researching", "ingredient": "#c:ores/diamond", "result": { "id": "neroagriculture:resource_seed" }, "input_count": 1, "energy": 0, "ticks": 1, "material": "c:diamond", "family": "orbital" }
+{ "type": "neroagriculture:seed_researching", "ingredient": "#c:ores/diamond", "result": { "id": "neroagriculture:resource_seed" }, "input_count": 1, "energy": 0, "ticks": 1, "material": "c:diamond", "family": "orbite" }

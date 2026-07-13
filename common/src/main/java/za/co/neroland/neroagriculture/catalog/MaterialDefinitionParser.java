@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Strict datapack parser with field-specific errors suitable for logs and admin diagnostics. */
 public final class MaterialDefinitionParser {
@@ -27,7 +27,7 @@ public final class MaterialDefinitionParser {
                     hasItem ? MaterialDefinition.InputSelector.Kind.ITEM : MaterialDefinition.InputSelector.Kind.TAG,
                     identifier(requiredString(selectorJson, hasItem ? "item" : "tag"), "input"));
             Identifier output = identifier(requiredString(json, "output"), "output");
-            EssenceFamily tier = tier(requiredString(json, "tier"));
+            FragmentTier tier = tier(requiredString(json, "tier"));
             Identifier gate = json.has("gate")
                     ? (json.get("gate").isJsonNull() ? null : identifier(json.get("gate").getAsString(), "gate"))
                     : defaultGate(tier);
@@ -49,18 +49,14 @@ public final class MaterialDefinitionParser {
     }
 
     @Nullable
-    public static Identifier defaultGate(EssenceFamily tier) {
-        return switch (tier) {
-            case TERRAN -> null;
-            case INDUSTRIAL -> Identifier.parse("nerolandcore:industrial_power");
-            case ORBITAL -> Identifier.parse("nerolandcore:reached_orbit");
-            case COLONIAL -> Identifier.parse("nerolandcore:first_colony");
-            case DEEPVOID -> Identifier.parse("nerolandcore:deep_space");
-        };
+    public static Identifier defaultGate(FragmentTier tier) {
+        // Native, standalone progression: NeroAgriculture owns and opens these gates itself, so the
+        // whole tier ladder is reachable with only Neroland Core present (no sibling mod required).
+        return za.co.neroland.neroagriculture.progression.AgricultureGates.forTier(tier);
     }
 
-    private static EssenceFamily tier(String raw) {
-        try { return EssenceFamily.valueOf(raw.toUpperCase(java.util.Locale.ROOT)); }
+    private static FragmentTier tier(String raw) {
+        try { return FragmentTier.valueOf(raw.toUpperCase(java.util.Locale.ROOT)); }
         catch (IllegalArgumentException e) { throw new IllegalArgumentException("unknown tier '" + raw + "'"); }
     }
 

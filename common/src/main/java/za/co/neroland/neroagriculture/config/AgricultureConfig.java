@@ -14,7 +14,7 @@ public final class AgricultureConfig {
     public static final ConfigValue<String> MATERIAL_BLACKLIST = SCHEMA.string("discovery.material_blacklist", "",
             true, "Comma-separated material ids disabled before exposure");
     public static final ConfigValue<String> MATERIAL_OVERRIDES = SCHEMA.string("discovery.material_overrides", "",
-            true, "Semicolon entries: id|tier=orbital|gate=id|yield=min:max:ramp|conversion=n|enabled=true");
+            true, "Semicolon entries: id|tier=orbite|gate=id|yield=min:max:ramp|conversion=n|enabled=true");
     public static final ConfigValue<Integer> CONDENSATION_TICKS = integer("condensation.ticks", 200, 1, 72_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_CAPACITY = integer("machines.energy_capacity", 100_000, 1_000, 10_000_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_RATE = integer("machines.energy_rate", 80, 1, 32_000);
@@ -25,8 +25,8 @@ public final class AgricultureConfig {
     public static final ConfigValue<Double> YIELD_MULTIPLIER = decimal("growth.yield_multiplier", 1.0, 0.0, 100.0);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_BASE = integer("growth.tier_yield_cap_base", 3, 1, 64);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_STEP = integer("growth.tier_yield_cap_step", 1, 0, 16);
-    public static final ConfigValue<String> CONTROLLED_TIER = SCHEMA.string("growth.controlled_tier", "orbital",
-            true, "Lowest tier that always requires a sealed greenhouse (terran|industrial|orbital|colonial|deepvoid)");
+    public static final ConfigValue<String> CONTROLLED_TIER = SCHEMA.string("growth.controlled_tier", "orbite",
+            true, "Lowest tier that always requires a sealed greenhouse (territe|forgite|orbite|colonite|voidite)");
     public static final ConfigValue<Integer> GREENHOUSE_VOLUME_CAP = integer("greenhouse.volume_cap", 4_096, 27, 65_536);
     public static final ConfigValue<Integer> GREENHOUSE_REVALIDATE_TICKS = integer("greenhouse.revalidate_ticks", 100, 20, 12_000);
     public static final ConfigValue<Integer> GREENHOUSE_UPKEEP_TICKS = integer("greenhouse.upkeep_ticks", 20, 1, 1_200);

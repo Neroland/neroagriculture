@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:forgite_fragment", "result": { "id": "neroagriculture:orbite_fragment" }, "input_count": 4, "energy": 2000, "ticks": 100, "family": "orbite" }

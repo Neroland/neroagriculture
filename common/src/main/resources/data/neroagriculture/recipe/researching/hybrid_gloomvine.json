@@ -1,1 +1,1 @@
-{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:vine", "result": {"id": "neroagriculture:alien_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:alien/hybrid_gloomvine", "family": "colonial"}
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:vine", "result": {"id": "neroagriculture:alien_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:alien/hybrid_gloomvine", "family": "colonite"}

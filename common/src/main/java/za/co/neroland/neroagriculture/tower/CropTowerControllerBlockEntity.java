@@ -24,7 +24,7 @@ import za.co.neroland.neroagriculture.automation.AreaWork;
 import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.crop.YieldCurve;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
@@ -181,9 +181,9 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         int amount = (int) Math.floor(YieldCurve.scaledCapped(definition.yield(), slot.harvestCount(),
                 AgricultureConfig.YIELD_MULTIPLIER.get(), cap) * cycleYield) + GeneticEffects.yieldBonus(slot.genetics())
                 + (consumeYieldFertiliser() ? AgricultureConfig.FERTILISER_MAX_DOSE.get() : 0);
-        ItemStack essence = new ItemStack(ModItems.MATERIAL_ESSENCE.get(), Math.min(64, Math.max(0, amount)));
-        essence.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
-        if (amount <= 0 || !insertOutput(essence)) return;
+        ItemStack fragment = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, Math.max(0, amount)));
+        fragment.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+        if (amount <= 0 || !insertOutput(fragment)) return;
         slot.harvested();
     }
 
@@ -305,7 +305,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             try {
                 Genetics genetics = new Genetics(input.getIntOr("S" + i + "Gy", 0), input.getIntOr("S" + i + "Gs", 0),
                         input.getIntOr("S" + i + "Gh", 0), input.getIntOr("S" + i + "Go", 0), input.getIntOr("S" + i + "Gf", 0));
-                slots[i].set(Identifier.parse(material), EssenceFamily.valueOf(input.getStringOr("S" + i + "F", "TERRAN")),
+                slots[i].set(Identifier.parse(material), FragmentTier.valueOf(input.getStringOr("S" + i + "F", "TERRITE")),
                         input.getIntOr("S" + i + "A", 0), input.getIntOr("S" + i + "H", 0), genetics);
             } catch (RuntimeException e) {
                 slots[i].clear();

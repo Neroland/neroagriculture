@@ -1,6 +1,6 @@
 package za.co.neroland.neroagriculture.balance;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /**
  * Pure, deterministic Stage 6 balance constants and net-conservation invariants for every built-in tier.
@@ -14,48 +14,48 @@ public final class TierBalance {
      * genetics bonus may push a single harvest above this. Derived from an operator-tunable base and step
      * so the cap grows monotonically with tier while remaining bounded and reload-safe.
      */
-    public static int yieldCap(EssenceFamily tier, int base, int step) {
+    public static int yieldCap(FragmentTier tier, int base, int step) {
         return Math.max(1, base + step * tier.ordinal());
     }
 
-    /** Neutral essence produced by extracting one real sample. */
-    public static int extractionEssence(EssenceFamily tier) {
+    /** Neutral fragment produced by extracting one real sample. */
+    public static int extractionFragment(FragmentTier tier) {
         return 2;
     }
 
-    /** Lower-tier neutral essence condensed into one unit of the next tier. */
+    /** Lower-tier neutral fragment condensed into one unit of the next tier. */
     public static int condensationRatio() {
         return 4;
     }
 
-    /** Neutral essence consumed to charge one blank seed at a tier. */
-    public static int chargeCost(EssenceFamily tier) {
+    /** Neutral fragment consumed to charge one blank seed at a tier. */
+    public static int chargeCost(FragmentTier tier) {
         return 8;
     }
 
-    /** Material essence consumed to convert back into one unit of the original resource. */
-    public static int conversionCount(EssenceFamily tier) {
+    /** Material fragment consumed to convert back into one unit of the original resource. */
+    public static int conversionCount(FragmentTier tier) {
         return 8 + tier.ordinal() * 4;
     }
 
     /** Conservative default maximum yield used when a definition does not override it. */
-    public static int defaultYieldMax(EssenceFamily tier) {
+    public static int defaultYieldMax(FragmentTier tier) {
         return tier.ordinal() + 3;
     }
 
     /** Conservative default fresh-seed yield: one unit, forcing harvest investment before the ramp helps. */
-    public static int defaultYieldMin(EssenceFamily tier) {
+    public static int defaultYieldMin(FragmentTier tier) {
         return 1;
     }
 
     /** Harvests required before a fresh seed reaches its maximum yield. */
-    public static int defaultRamp(EssenceFamily tier) {
+    public static int defaultRamp(FragmentTier tier) {
         return 32 * (tier.ordinal() + 1);
     }
 
-    /** Raw samples sunk into one fabricated seed: synthesis sample + extracted material essence + charge. */
-    public static int samplesPerSeed(EssenceFamily tier) {
-        return 2 + ceilDiv(chargeCost(tier), extractionEssence(tier));
+    /** Raw samples sunk into one fabricated seed: synthesis sample + extracted resource fragment + charge. */
+    public static int samplesPerSeed(FragmentTier tier) {
+        return 2 + ceilDiv(chargeCost(tier), extractionFragment(tier));
     }
 
     /**
@@ -63,12 +63,12 @@ public final class TierBalance {
      * converted back into a full unit of the source resource, so the loop never mints resources from
      * nothing before the documented repeated-harvest investment. Verified for every tier by tests.
      */
-    public static boolean singleHarvestCannotMintResource(EssenceFamily tier, int cap) {
+    public static boolean singleHarvestCannotMintResource(FragmentTier tier, int cap) {
         return Math.min(cap, defaultYieldMax(tier)) < conversionCount(tier);
     }
 
     /** Sanity invariant: the default ramp keeps fresh seeds below the cap until investment is made. */
-    public static boolean freshSeedBelowMax(EssenceFamily tier) {
+    public static boolean freshSeedBelowMax(FragmentTier tier) {
         return defaultYieldMin(tier) < defaultYieldMax(tier) && defaultRamp(tier) > 0;
     }
 

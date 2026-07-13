@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
@@ -71,9 +71,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof ResourceCropBlockEntity crop)) return;
         GrowthRules.BlockedReason reason = growthReason(level, pos, crop, null);
         if (reason != GrowthRules.BlockedReason.NONE) return;
-        EssenceFamily resolvedTier = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
+        FragmentTier resolvedTier = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
                 .material().map(material -> material.definition().tier()).orElse(crop.variant().family());
-        if (resolvedTier != EssenceFamily.TERRAN
+        if (resolvedTier != FragmentTier.TERRITE
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed)
                         || !bed.consumeGrowthResources())) return;
         int step = za.co.neroland.neroagriculture.genetics.GeneticEffects.growthStep(
@@ -92,14 +92,14 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             var definition = lookup.material().map(material -> material.definition()).orElse(null);
             double multiplier = AgricultureConfig.YIELD_MULTIPLIER.get();
             int harvests = crop.variant().harvestCount();
-            EssenceFamily requiredBed = definition == null ? crop.variant().family() : definition.tier();
+            FragmentTier requiredBed = definition == null ? crop.variant().family() : definition.tier();
             int cap = tierCap(requiredBed);
             int yield = definition == null ? 0
                     : YieldCurve.scaledCapped(definition.yield(), harvests, multiplier, cap);
             int nextYield = definition == null ? 0
                     : YieldCurve.nextCapped(definition.yield(), harvests, multiplier, cap);
             int maxYield = definition == null ? 0 : YieldCurve.maxCapped(definition.yield(), multiplier, cap);
-            EssenceFamily actualBed = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
+            FragmentTier actualBed = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
             String gate = definition == null || definition.gate() == null ? "none"
                     : definition.gate() + ":" + (ProgressionGates.isOpen(serverPlayer, definition.gate())
                             ? "open" : "closed");
@@ -127,17 +127,17 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);
-        giveEssence(serverPlayer, pos, definition.id(), definition.tier(), amount);
+        giveFragment(serverPlayer, pos, definition.id(), definition.tier(), amount);
         return InteractionResult.SUCCESS;
     }
 
     private static GrowthRules.BlockedReason growthReason(ServerLevel level, BlockPos pos,
             ResourceCropBlockEntity crop, @Nullable ServerPlayer explicitPlayer) {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
-        EssenceFamily materialTier = lookup.material().map(material -> material.definition().tier())
+        FragmentTier materialTier = lookup.material().map(material -> material.definition().tier())
                 .orElse(crop.variant().family());
         var definition = lookup.material().map(material -> material.definition()).orElse(null);
-        EssenceFamily bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
+        FragmentTier bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
         ServerPlayer player = explicitPlayer;
         if (player == null) {
             Player nearest = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
@@ -148,8 +148,8 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 || player != null && ProgressionGates.isOpen(player, definition.gate());
         boolean dimension = definition == null || definition.worldRestriction() == null
                 || definition.worldRestriction().dimension().equals(level.dimension().identifier());
-        boolean power = materialTier == EssenceFamily.TERRAN;
-        boolean nutrient = materialTier == EssenceFamily.TERRAN;
+        boolean power = materialTier == FragmentTier.TERRITE;
+        boolean nutrient = materialTier == FragmentTier.TERRITE;
         if (level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) {
             int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
             int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
@@ -167,11 +167,11 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 level.getRawBrightness(pos, 0) >= 9, dimension, climate, power, nutrient));
     }
 
-    private static void giveEssence(ServerPlayer player, BlockPos pos, net.minecraft.resources.Identifier material,
-            EssenceFamily family, int amount) {
+    private static void giveFragment(ServerPlayer player, BlockPos pos, net.minecraft.resources.Identifier material,
+            FragmentTier family, int amount) {
         int remaining = amount;
         while (remaining > 0) {
-            ItemStack stack = new ItemStack(ModItems.MATERIAL_ESSENCE.get(), Math.min(64, remaining));
+            ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
             stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
             remaining -= stack.getCount();
             if (!player.getInventory().add(stack)) popResource(player.level(), pos, stack);
@@ -185,7 +185,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
             var lookup = level.getServer() == null ? MaterialCatalog.current().lookup(crop.variant().material())
                     : MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
-            EssenceFamily family = lookup.material().map(material -> material.definition().tier()).orElse(crop.variant().family());
+            FragmentTier family = lookup.material().map(material -> material.definition().tier()).orElse(crop.variant().family());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(crop.variant().material(), family));
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());
             if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
@@ -193,7 +193,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         }
     }
 
-    private static int tierCap(EssenceFamily tier) {
+    private static int tierCap(FragmentTier tier) {
         return TierBalance.yieldCap(tier, AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
     }

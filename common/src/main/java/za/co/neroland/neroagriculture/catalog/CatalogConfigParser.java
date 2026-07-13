@@ -10,7 +10,7 @@ import java.util.Set;
 
 import net.minecraft.resources.Identifier;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Parses compact server properties without silently accepting malformed entries. */
 public final class CatalogConfigParser {
@@ -26,25 +26,26 @@ public final class CatalogConfigParser {
             try { blocked.add(Identifier.parse(raw.trim())); }
             catch (RuntimeException e) { errors.add("blacklist contains invalid id '" + raw.trim() + "'"); }
         }
-        // Format: material_id|tier=orbital|gate=nerolandcore:reached_orbit|yield=1:4:32|conversion=8|enabled=true
+        // Format: material_id|tier=orbite|gate=neroagriculture:synthesis|color=#55D6C8|yield=1:4:32|conversion=8|enabled=true
         for (String entry : overrides.split(";")) {
             if (entry.isBlank()) continue;
             String[] fields = entry.trim().split("\\|");
             try {
                 Identifier id = Identifier.parse(fields[0].trim());
-                EssenceFamily tier = null;
+                FragmentTier tier = null;
                 Identifier gate = null;
                 boolean gateSpecified = false;
                 MaterialDefinition.Yield yield = null;
                 Integer conversion = null;
                 Boolean enabled = null;
+                Integer color = null;
                 for (int i = 1; i < fields.length; i++) {
                     String[] pair = fields[i].split("=", 2);
                     if (pair.length != 2) throw new IllegalArgumentException("expected key=value at '" + fields[i] + "'");
                     String key = pair[0].trim().toLowerCase(Locale.ROOT);
                     String value = pair[1].trim();
                     switch (key) {
-                        case "tier" -> tier = EssenceFamily.valueOf(value.toUpperCase(Locale.ROOT));
+                        case "tier" -> tier = FragmentTier.valueOf(value.toUpperCase(Locale.ROOT));
                         case "gate" -> { gateSpecified = true; gate = value.equalsIgnoreCase("none") ? null : Identifier.parse(value); }
                         case "yield" -> {
                             String[] parts = value.split(":");
@@ -52,6 +53,7 @@ public final class CatalogConfigParser {
                             yield = new MaterialDefinition.Yield(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
                         }
                         case "conversion" -> conversion = Integer.parseInt(value);
+                        case "color" -> color = parseColor(value);
                         case "enabled" -> {
                             if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) throw new IllegalArgumentException("enabled must be true or false");
                             enabled = Boolean.parseBoolean(value);
@@ -59,11 +61,23 @@ public final class CatalogConfigParser {
                         default -> throw new IllegalArgumentException("unknown override field '" + key + "'");
                     }
                 }
-                parsedOverrides.put(id, new MaterialOverride(tier, gate, gateSpecified, yield, conversion, enabled));
+                parsedOverrides.put(id, new MaterialOverride(tier, gate, gateSpecified, yield, conversion, enabled, color));
             } catch (RuntimeException e) {
                 errors.add("override '" + entry.trim() + "': " + e.getMessage());
             }
         }
         return new Parsed(Set.copyOf(blocked), Map.copyOf(parsedOverrides), List.copyOf(errors));
+    }
+
+    /** Accepts a 24-bit RGB integer or a {@code #RRGGBB}/{@code RRGGBB} hex string. */
+    private static int parseColor(String raw) {
+        String hex = raw.trim();
+        if (hex.startsWith("#")) hex = hex.substring(1);
+        int value;
+        try { value = hex.length() <= 6 && !hex.isEmpty() && hex.chars().allMatch(c -> Character.digit(c, 16) >= 0)
+                ? Integer.parseInt(hex, 16) : Integer.parseInt(raw.trim()); }
+        catch (NumberFormatException e) { throw new IllegalArgumentException("color must be an RGB integer or #RRGGBB"); }
+        if ((value & 0xFF000000) != 0) throw new IllegalArgumentException("color must be a 24-bit RGB value");
+        return value;
     }
 }

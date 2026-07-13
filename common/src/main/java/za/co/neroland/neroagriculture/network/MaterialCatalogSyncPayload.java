@@ -10,7 +10,7 @@ import net.minecraft.resources.Identifier;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.ResolvedCatalog;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Minimal bounded display snapshot; recipes, gates, selectors and conversion rules remain server-only. */
 public record MaterialCatalogSyncPayload(List<Entry> entries) implements CustomPacketPayload {
@@ -60,7 +60,7 @@ public record MaterialCatalogSyncPayload(List<Entry> entries) implements CustomP
         List<Entry> entries = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             entries.add(new Entry(Identifier.parse(buffer.readUtf(MAX_ID_LENGTH)),
-                    buffer.readEnum(EssenceFamily.class), buffer.readUtf(MAX_DISPLAY_LENGTH), buffer.readInt()));
+                    buffer.readEnum(FragmentTier.class), buffer.readUtf(MAX_DISPLAY_LENGTH), buffer.readInt()));
         }
         return new MaterialCatalogSyncPayload(entries);
     }
@@ -71,7 +71,7 @@ public record MaterialCatalogSyncPayload(List<Entry> entries) implements CustomP
 
     @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
-    public record Entry(Identifier id, EssenceFamily tier, String displayKey, int color) {
+    public record Entry(Identifier id, FragmentTier tier, String displayKey, int color) {
         public Entry {
             if (id.toString().length() > MAX_ID_LENGTH || displayKey.isBlank()
                     || displayKey.length() > MAX_DISPLAY_LENGTH || (color & 0xFF000000) != 0) {

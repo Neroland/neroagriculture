@@ -1,1 +1,0 @@
-{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:industrial_essence", "result": { "id": "neroagriculture:orbital_essence" }, "input_count": 4, "energy": 2000, "ticks": 100, "family": "orbital" }

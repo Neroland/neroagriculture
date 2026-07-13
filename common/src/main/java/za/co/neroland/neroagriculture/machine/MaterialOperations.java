@@ -12,10 +12,10 @@ import net.minecraft.world.item.ItemStack;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition;
 import za.co.neroland.neroagriculture.catalog.ResolvedCatalog;
 import za.co.neroland.neroagriculture.catalog.ResolvedMaterial;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.registry.ModItems;
 
-/** Deterministic catalog matching and finite essence-family item mapping. */
+/** Deterministic catalog matching and finite fragment-family item mapping. */
 public final class MaterialOperations {
     private MaterialOperations() { }
 
@@ -41,13 +41,13 @@ public final class MaterialOperations {
         };
     }
 
-    public static Item neutralEssence(EssenceFamily family) {
+    public static Item neutralFragment(FragmentTier family) {
         return switch (family) {
-            case TERRAN -> ModItems.TERRAN_ESSENCE.get();
-            case INDUSTRIAL -> ModItems.INDUSTRIAL_ESSENCE.get();
-            case ORBITAL -> ModItems.ORBITAL_ESSENCE.get();
-            case COLONIAL -> ModItems.COLONIAL_ESSENCE.get();
-            case DEEPVOID -> ModItems.DEEPVOID_ESSENCE.get();
+            case TERRITE -> ModItems.TERRITE_FRAGMENT.get();
+            case FORGITE -> ModItems.FORGITE_FRAGMENT.get();
+            case ORBITE -> ModItems.ORBITE_FRAGMENT.get();
+            case COLONITE -> ModItems.COLONITE_FRAGMENT.get();
+            case VOIDITE -> ModItems.VOIDITE_FRAGMENT.get();
         };
     }
 }

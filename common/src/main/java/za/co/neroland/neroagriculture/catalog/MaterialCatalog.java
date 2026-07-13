@@ -25,8 +25,9 @@ import za.co.neroland.neroagriculture.catalog.CatalogResolver.Candidate;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.InputSelector;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.InputSelector.Kind;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.Yield;
+import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.nerolandcore.meteor.MeteorMaterials;
 
 /** Server-owned, reload-safe material catalog. */
@@ -48,7 +49,7 @@ public final class MaterialCatalog {
     public static synchronized ResolvedCatalog reload(MinecraftServer server) {
         List<String> errors = new ArrayList<>();
         List<Candidate> candidates = new ArrayList<>();
-        candidates.addAll(discoverOreTags(errors));
+        candidates.addAll(discoverTaggedMaterials(errors));
         candidates.addAll(BuiltinMaterials.candidates());
         try {
             MeteorMaterials.reload(server);
@@ -129,31 +130,60 @@ public final class MaterialCatalog {
         return null;
     }
 
-    private static List<Candidate> discoverOreTags(List<String> errors) {
+    /** Tag categories scanned for auto-generation, in output-preference order (ingots/gems win over ore/dust). */
+    private static final List<String> DISCOVERY_CATEGORIES = List.of("ingots", "gems", "raw_materials", "dusts", "ores");
+
+    /**
+     * Auto-generate a catalog candidate for every resource discovered through the common material tags
+     * ({@code c:ingots/*}, {@code c:gems/*}, {@code c:raw_materials/*}, {@code c:dusts/*}, {@code c:ores/*}).
+     * The tier comes from {@link TierHeuristic}, the colour from {@link MaterialColors}, and the native
+     * gate from the tier — all of which config/datapack entries may override. Curated built-ins and
+     * datapack definitions outrank these (lower {@link CatalogSource} priority), so this only fills in
+     * modded resources that ship no explicit definition. Recipes still require the real resource, so an
+     * absent mod simply yields no craftable seed.
+     */
+    private static List<Candidate> discoverTaggedMaterials(List<String> errors) {
         List<Candidate> result = new ArrayList<>();
         BuiltInRegistries.ITEM.getTags()
                 .filter(named -> named.key().location().getNamespace().equals("c")
-                        && named.key().location().getPath().startsWith("ores/"))
+                        && category(named.key().location().getPath()) != null)
                 .sorted(Comparator.comparing(named -> named.key().location().toString()))
                 .forEach(named -> {
                     TagKey<Item> tag = named.key();
+                    String category = category(tag.location().getPath());
+                    String path = tag.location().getPath().substring(category.length() + 1);
                     List<Identifier> outputs = java.util.stream.StreamSupport.stream(named.spliterator(), false)
                             .map(holder -> BuiltInRegistries.ITEM.getKey(holder.value()))
                             .filter(java.util.Objects::nonNull).sorted(Comparator.comparing(Identifier::toString)).toList();
                     if (outputs.isEmpty()) {
-                        errors.add(tag.location() + ": ore tag is empty");
+                        errors.add(tag.location() + ": material tag is empty");
                         return;
                     }
-                    String path = tag.location().getPath().substring("ores/".length());
                     Identifier id = Identifier.fromNamespaceAndPath(tag.location().getNamespace(), path);
-                    int color = 0x303030 | (id.toString().hashCode() & 0xCFCFCF);
+                    FragmentTier tier = TierHeuristic.assign(path, category);
+                    int color = MaterialColors.resolve(path);
                     MaterialDefinition definition = new MaterialDefinition(id,
-                            new InputSelector(Kind.TAG, tag.location()), outputs.getFirst(), EssenceFamily.ORBITAL,
-                            MaterialDefinitionParser.defaultGate(EssenceFamily.ORBITAL), new Yield(1, 5, 96), 16,
+                            new InputSelector(Kind.TAG, tag.location()), outputs.getFirst(), tier,
+                            MaterialDefinitionParser.defaultGate(tier),
+                            new Yield(TierBalance.defaultYieldMin(tier), TierBalance.defaultYieldMax(tier),
+                                    TierBalance.defaultRamp(tier)),
+                            TierBalance.conversionCount(tier),
                             "material." + id.getNamespace() + "." + id.getPath().replace('/', '.'), color, true, null);
-                    result.add(new Candidate(definition, CatalogSource.ORE_TAG, "discovered tag " + tag.location()));
+                    // Rank the detail string so, among same-id discoveries, the preferred category wins the
+                    // resolver tiebreak (all share CatalogSource.ORE_TAG priority; detail breaks the tie).
+                    String rank = Integer.toString(DISCOVERY_CATEGORIES.indexOf(category));
+                    result.add(new Candidate(definition, CatalogSource.ORE_TAG,
+                            rank + " discovered " + category + " tag " + tag.location()));
                 });
         return result;
+    }
+
+    @Nullable
+    private static String category(String tagPath) {
+        for (String category : DISCOVERY_CATEGORIES) {
+            if (tagPath.startsWith(category + "/")) return category;
+        }
+        return null;
     }
 
     @Nullable

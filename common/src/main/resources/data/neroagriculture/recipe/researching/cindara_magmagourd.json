@@ -1,1 +1,1 @@
-{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:magma_cream", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/cindara_magmagourd", "family": "orbital"}
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:magma_cream", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/cindara_magmagourd", "family": "orbite"}

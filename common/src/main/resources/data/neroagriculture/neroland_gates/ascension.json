@@ -1,0 +1,7 @@
+{
+  "scope": "player",
+  "requires": [
+    "neroagriculture:transmutation"
+  ],
+  "title": "Ascension"
+}

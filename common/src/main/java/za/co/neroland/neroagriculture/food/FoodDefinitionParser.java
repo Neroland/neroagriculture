@@ -6,7 +6,7 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Strict datapack parser for food/alien species with field-specific errors for logs and diagnostics. */
 public final class FoodDefinitionParser {
@@ -29,7 +29,7 @@ public final class FoodDefinitionParser {
             int durationCap = optionalInt(json, "duration_cap", durationTicks);
             int nutrition = requiredInt(json, "nutrition");
             float saturation = (float) json.get("saturation").getAsDouble();
-            EssenceFamily tier = enumValue(EssenceFamily.class, requiredString(json, "tier"), "tier");
+            FragmentTier tier = enumValue(FragmentTier.class, requiredString(json, "tier"), "tier");
             PlanetTheme theme = json.has("theme") && !json.get("theme").isJsonNull()
                     ? enumValue(PlanetTheme.class, json.get("theme").getAsString(), "theme")
                     : PlanetTheme.EARTH;
