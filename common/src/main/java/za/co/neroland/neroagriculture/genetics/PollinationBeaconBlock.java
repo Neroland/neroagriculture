@@ -38,6 +38,12 @@ public final class PollinationBeaconBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
+    @Override
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

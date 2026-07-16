@@ -270,10 +270,12 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         }
         ServerPlayer player = nearbyPlayer(level);
         if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
-        if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
-                definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
-        if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
-                definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
+        if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
+            if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
+                    definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
+            if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
+                    definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
+        }
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
         seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.id());
@@ -290,10 +292,12 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (variant.family() != definition.tier()) return fail(MachineBlockedReason.INVALID_COMPONENT);
         ServerPlayer player = nearbyPlayer(level);
         if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
-        if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
-                definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
-        if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
-                definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
+        if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
+            if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
+                    definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
+            if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
+                    definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
+        }
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.CONVERSION.get(), candidate ->
                 candidate.material().isPresent() && candidate.material().get().equals(definition.id()));
         if (recipe == null || recipe.inputCount() < definition.conversion()) return fail(MachineBlockedReason.NO_RECIPE);

@@ -68,7 +68,7 @@ class CatalogResolverTest {
                 """).getAsJsonObject();
         MaterialDefinitionParser.Result result = MaterialDefinitionParser.parse(id, valid);
         assertTrue(result.valid());
-        assertEquals(Identifier.parse("neroagriculture:refinement"), result.definition().gate());
+        assertNull(result.definition().gate(), "no hard gates by default");
 
         var invalid = JsonParser.parseString("""
                 {"input":{"item":"bad id","tag":"c:ores/copper"},"output":"minecraft:copper_ingot",

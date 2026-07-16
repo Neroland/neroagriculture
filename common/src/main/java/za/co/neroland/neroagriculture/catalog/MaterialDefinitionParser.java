@@ -50,9 +50,10 @@ public final class MaterialDefinitionParser {
 
     @Nullable
     public static Identifier defaultGate(FragmentTier tier) {
-        // Native, standalone progression: NeroAgriculture owns and opens these gates itself, so the
-        // whole tier ladder is reachable with only Neroland Core present (no sibling mod required).
-        return za.co.neroland.neroagriculture.progression.AgricultureGates.forTier(tier);
+        // No hard gates by default (playtest decision 2026-07-16): every tier is open out of the box.
+        // Pack-makers can still gate materials explicitly via datapack/config ("gate": id), and the
+        // native gate ids in AgricultureGates remain registered + opened for packs that want them.
+        return null;
     }
 
     private static FragmentTier tier(String raw) {

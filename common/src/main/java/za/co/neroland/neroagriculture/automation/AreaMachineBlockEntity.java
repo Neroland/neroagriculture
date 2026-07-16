@@ -69,21 +69,33 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         return Mode.PLANT;
     }
 
+    private boolean showArea;
+
     private final ContainerData menuData = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
                 case 0 -> mode().ordinal();
                 case 1 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
                 case 2 -> 2 * AreaWork.radius(upgrades.count(UpgradeType.RANGE)) + 1;
+                case 3 -> showArea ? 1 : 0;
                 default -> 0;
             };
         }
         @Override public void set(int index, int value) { }
-        @Override public int getCount() { return 3; }
+        @Override public int getCount() { return 4; }
     };
+
+    public void toggleShowArea() {
+        showArea = !showArea;
+        setChanged();
+    }
 
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            za.co.neroland.neroagriculture.network.AgricultureNetwork.sendToPlayer(serverPlayer,
+                    new za.co.neroland.neroagriculture.network.MachineMenuPositionPayload(id, worldPosition.asLong()));
+        }
         return new AreaMachineMenu(id, inventory, this, menuData, worldPosition);
     }
 
@@ -97,9 +109,26 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
     public static void tick(Level level, BlockPos pos, BlockState state, AreaMachineBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
         if (!(level instanceof ServerLevel serverLevel)) return;
+        if (machine.showArea && level.getGameTime() % 10 == 0) machine.emitAreaHologram(serverLevel);
         if (--machine.workTimer > 0) return;
         machine.workTimer = Math.max(1, AgricultureConfig.AUTOMATION_INTERVAL.get());
         machine.runPass(serverLevel);
+    }
+
+    /** "Hologram" outline of the working area: end-rod particles along the square perimeter. */
+    private void emitAreaHologram(ServerLevel level) {
+        int radius = AreaWork.radius(upgrades.count(UpgradeType.RANGE));
+        double y = worldPosition.getY() + 1.15;
+        for (int d = -radius; d <= radius; d++) {
+            spawnMarker(level, worldPosition.getX() + d + 0.5, y, worldPosition.getZ() - radius + 0.5);
+            spawnMarker(level, worldPosition.getX() + d + 0.5, y, worldPosition.getZ() + radius + 0.5);
+            spawnMarker(level, worldPosition.getX() - radius + 0.5, y, worldPosition.getZ() + d + 0.5);
+            spawnMarker(level, worldPosition.getX() + radius + 0.5, y, worldPosition.getZ() + d + 0.5);
+        }
+    }
+
+    private static void spawnMarker(ServerLevel level, double x, double y, double z) {
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, x, y, z, 1, 0, 0, 0, 0);
     }
 
     private void runPass(ServerLevel level) {
@@ -289,6 +318,7 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
         output.putInt("Cursor", cursor);
+        output.putBoolean("ShowArea", showArea);
         AutomationOwner.save(output, owner);
     }
 
@@ -296,6 +326,7 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         super.loadAdditional(input);
         ContainerHelper.loadAllItems(input, items);
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
+        showArea = input.getBooleanOr("ShowArea", false);
         owner = AutomationOwner.load(input);
     }
 

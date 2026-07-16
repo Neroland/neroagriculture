@@ -36,19 +36,20 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
-        addSlot(new Slot(machine, 0, 26, 30));
-        addSlot(new Slot(machine, 1, 48, 30));
-        addSlot(new Slot(machine, 2, 70, 30));
-        addSlot(new Slot(machine, 3, 116, 30) {
+        // One clean row: inputs | upgrades | outputs (status/progress live in their own bands below).
+        addSlot(new Slot(machine, 0, 17, 30));
+        addSlot(new Slot(machine, 1, 39, 30));
+        addSlot(new Slot(machine, 2, 61, 30));
+        addSlot(new Slot(machine, 3, 127, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 4, 138, 30) {
+        addSlot(new Slot(machine, 4, 149, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 5, 92, 22) {
+        addSlot(new Slot(machine, 5, 83, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(5, stack); }
         });
-        addSlot(new Slot(machine, 6, 92, 42) {
+        addSlot(new Slot(machine, 6, 105, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(6, stack); }
         });
         for (int row = 0; row < 3; row++) {

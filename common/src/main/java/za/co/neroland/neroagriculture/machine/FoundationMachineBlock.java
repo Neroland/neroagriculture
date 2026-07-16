@@ -49,6 +49,14 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
+    @Override
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state,
+            net.minecraft.world.level.Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        // Open the UI with an item in hand too (instead of vanilla placing the held block).
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(net.minecraft.world.level.Level level,

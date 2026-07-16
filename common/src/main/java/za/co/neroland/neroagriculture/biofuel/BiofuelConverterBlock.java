@@ -38,6 +38,13 @@ public final class BiofuelConverterBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    @Override
     protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
             BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof BiofuelConverterBlockEntity machine) {

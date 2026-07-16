@@ -174,6 +174,37 @@ behaviour still want an in-client check on the dev machine.)
   food/alien crops; `gen_textures.py` kept in lockstep). The Prospora farmland crop keeps the vanilla
   height.
 
+### Playtest round 2 fixes (2026-07-16 screenshots)
+
+- **No more hard gates.** Tier progression gates no longer block anything by default: material
+  definitions get no default gate, machine steps are never gate-blocked, and sibling overlays default
+  **off**. The Seed Research requirement is also off by default (`progression.require_research`).
+  The native gate ids remain registered (and still open via milestones) so packs can explicitly gate
+  materials via datapack/config if they want unlocks back.
+- **Machine screen overlap fixed for real**: the fabrication machines now use a single clean slot row
+  — inputs | upgrades | outputs — with the status line and progress bar in their own bands below.
+- **Right-click with an item in hand now opens machine UIs** (previously vanilla would place the held
+  block instead — which made machines look like they "had no UI" when testing with a full hotbar).
+  Applies to every machine including Planter/Harvester/Applicator; grow beds still hand-plant seeds.
+- **Working-area hologram toggle**: the Planter/Harvester/Fertiliser Applicator UI gains a
+  "Show area" button that outlines the machine's working radius in-world with end-rod particles
+  (server-side, cross-loader; persisted per machine).
+- **Fluids animate**: nutrient/biofuel still+flow sprites are now 8-frame animated strips with
+  `.mcmeta` (shimmering still, scrolling flow).
+
+### Playtest round 3 (2026-07-16 requests)
+
+- **Grow beds are hopping pots**: a bed now auto-harvests its mature crop into **its own four output
+  slots** (hopper-extractable) and auto-replants from its seed slot — the full farm loop automates on
+  the bed itself. Bed UI shows seed slot → output slots; side config exposes seed in / harvest out.
+- **Planter/Harvester/Applicator base area is 7x7** (3 blocks on either side), range upgrades now
+  extend it up to 13x13.
+- **Gallery reworked**: the fluid blocks are excluded from the block grid (they flooded the display),
+  and the exhibits are richer — the numbered fabrication chain (extract → infuse/ladder → **fusion
+  demo** (Iron Fragments + Redstone → Nero Alloy Seed) → synthesize (fully staged) → research), a
+  **Prospora farmland plot**, the Fertiliser Applicator, and a working farm whose beds are seeded for
+  the hopping-pot loop, flanked by Planter + Harvester with their **area holograms switched on**.
+
 ## [0.0.1-alpha.2] - 2026-07-13
 
 First consolidated alpha of NeroAgriculture — a sci-fi farming mod built on **Neroland Core**,

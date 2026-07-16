@@ -8,12 +8,12 @@ import net.minecraft.core.BlockPos;
  * from a persisted cursor so there is never a per-tick full-area scan.
  */
 public final class AreaWork {
-    public static final int MIN_RADIUS = 1; // 3x3
-    public static final int MAX_RADIUS = 4; // 9x9
+    public static final int MIN_RADIUS = 3; // 7x7 base (3 blocks on either side)
+    public static final int MAX_RADIUS = 6; // 13x13 with range upgrades
 
     private AreaWork() { }
 
-    /** Radius (in columns) from the installed RANGE upgrade count, clamped to the 3x3..9x9 range. */
+    /** Radius (in columns) from the installed RANGE upgrade count, clamped to the 7x7..13x13 range. */
     public static int radius(int rangeUpgrades) {
         return Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, MIN_RADIUS + Math.max(0, rangeUpgrades)));
     }

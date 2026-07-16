@@ -55,9 +55,12 @@ public final class AgricultureConfig {
     public static final ConfigValue<String> FUSION_MAX_TIER = SCHEMA.string("fusion.max_tier", "voidite", true,
             "Highest tier an alloy seed may be fused at (territe|forgite|orbite|colonite|voidite); "
             + "alloys whose resource sits above this tier cannot be fused");
-    public static final ConfigValue<String> SIBLING_OVERLAYS = SCHEMA.string("progression.sibling_overlays", "auto",
-            true, "Whether higher tiers ALSO require a sibling mod's Core arc gate: auto (only when the "
-            + "opener mod is loaded), on (always), or off. Standalone play is never blocked by this");
+    public static final ConfigValue<Boolean> REQUIRE_RESEARCH = SCHEMA.bool("progression.require_research", false,
+            true, "Require materials to be researched at the Seed Research Bench before synthesis/conversion "
+            + "(off by default — no hard unlocks)");
+    public static final ConfigValue<String> SIBLING_OVERLAYS = SCHEMA.string("progression.sibling_overlays", "off",
+            true, "Whether higher tiers ALSO require a sibling mod's Core arc gate: off (default — no "
+            + "hard gates), auto (only when the opener mod is loaded), or on (always)");
     public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
             "Enable seasonal/stellar-cycle growth and yield modifiers");
     public static final ConfigValue<Boolean> TERRAFORM_ENABLED = SCHEMA.bool("terraforming.enabled", true, true,

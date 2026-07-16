@@ -20,21 +20,30 @@ public final class GrowBedMenu extends AbstractContainerMenu {
     private final ContainerData data;
     private final BlockPos blockPos;
 
+    private static final int MACHINE_SLOTS = 5;
+
     public GrowBedMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(1), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
     }
 
     public GrowBedMenu(int id, Inventory inventory, Container machine, ContainerData data, BlockPos blockPos) {
         super(ModMenuTypes.GROW_BED.get(), id);
-        checkContainerSize(machine, 1);
+        checkContainerSize(machine, MACHINE_SLOTS);
         checkContainerDataCount(data, DATA_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
-        addSlot(new Slot(machine, 0, 80, 30) {
+        // seed input, then four harvest-output slots (auto-harvest fills these; hoppers extract them)
+        addSlot(new Slot(machine, 0, 26, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(0, stack); }
         });
+        for (int i = 1; i < MACHINE_SLOTS; i++) {
+            final int index = i;
+            addSlot(new Slot(machine, index, 80 + (i - 1) * 22, 30) {
+                @Override public boolean mayPlace(ItemStack stack) { return false; }
+            });
+        }
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
         }
@@ -52,8 +61,8 @@ public final class GrowBedMenu extends AbstractContainerMenu {
         if (!slot.hasItem()) return ItemStack.EMPTY;
         ItemStack current = slot.getItem();
         ItemStack copy = current.copy();
-        if (index < 1) {
-            if (!moveItemStackTo(current, 1, slots.size(), true)) return ItemStack.EMPTY;
+        if (index < MACHINE_SLOTS) {
+            if (!moveItemStackTo(current, MACHINE_SLOTS, slots.size(), true)) return ItemStack.EMPTY;
         } else if (!moveItemStackTo(current, 0, 1, false)) {
             return ItemStack.EMPTY;
         }

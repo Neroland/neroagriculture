@@ -40,6 +40,12 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
             @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (blockEntity instanceof CropTowerControllerBlockEntity tower) tower.dropTowerContents(level);

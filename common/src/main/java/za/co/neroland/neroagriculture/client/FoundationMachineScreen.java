@@ -82,9 +82,9 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        // Energy gauge (left half of the header band, clear of the upgrade column at x92).
-        int energyFrac = Math.min(80, menu.energy() * 80 / 100_000);
-        g.fill(x + 8, y + 20, x + 88, y + 23, TROUGH);
+        // Energy gauge across the header band (the slot row starts at y30, so this is clear).
+        int energyFrac = Math.min(160, menu.energy() * 160 / 100_000);
+        g.fill(x + 8, y + 20, x + 168, y + 23, TROUGH);
         if (energyFrac > 0) g.fill(x + 8, y + 20, x + 8 + energyFrac, y + 23, ENERGY);
         g.fill(x + 8, y + 20, x + 10, y + 23, ENERGY);
 

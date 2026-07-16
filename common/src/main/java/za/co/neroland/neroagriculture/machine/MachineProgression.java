@@ -16,8 +16,9 @@ public final class MachineProgression {
 
     @Nullable
     public static Identifier gate(FragmentTier family) {
-        // Native standalone gates owned + opened by NeroAgriculture (see AgricultureGates).
-        return za.co.neroland.neroagriculture.progression.AgricultureGates.forTier(family);
+        // No hard tier gates (playtest decision 2026-07-16): machine steps are never gate-blocked.
+        // The native gates still exist and open via milestones for packs that reference them.
+        return null;
     }
 
     private static Identifier id(String path) {

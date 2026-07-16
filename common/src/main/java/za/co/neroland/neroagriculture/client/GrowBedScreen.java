@@ -61,9 +61,14 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
         g.fill(x + 8, y + 25, x + 168, y + 28, TROUGH);
         if (nutrientFrac > 0) g.fill(x + 8, y + 25, x + 8 + nutrientFrac, y + 28, NUTRIENT);
 
+        // seed → harvest arrow
+        g.fill(x + 48, y + 37, x + 74, y + 39, DIVIDER);
+        g.fill(x + 72, y + 35, x + 74, y + 41, ACCENT);
+
         FragmentTier[] tiers = FragmentTier.values();
         String tier = menu.tier() >= 0 && menu.tier() < tiers.length ? tiers[menu.tier()].name() : "?";
-        g.text(font, Component.literal("Tier: " + tier + " — seed auto-plants above"), x + 8, y + 56, MUTED, false);
+        g.text(font, Component.literal("Tier: " + tier + " — auto-plants and harvests into its slots"),
+                x + 8, y + 56, MUTED, false);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }

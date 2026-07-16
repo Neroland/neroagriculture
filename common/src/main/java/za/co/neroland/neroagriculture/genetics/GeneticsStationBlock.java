@@ -42,6 +42,12 @@ public final class GeneticsStationBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
             @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (blockEntity instanceof GeneticsStationBlockEntity machine) Containers.dropContents(level, pos, machine);

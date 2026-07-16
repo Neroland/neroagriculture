@@ -38,6 +38,20 @@ public final class GrowBedBlock extends BaseEntityBlock {
         return net.minecraft.world.InteractionResult.SUCCESS;
     }
 
+    @Override
+    protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
+        // Seeds keep their hand-planting behaviour (the seed item's useOn plants above the bed).
+        if (stack.is(za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get())
+                || stack.is(za.co.neroland.neroagriculture.registry.ModItems.FOOD_SEED.get())
+                || stack.is(za.co.neroland.neroagriculture.registry.ModItems.ALIEN_SEED.get())) {
+            return net.minecraft.world.InteractionResult.PASS;
+        }
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
     @org.jetbrains.annotations.Nullable
     @Override
     public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(

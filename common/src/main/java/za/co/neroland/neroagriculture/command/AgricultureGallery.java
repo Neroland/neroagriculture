@@ -72,10 +72,12 @@ public final class AgricultureGallery {
         int fy = origin.getY();
         BlockState floor = ModBlocks.GREENHOUSE_FRAME.get().defaultBlockState();
 
-        // BLOCK GRID (EAST): every block registered under this namespace, floating two blocks above a frame.
+        // BLOCK GRID (EAST): every block registered under this namespace, floating two blocks above a
+        // frame. Fluids are excluded — placing a liquid source here floods the gallery.
         List<Block> blocks = new ArrayList<>();
         for (Block block : BuiltInRegistries.BLOCK) {
-            if (NeroAgricultureCommon.MOD_ID.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) {
+            if (NeroAgricultureCommon.MOD_ID.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())
+                    && !(block instanceof net.minecraft.world.level.block.LiquidBlock)) {
                 blocks.add(block);
             }
         }
@@ -103,31 +105,57 @@ public final class AgricultureGallery {
         }
         label(level, cropPos.above(2), "Grow Bed — a resource crop mid-growth");
 
-        // FABRICATION STRIP (SOUTH): the four fabrication machines, powered and fed.
+        // FABRICATION STRIP (SOUTH): the fabrication chain end to end, powered and fed.
         int px = origin.getX() - 8;
         int pz = origin.getZ() + 24;
-        fillFloor(level, px - 1, pz - 1, px + 3 * EXHIBIT_STEP + 1, pz + 1, fy, floor);
+        fillFloor(level, px - 1, pz - 1, px + 4 * EXHIBIT_STEP + 1, pz + 1, fy, floor);
         liveMachine(level, new BlockPos(px, fy + 1, pz), ModBlocks.FRAGMENT_EXTRACTOR.get(),
-                new ItemStack(Items.COAL, 64), 0, "Fragment Extractor — sample → fragment");
+                new ItemStack(Items.COAL, 64), 0, "1. Fragment Extractor — sample → Territe Fragment");
         liveMachine(level, new BlockPos(px + EXHIBIT_STEP, fy + 1, pz), ModBlocks.FRAGMENT_INFUSER.get(),
-                new ItemStack(ModItems.TERRITE_FRAGMENT.get(), 64), 0, "Fragment Infuser — condensing fragment");
-        liveMachine(level, new BlockPos(px + EXHIBIT_STEP * 2, fy + 1, pz), ModBlocks.SEED_SYNTHESIZER.get(),
-                new ItemStack(Items.COAL, 64), 0, "Seed Synthesizer — fabricating a seed");
-        liveMachine(level, new BlockPos(px + EXHIBIT_STEP * 3, fy + 1, pz), ModBlocks.SEED_RESEARCH_BENCH.get(),
-                new ItemStack(Items.WHEAT, 64), 0, "Research Bench — discovering a seed");
+                new ItemStack(ModItems.TERRITE_FRAGMENT.get(), 64), 0,
+                "2. Fragment Infuser — 4x Territe → Forgite (the ladder)");
+        BlockPos fusionPos = new BlockPos(px + EXHIBIT_STEP * 2, fy + 1, pz);
+        liveMachine(level, fusionPos, ModBlocks.FRAGMENT_INFUSER.get(),
+                resourceFragment(Identifier.parse("c:iron"), FragmentTier.FORGITE, 64), 0,
+                "3. Fusion — Iron Fragments + Redstone → Nero Alloy Seed");
+        if (level.getBlockEntity(fusionPos) instanceof Container fusion && fusion.getContainerSize() > 1) {
+            fusion.setItem(1, new ItemStack(Items.REDSTONE, 64));
+        }
+        BlockPos synthPos = new BlockPos(px + EXHIBIT_STEP * 3, fy + 1, pz);
+        liveMachine(level, synthPos, ModBlocks.SEED_SYNTHESIZER.get(),
+                new ItemStack(Items.COAL, 64), 0, "4. Seed Synthesizer — resource + fragments + Prospora → seed");
+        if (level.getBlockEntity(synthPos) instanceof Container synth && synth.getContainerSize() > 2) {
+            synth.setItem(1, new ItemStack(ModItems.TERRITE_FRAGMENT.get(), 64));
+            synth.setItem(2, new ItemStack(ModItems.PROSPORA_SEED.get(), 16));
+        }
+        liveMachine(level, new BlockPos(px + EXHIBIT_STEP * 4, fy + 1, pz), ModBlocks.SEED_RESEARCH_BENCH.get(),
+                new ItemStack(Items.WHEAT, 64), 0, "5. Research Bench — optional seed discovery");
 
-        // AUTOMATION + LIFE SUPPORT (SW): planter, bioreactor, biofuel converter, fertiliser processor.
+        // AUTOMATION + LIFE SUPPORT (SW): bioreactor, biofuel converter, fertiliser processor + applicator.
         int wx = origin.getX() - 26;
         int wz = origin.getZ() + 12;
         fillFloor(level, wx - 1, wz - 1, wx + 3 * EXHIBIT_STEP + 1, wz + 1, fy, floor);
-        liveMachine(level, new BlockPos(wx, fy + 1, wz), ModBlocks.PLANTER.get(),
-                resourceSeed(), 0, "Planter — sowing an area of beds");
-        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP, fy + 1, wz), ModBlocks.OXYGEN_PLANT.get(),
+        liveMachine(level, new BlockPos(wx, fy + 1, wz), ModBlocks.OXYGEN_PLANT.get(),
                 new ItemStack(ModItems.BIOMASS.get(), 64), 0, "Bioreactor — biomass → nutrient");
-        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP * 2, fy + 1, wz), ModBlocks.BIOFUEL_CONVERTER.get(),
+        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP, fy + 1, wz), ModBlocks.BIOFUEL_CONVERTER.get(),
                 new ItemStack(ModItems.BIOMASS.get(), 64), 0, "Biofuel Converter — farm surplus → fuel");
-        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP * 3, fy + 1, wz), ModBlocks.FERTILISER_PROCESSOR.get(),
+        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP * 2, fy + 1, wz), ModBlocks.FERTILISER_PROCESSOR.get(),
                 new ItemStack(ModItems.BIOMASS.get(), 64), 0, "Fertiliser Processor — making fertiliser");
+        liveMachine(level, new BlockPos(wx + EXHIBIT_STEP * 3, fy + 1, wz), ModBlocks.FERTILISER_APPLICATOR.get(),
+                new ItemStack(ModItems.FERTILISER.get(), 64), 0, "Fertiliser Applicator — auto-doses beds");
+
+        // PROSPORA PLOT (SW corner): the base crop on plain farmland — the standalone ladder entry.
+        int fx2 = wx;
+        int fz2 = wz + 5;
+        fillFloor(level, fx2 - 1, fz2 - 1, fx2 + 4, fz2 + 1, fy, floor);
+        for (int i = 0; i < 4; i++) {
+            BlockPos farm = new BlockPos(fx2 + i, fy + 1, fz2);
+            level.setBlockAndUpdate(farm, Blocks.FARMLAND.defaultBlockState());
+            level.setBlockAndUpdate(farm.above(), ModBlocks.PROSPORA_CROP.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.CropBlock.AGE, Math.min(7, 1 + i * 2)));
+        }
+        label(level, new BlockPos(fx2 + 2, fy + 4, fz2),
+                "Prospora Crop — grows on farmland, drops Territe Fragments");
 
         // GENETICS + POLLINATION (W): the station splicing a seed, the beacon boosting crossing.
         int ax = origin.getX() - 26;
@@ -227,6 +255,20 @@ public final class AgricultureGallery {
         return seed;
     }
 
+    private static ItemStack resourceSeed(Identifier material, FragmentTier tier) {
+        ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get(), 16);
+        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, material);
+        return seed;
+    }
+
+    private static ItemStack resourceFragment(Identifier material, FragmentTier tier, int count) {
+        ItemStack fragment = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), count);
+        fragment.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier));
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(fragment, material);
+        return fragment;
+    }
+
     private static void battery(ServerLevel level, BlockPos pos) {
         level.setBlockAndUpdate(pos, za.co.neroland.nerolandcore.registry.ModBlocks.CREATIVE_BATTERY.get().defaultBlockState());
     }
@@ -288,17 +330,17 @@ public final class AgricultureGallery {
 
     /**
      * A working demonstration farm: a 3×2 grid of tier grow beds, each powered + nutrient-fed with a fully
-     * grown ore crop on top, flanked by a Planter and Harvester. Every crop is at {@code MAX_AGE}, so
-     * right-clicking one harvests its fragment and replants the seed (age resets to 0). Higher-tier ores still
-     * require their Core progression gate to be open to harvest — that is intended game behaviour.
+     * grown ore crop on top AND a stack of matching seeds in its seed slot — so the beds demonstrate the
+     * full hopping-pot loop (auto-harvest into their own output slots, auto-replant from the seed slot).
+     * Flanked by a Planter and a Harvester with their working-area holograms switched on.
      */
     private static void buildFarm(ServerLevel level, BlockState floor, int bx, int bz, int fy) {
         int cols = 3;
         fillFloor(level, bx - 2, bz - 1, bx + cols * 3 + 1, bz + 2 * 3, fy, floor);
         label(level, new BlockPos(bx + 3, fy + 4, bz - 1),
-                "Farm — power + nutrient each bed; right-click a grown crop to harvest (it stays planted)");
+                "Farm — beds auto-harvest into their own slots and replant from their seed slot");
         Object[][] plots = {
-            {ModBlocks.TERRITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe (ungated)"},
+            {ModBlocks.TERRITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:iron", FragmentTier.FORGITE, "Iron — Forgite"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:copper", FragmentTier.FORGITE, "Copper — Forgite"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:gold", FragmentTier.FORGITE, "Gold — Forgite"},
@@ -310,10 +352,20 @@ public final class AgricultureGallery {
             plantBed(level, bedPos, (Block) plots[i][0], Identifier.parse((String) plots[i][1]),
                     (FragmentTier) plots[i][2], (String) plots[i][3]);
         }
-        liveMachine(level, new BlockPos(bx - 2, fy + 1, bz + 1), ModBlocks.PLANTER.get(),
-                resourceSeed(), 0, "Planter — auto-sows the beds");
-        liveMachine(level, new BlockPos(bx + cols * 3 + 1, fy + 1, bz + 1), ModBlocks.HARVESTER.get(),
-                ItemStack.EMPTY, 0, "Harvester — auto-reaps grown crops");
+        BlockPos planterPos = new BlockPos(bx - 2, fy + 1, bz + 1);
+        liveMachine(level, planterPos, ModBlocks.PLANTER.get(),
+                resourceSeed(), 0, "Planter — auto-sows a 7x7 area (hologram on)");
+        showArea(level, planterPos);
+        BlockPos harvesterPos = new BlockPos(bx + cols * 3 + 1, fy + 1, bz + 1);
+        liveMachine(level, harvesterPos, ModBlocks.HARVESTER.get(),
+                ItemStack.EMPTY, 0, "Harvester — auto-reaps a 7x7 area (hologram on)");
+        showArea(level, harvesterPos);
+    }
+
+    private static void showArea(ServerLevel level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof za.co.neroland.neroagriculture.automation.AreaMachineBlockEntity machine) {
+            machine.toggleShowArea();
+        }
     }
 
     private static void plantBed(ServerLevel level, BlockPos bedPos, Block bed, Identifier material,
@@ -321,9 +373,11 @@ public final class AgricultureGallery {
         level.setBlockAndUpdate(bedPos, bed.defaultBlockState());
         battery(level, bedPos.below());
         charge(level, bedPos);
-        if (level.getBlockEntity(bedPos) instanceof GrowBedBlockEntity growBed
-                && growBed.getFluid() instanceof FluidBuffer fluid) {
-            fluid.setRaw(ModFluids.NUTRIENT.get(), 100_000);
+        if (level.getBlockEntity(bedPos) instanceof GrowBedBlockEntity growBed) {
+            if (growBed.getFluid() instanceof FluidBuffer fluid) {
+                fluid.setRaw(ModFluids.NUTRIENT.get(), 100_000);
+            }
+            growBed.setItem(GrowBedBlockEntity.SEED_SLOT, resourceSeed(material, tier));
             growBed.setChanged();
         }
         BlockPos cropPos = bedPos.above();

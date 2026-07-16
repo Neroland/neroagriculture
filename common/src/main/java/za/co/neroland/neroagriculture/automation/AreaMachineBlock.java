@@ -54,6 +54,9 @@ public final class AreaMachineBlock extends BaseEntityBlock {
                 if (!player.getAbilities().instabuild) player.setItemInHand(hand, leftover);
                 return InteractionResult.CONSUME;
             }
+            // Nothing to insert: open the UI rather than letting vanilla place the held block.
+            player.openMenu(machine);
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
     }

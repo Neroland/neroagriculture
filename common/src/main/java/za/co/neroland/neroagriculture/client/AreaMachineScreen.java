@@ -28,6 +28,8 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
 
     private static final String[] MODES = {"Planting", "Harvesting", "Applying"};
 
+    @org.jetbrains.annotations.Nullable private net.minecraft.core.BlockPos machinePos;
+
     public AreaMachineScreen(AreaMachineMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 166);
         titleLabelX = 8;
@@ -64,7 +66,30 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
         g.text(font, Component.literal(modeName + " — range " + menu.range() + "x" + menu.range()),
                 x + 92, y + 22, MUTED, false);
 
+        // "Show area" toggle pill — outlines the working radius in-world with hologram particles.
+        int pillColor = menu.showArea() ? ACCENT : MUTED;
+        g.fill(x + 92, y + 32, x + 164, y + 45, TROUGH);
+        g.fill(x + 92, y + 32, x + 164, y + 33, pillColor);
+        Component label = Component.translatable(menu.showArea()
+                ? "screen.neroagriculture.area.hide" : "screen.neroagriculture.area.show");
+        g.text(font, label, x + 128 - font.width(label) / 2, y + 35, pillColor, false);
+
         super.extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        if (event.x() >= leftPos + 92 && event.x() < leftPos + 164
+                && event.y() >= topPos + 32 && event.y() < topPos + 45) {
+            if (machinePos == null) {
+                machinePos = za.co.neroland.neroagriculture.network.ClientMachineMenuPositions.poll(menu.containerId);
+            }
+            if (machinePos != null) {
+                za.co.neroland.neroagriculture.platform.Services.NETWORK.sendToServer(
+                        new za.co.neroland.neroagriculture.network.MachineActionPayload(machinePos.asLong(), 1, 0));
+            }
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {

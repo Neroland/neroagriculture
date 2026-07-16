@@ -18,7 +18,7 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
     private static final int ITEM_SLOTS = 9;
     private static final int UPGRADE_START = 9;
     private static final int MACHINE_SLOTS = 12;
-    private static final int DATA_COUNT = 3;
+    private static final int DATA_COUNT = 4;
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
@@ -58,6 +58,7 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
     public int mode() { return data.get(0); }
     public int energy() { return data.get(1); }
     public int range() { return data.get(2); }
+    public boolean showArea() { return data.get(3) != 0; }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

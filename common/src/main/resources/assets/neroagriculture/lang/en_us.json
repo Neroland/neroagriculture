@@ -93,6 +93,8 @@
   "warning.neroagriculture.invalid_charge": "Invalid or uncharged seed blank",
   "screen.neroagriculture.research": "Research",
   "screen.neroagriculture.genetics.insert_seed": "Insert a seed to read its traits",
+  "screen.neroagriculture.area.show": "Show area",
+  "screen.neroagriculture.area.hide": "Hide area",
   "screen.neroagriculture.tower.unformed": "Tower not formed",
   "screen.neroagriculture.tower.status": "Height %s — %s slots active",
   "machine.neroagriculture.status.idle": "Idle",
