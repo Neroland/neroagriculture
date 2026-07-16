@@ -23,6 +23,7 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> GROW_BED_NUTRIENT_COST = integer("grow_beds.nutrient_per_growth_mb", 25, 0, 10_000);
     public static final ConfigValue<Double> GROWTH_MULTIPLIER = decimal("growth.multiplier", 1.0, 0.05, 100.0);
     public static final ConfigValue<Double> YIELD_MULTIPLIER = decimal("growth.yield_multiplier", 1.0, 0.0, 100.0);
+    public static final ConfigValue<Integer> SEED_RETURN_PERCENT = integer("growth.seed_return_percent", 10, 0, 100);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_BASE = integer("growth.tier_yield_cap_base", 3, 1, 64);
     public static final ConfigValue<Integer> YIELD_TIER_CAP_STEP = integer("growth.tier_yield_cap_step", 1, 0, 16);
     public static final ConfigValue<String> CONTROLLED_TIER = SCHEMA.string("growth.controlled_tier", "orbite",

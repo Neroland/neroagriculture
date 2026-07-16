@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/crop","textures":{"crop":"neroagriculture:block/resource_crop_stage2"}}
+{"parent":"neroagriculture:block/tinted_crop","textures":{"crop":"neroagriculture:block/resource_crop_stage2"}}

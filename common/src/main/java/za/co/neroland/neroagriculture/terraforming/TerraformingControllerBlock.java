@@ -60,7 +60,7 @@ public final class TerraformingControllerBlock extends BaseEntityBlock {
                 serverPlayer.sendSystemMessage(Component.literal(rolled
                         ? "[NeroAgriculture] Terraforming rolled back." : "[NeroAgriculture] Not authorised to roll back."));
             } else {
-                serverPlayer.sendSystemMessage(Component.literal("[NeroAgriculture] terraforming " + controller.status()));
+                serverPlayer.openMenu(controller);
             }
         }
         return InteractionResult.SUCCESS;

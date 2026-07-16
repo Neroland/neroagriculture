@@ -33,7 +33,7 @@ public final class ModItems {
     public static final RegistryEntry<Item> ORBITE_FRAGMENT = item("orbite_fragment");
     public static final RegistryEntry<Item> COLONITE_FRAGMENT = item("colonite_fragment");
     public static final RegistryEntry<Item> VOIDITE_FRAGMENT = item("voidite_fragment");
-    public static final RegistryEntry<Item> PROSPORA_SEED = item("prospora_seed");
+    public static final RegistryEntry<Item> PROSPORA_SEED = prosporaSeed();
     public static final RegistryEntry<Item> BLANK_SEED = item("blank_seed");
     public static final RegistryEntry<Item> CHARGED_SEED = chargedSeed();
     public static final RegistryEntry<Item> NUTRIENT_CANISTER = item("nutrient_canister");
@@ -56,7 +56,7 @@ public final class ModItems {
     static {
         for (RegistryEntry<? extends net.minecraft.world.level.block.Block> block : ModBlocks.ALL) {
             RegistryEntry<BlockItem> entry = ITEMS.register(block.id().getPath(), key ->
-                    new BlockItem(block.get(), new Item.Properties().setId(key)));
+                    new BlockItem(block.get(), new Item.Properties().setId(key).useBlockDescriptionPrefix()));
             TAB_ITEMS.add(entry);
         }
     }
@@ -69,6 +69,13 @@ public final class ModItems {
 
     private static RegistryEntry<Item> variantItem(String name) {
         RegistryEntry<Item> entry = ITEMS.register(name, key -> new MaterialVariantItem(new Item.Properties().setId(key)));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
+    private static RegistryEntry<Item> prosporaSeed() {
+        RegistryEntry<Item> entry = ITEMS.register("prospora_seed",
+                key -> new za.co.neroland.neroagriculture.content.ProsporaSeedItem(new Item.Properties().setId(key)));
         TAB_ITEMS.add(entry);
         return entry;
     }

@@ -4,9 +4,15 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +28,7 @@ import za.co.neroland.neroagriculture.automation.AutomationOwner;
 import za.co.neroland.neroagriculture.automation.AutomationPolicy;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
@@ -38,7 +45,8 @@ import za.co.neroland.nerolandcore.sideconfig.SideMode;
  * chunks, respects the claim/owner policy (fail-closed), and rolls back cleanly. Progress/completion/rollback
  * are published through the public {@link AgricultureApi} terraforming events.
  */
-public final class TerraformingControllerBlockEntity extends AbstractMachineBlockEntity implements AutomationOwner.Owned {
+public final class TerraformingControllerBlockEntity extends AbstractMachineBlockEntity
+        implements AutomationOwner.Owned, MenuProvider {
     private final FluidBuffer nutrient;
     private boolean seeded;
     private int progress;
@@ -58,6 +66,26 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
     public NeroFluidStorage getFluid() { return nutrient; }
     public TerraformingStage stage() { return stage; }
     public int progress() { return progress; }
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            int total = AgricultureConfig.TERRAFORM_TOTAL_PROGRESS.get();
+            return switch (index) {
+                case StatusMenu.MACHINE_ID -> StatusMenu.ID_TERRAFORMING;
+                case StatusMenu.ENERGY -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case StatusMenu.V0 -> total <= 0 ? 100 : (int) (100L * progress / total);
+                case StatusMenu.V1 -> stage.ordinal();
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return StatusMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new StatusMenu(id, inventory, menuData, worldPosition, this);
+    }
     @Override public @Nullable UUID automationOwner() { return owner; }
     @Override public void clearAutomationOwner() { owner = null; setChanged(); }
 

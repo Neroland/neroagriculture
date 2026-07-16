@@ -40,6 +40,9 @@ wheat seeds**. Then synthesize a resource seed in the **Seed Synthesizer**:
 Resource Seed(X) = the real resource X + N matching Tier Fragments + one Prospora Seed
 ```
 
+The Prospora Seed also plants a **base crop** on farmland: it grows like wheat and, on harvest,
+drops **Territe Fragments** plus a Prospora Seed — a renewable, standalone way into the ladder.
+
 Requiring the real resource keeps seeds an **amplifier** — you can only farm a resource you already
 possess — so a resource from an absent mod simply has no craftable seed.
 

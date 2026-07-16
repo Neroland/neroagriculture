@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.automation;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -63,7 +62,7 @@ public final class AreaMachineBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
             BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AreaMachineBlockEntity machine) {
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] " + machine.status()));
+            player.openMenu(machine);
         }
         return InteractionResult.SUCCESS;
     }

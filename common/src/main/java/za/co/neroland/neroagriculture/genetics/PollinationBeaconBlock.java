@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.genetics;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -34,7 +33,7 @@ public final class PollinationBeaconBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PollinationBeaconBlockEntity beacon) {
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] " + beacon.status()));
+            player.openMenu(beacon);
         }
         return InteractionResult.SUCCESS;
     }

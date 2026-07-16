@@ -746,7 +746,7 @@ def gen_crop(name, family):
                 px[main, top - 1] = glow
         save_tex(img, "block", f"{name}_stage{age}")
         write_json("block_model", f"{name}_stage{age}", {
-            "parent": "minecraft:block/crop",
+            "parent": "neroagriculture:block/tinted_crop" if family == "resource" else "neroagriculture:block/bed_crop",
             "textures": {"crop": f"{NS}:block/{name}_stage{age}"}})
     write_json("blockstate", name, {
         "variants": {f"age={a}": {"model": f"{NS}:block/{name}_stage{a}"} for a in range(8)}})

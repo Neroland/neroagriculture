@@ -3,10 +3,15 @@ package za.co.neroland.neroagriculture.genetics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,6 +21,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
+import za.co.neroland.neroagriculture.menu.GeneticsStationMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -30,7 +36,7 @@ import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
  * fragment upgrades the seed's lowest trait by one. All genetics maths is the deterministic, capped
  * {@link Genetics} logic, so no operation can exceed the caps.
  */
-public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     public static final int INPUT_A = 0;
     public static final int INPUT_B = 1;
     public static final int OUTPUT = 2;
@@ -40,6 +46,21 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
     private int progress;
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> progress;
+                case 1 -> PROCESS_TICKS;
+                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) {
+            if (index == 0) progress = value;
+        }
+        @Override public int getCount() { return 3; }
+    };
 
     public GeneticsStationBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.GENETICS_STATION.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),
@@ -107,6 +128,11 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
     private static boolean isSeed(ItemStack stack) {
         return stack.is(ModItems.RESOURCE_SEED.get()) || stack.is(ModItems.FOOD_SEED.get())
                 || stack.is(ModItems.ALIEN_SEED.get());
+    }
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new GeneticsStationMenu(id, inventory, this, menuData, worldPosition);
     }
 
     @Override public int getContainerSize() { return items.size(); }

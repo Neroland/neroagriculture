@@ -37,6 +37,15 @@ public final class FertiliserProcessorBlock extends BaseEntityBlock {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
     }
 
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FertiliserProcessorBlockEntity machine) {
+            player.openMenu(machine);
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

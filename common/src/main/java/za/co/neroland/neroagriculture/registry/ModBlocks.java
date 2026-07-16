@@ -12,6 +12,7 @@ import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.machine.FoundationMachineBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
 import za.co.neroland.neroagriculture.fluid.NutrientLiquidBlock;
+import za.co.neroland.neroagriculture.crop.ProsporaCropBlock;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
 import za.co.neroland.neroagriculture.crop.SpeciesCropBlock;
 import za.co.neroland.neroagriculture.crop.GrowBedBlock;
@@ -33,6 +34,11 @@ public final class ModBlocks {
             key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
                     .strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    // Base crop planted from the Prospora Seed; not in ALL, so no block item (placed via the seed).
+    public static final RegistryEntry<ProsporaCropBlock> PROSPORA_CROP = BLOCKS.register("prospora_crop",
+            key -> new ProsporaCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
+                    .strength(0.0F).sound(SoundType.CROP).noOcclusion().randomTicks()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     public static final RegistryEntry<SpeciesCropBlock> ENGINEERED_FOOD_CROP =
             speciesCrop("engineered_food_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD, MapColor.PLANT);
     public static final RegistryEntry<SpeciesCropBlock> ALIEN_CROP =

@@ -2,6 +2,11 @@ package za.co.neroland.neroagriculture.fertiliser;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
@@ -25,7 +30,7 @@ import za.co.neroland.nerolandcore.sideconfig.SideMode;
 import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /** NF-powered processor: biomass + crop waste to base fertiliser, on Core machine/side-config surfaces. */
-public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     public static final int BIOMASS = 0;
     public static final int WASTE = 1;
     public static final int OUTPUT = 2;
@@ -35,6 +40,26 @@ public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEn
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
     private int progress;
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> progress;
+                case 1 -> PROCESS_TICKS;
+                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { if (index == 0) progress = value; }
+        @Override public int getCount() { return za.co.neroland.neroagriculture.menu.ProcessorMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
+        return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
+                za.co.neroland.neroagriculture.registry.ModMenuTypes.PROCESSOR.get(), id, inventory, this,
+                menuData, worldPosition, 2);
+    }
 
     public FertiliserProcessorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FERTILISER_PROCESSOR.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),

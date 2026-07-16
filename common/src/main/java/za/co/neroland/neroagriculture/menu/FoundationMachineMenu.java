@@ -36,26 +36,26 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
-        addSlot(new Slot(machine, 0, 26, 26));
-        addSlot(new Slot(machine, 1, 48, 26));
-        addSlot(new Slot(machine, 2, 70, 26));
-        addSlot(new Slot(machine, 3, 116, 26) {
+        addSlot(new Slot(machine, 0, 26, 30));
+        addSlot(new Slot(machine, 1, 48, 30));
+        addSlot(new Slot(machine, 2, 70, 30));
+        addSlot(new Slot(machine, 3, 116, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 4, 138, 26) {
+        addSlot(new Slot(machine, 4, 138, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 5, 92, 20) {
+        addSlot(new Slot(machine, 5, 92, 22) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(5, stack); }
         });
-        addSlot(new Slot(machine, 6, 92, 38) {
+        addSlot(new Slot(machine, 6, 92, 42) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(6, stack); }
         });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9,
-                    8 + col * 18, 68 + row * 18));
+                    8 + col * 18, 88 + row * 18));
         }
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 126));
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 146));
         addDataSlots(data);
     }
 

@@ -4,12 +4,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,6 +35,7 @@ import za.co.neroland.neroagriculture.crop.YieldCurve;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
 import za.co.neroland.neroagriculture.genetics.GeneticEffects;
 import za.co.neroland.neroagriculture.genetics.Genetics;
+import za.co.neroland.neroagriculture.menu.CropTowerMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
@@ -49,7 +55,7 @@ import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
  * SAME shared rules as ordinary crops, so a tower can never out-produce an equivalent farm or duplicate. The
  * structure is validated on a slow interval only — never scanned per tick.
  */
-public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     private static final int SEED_START = 0;
     private static final int SEED_END = 2;
     private static final int FERTILISER = 3;
@@ -65,6 +71,20 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     private int cursor;
     private int workTimer;
     private int revalidateTimer;
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> height;
+                case 1 -> activeSlots();
+                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case 3 -> (int) Math.min(Integer.MAX_VALUE, nutrient.getAmount());
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return 4; }
+    };
 
     public CropTowerControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CROP_TOWER_CONTROLLER.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),
@@ -246,6 +266,11 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     }
 
     // --- container ---------------------------------------------------------
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new CropTowerMenu(id, inventory, this, menuData, worldPosition);
+    }
+
     @Override public int getContainerSize() { return SLOT_COUNT; }
     @Override public boolean isEmpty() { return items.stream().allMatch(ItemStack::isEmpty); }
     @Override public ItemStack getItem(int slot) { return items.get(slot); }

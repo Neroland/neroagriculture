@@ -54,10 +54,24 @@ NeroAgriculture-native progression. In progress; each stage is build-verified ac
 - **Dynamic creative tab** — the tab now lists one Resource Seed per resource in the (client-synced)
   material catalog, so it reads like a distinct seed per resource for vanilla and any modded resource,
   with the curated examples shown as a fallback before the catalog syncs.
+- **Self-sustaining farms** — harvesting a mature resource crop now has a configurable chance
+  (`growth.seed_return_percent`, default 10%) to also return a planted seed, carrying its material tint
+  and genetics.
+- **Prospora base crop** — the Prospora Seed now also plants a **base crop** on farmland (a simple
+  wheat-style crop): it grows and, on harvest, drops **Territe Fragments** plus a Prospora Seed, a
+  renewable standalone entry to the ladder (Territe is also obtainable from tier-1 ore extraction, so
+  this is a convenience, not a gate).
+- **In-world crop block tint** — placed Resource Crops now tint to their resource's ingot colour, via a
+  custom `BlockTintSource` that reads the crop block entity's material (resolved through the shared
+  `MaterialColors`). Wired on all three loaders — each exposes vanilla `BlockColors.register` a little
+  differently (NeoForge `RegisterColorHandlersEvent.BlockTintSources`, Forge
+  `RegisterColorHandlersEvent.Block.getBlockColors()`, Fabric via `Minecraft.getBlockColors()` directly,
+  no Fabric-API rendering module) — and the crop models gained a `tintindex` (a shared `tinted_crop`
+  parent, kept in lockstep in `gen_textures.py`).
 
-> Follow-ons still open in this area: the optional Prospora **base crop** (planting Prospora → Territe
-> Fragments; Territe is already obtainable via tier-1 extraction, so nothing is blocked) and explicit
-> seed-return-chance tuning on the harvest→resource loop.
+> Everything above builds green across all six cells; the machine UIs and the two tint paths are
+> compile-verified but still want an in-client look at playtest (in particular, that Fabric can read
+> `getBlockColors()` at client-init time).
 
 **Stage 4 — fusion / alloy seeds**
 
@@ -119,6 +133,46 @@ NeroAgriculture-native progression. In progress; each stage is build-verified ac
 - **Balance** was kept conservative: the ladder's steep per-tier NeroFlux/time costs, the tier-scaled
   seed fragment cost, and the fusion costs all preserve Core's net-conservation invariant (no single
   harvest can mint a resource), which the `TierBalance` tests continue to assert.
+
+### Machine UIs
+
+Every machine that previously reported its state only via chat now opens a real screen. All follow the
+existing texture-free, `fill`-drawn style, with menu types + per-loader screen registration wired.
+
+- **Genetics Station** — two input slots (seed / seed + fragment), a locked output, energy + splice
+  progress, and a live readout of the input seed's traits (read off the synced slot).
+- **Crop Tower Controller** — three seed slots + a fertiliser slot, six output slots, energy + nutrient
+  gauges, and a tower height / active-slots readout.
+- **Planter / Harvester / Fertiliser Applicator** — a 3x3 seed/output grid, three upgrade slots, energy,
+  and a mode + working-range readout (one menu for all three of the shared area machine's modes).
+- **Greenhouse**, **Terraforming**, and **Pollination Beacon** — read-only status panels (via one shared,
+  slot-free status menu keyed by a synced machine id) showing state/volume/crops, progress/stage, or
+  range respectively.
+
+(All compile-verified across the six cells on Fabric/Forge/NeoForge; the visual layout and in-game
+behaviour still want an in-client check on the dev machine.)
+
+### Playtest round 1 fixes (2026-07-15 screenshots)
+
+- **Seeds and fragments are named for their resource** — "Iron Seed", "Redstone Fragment" — built
+  from the material component (`%s Seed` / `%s Fragment` lang keys, title-cased material path).
+- **Block items translate again**: all block items now use their block's `block.*` translation key
+  (26.x `useBlockDescriptionPrefix()`), fixing raw keys like `item.neroagriculture.oxygen_plant`.
+- **Fluids have textures**: new `nutrient_still/flow` and `biofuel_still/flow` sprites, and the fluid
+  models are registered on **NeoForge** (`RegisterFluidModelsEvent`) — this was the magenta/black
+  checkerboard "liquid" (and the untextured source-block shape). *Forge/Fabric fluid visuals still
+  pending (different APIs; tracked).*
+- **Fabrication screens un-squished**: the shared machine screen grew to 176x172 with banded layout —
+  energy gauge, slot row, status line, progress bar and the research pill no longer overlap.
+- **Bioreactor, Biofuel Converter and Fertiliser Processor are now interactable** with real UIs (a
+  shared processor menu/screen: inputs → progress arrow → output + energy).
+- **Grow beds have a UI**: a seed slot (auto-plants above the bed once a second, same catalog/tier/
+  gate checks as hand-planting, gates checked against the nearest player), energy + nutrient gauges,
+  and the bed tier. Hoppers can feed the seed slot.
+- **Crops no longer float** above grow beds: the crop cross models are shifted down so bed crops
+  emerge from the grow-bed soil (`tinted_crop` for resource crops, new `bed_crop` parent for
+  food/alien crops; `gen_textures.py` kept in lockstep). The Prospora farmland crop keeps the vanilla
+  height.
 
 ## [0.0.1-alpha.2] - 2026-07-13
 

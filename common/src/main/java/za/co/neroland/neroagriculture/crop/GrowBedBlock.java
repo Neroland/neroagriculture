@@ -27,4 +27,23 @@ public final class GrowBedBlock extends BaseEntityBlock {
     @Override protected MapCodec<GrowBedBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GrowBedBlockEntity(pos, state); }
+
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,
+            net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.phys.BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof GrowBedBlockEntity bed) {
+            player.openMenu(bed);
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            net.minecraft.world.level.Level level, BlockState state,
+            net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return level.isClientSide() ? null : createTickerHelper(type,
+                za.co.neroland.neroagriculture.registry.ModBlockEntities.GROW_BED.get(), GrowBedBlockEntity::tick);
+    }
 }

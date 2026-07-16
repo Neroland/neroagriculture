@@ -5,11 +5,16 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.AgricultureUpgradeItem;
+import za.co.neroland.neroagriculture.menu.AreaMachineMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -32,7 +38,7 @@ import za.co.neroland.nerolandcore.upgrade.UpgradeType;
 
 /** Bounded, interval-batched Planter/Harvester. One BE serves both modes, selected from its block. */
 public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
-        implements WorldlyContainer, AutomationOwner.Owned {
+        implements WorldlyContainer, AutomationOwner.Owned, MenuProvider {
     public enum Mode { PLANT, HARVEST, APPLY }
 
     public static final int SLOT_COUNT = 9;
@@ -61,6 +67,24 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         if (block == ModBlocks.HARVESTER.get()) return Mode.HARVEST;
         if (block == ModBlocks.FERTILISER_APPLICATOR.get()) return Mode.APPLY;
         return Mode.PLANT;
+    }
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> mode().ordinal();
+                case 1 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case 2 -> 2 * AreaWork.radius(upgrades.count(UpgradeType.RANGE)) + 1;
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return 3; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new AreaMachineMenu(id, inventory, this, menuData, worldPosition);
     }
 
     @Override public @Nullable UUID automationOwner() { return owner; }

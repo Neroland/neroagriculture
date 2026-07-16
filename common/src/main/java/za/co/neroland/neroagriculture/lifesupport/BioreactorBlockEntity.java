@@ -3,6 +3,11 @@ package za.co.neroland.neroagriculture.lifesupport;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -35,7 +40,7 @@ import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
  * NF bioreactor closing the life-support loop: farmed Biomass becomes Nutrient fluid (with an explicit loss)
  * plus a periodic recoverable Crop Waste byproduct. Losses mean the loop can never mint net items or energy.
  */
-public final class BioreactorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class BioreactorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     public static final int BIOMASS = 0;
     public static final int WASTE_OUT = 1;
     public static final int ENERGY_PER_TICK = 8;
@@ -44,6 +49,26 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
     private final NonNullList<ItemStack> items = NonNullList.withSize(2, ItemStack.EMPTY);
     private final FluidBuffer nutrient;
     private int progress;
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> progress;
+                case 1 -> AgricultureConfig.BIOREACTOR_TICKS.get();
+                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { if (index == 0) progress = value; }
+        @Override public int getCount() { return za.co.neroland.neroagriculture.menu.ProcessorMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
+        return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
+                za.co.neroland.neroagriculture.registry.ModMenuTypes.CONVERTER.get(), id, inventory, this,
+                menuData, worldPosition, 1);
+    }
     private int cycles;
 
     public BioreactorBlockEntity(BlockPos pos, BlockState state) {

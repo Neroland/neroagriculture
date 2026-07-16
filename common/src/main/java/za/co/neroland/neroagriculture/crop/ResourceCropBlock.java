@@ -129,6 +129,15 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);
         giveFragment(serverPlayer, pos, definition.id(), definition.tier(), amount);
+        // Self-sustaining farms: a configurable chance to also return a planted seed on harvest.
+        if (AgricultureConfig.SEED_RETURN_PERCENT.get() > 0
+                && level.getRandom().nextInt(100) < AgricultureConfig.SEED_RETURN_PERCENT.get()) {
+            ItemStack returned = new ItemStack(ModItems.RESOURCE_SEED.get());
+            returned.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(returned, definition.id());
+            if (!crop.genetics().isEmpty()) returned.set(ModDataComponents.GENETICS.get(), crop.genetics());
+            if (!serverPlayer.getInventory().add(returned)) popResource(level, pos, returned);
+        }
         return InteractionResult.SUCCESS;
     }
 

@@ -4,8 +4,14 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -19,6 +25,7 @@ import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
 import za.co.neroland.neroagriculture.crop.SpeciesCropBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
@@ -28,7 +35,7 @@ import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
 
 /** NF/nutrient-powered controller that maintains a sealed, cached interior and publishes it to the index. */
-public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockEntity {
+public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockEntity implements MenuProvider {
     private final FluidBuffer nutrient;
     private GreenhouseState state = GreenhouseState.UNFORMED;
     private Set<Long> interior = Set.of();
@@ -53,6 +60,26 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
     public GreenhouseState state() { return state; }
     public int volume() { return volume; }
     public int activeCrops() { return activeCrops; }
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case StatusMenu.MACHINE_ID -> StatusMenu.ID_GREENHOUSE;
+                case StatusMenu.ENERGY -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case StatusMenu.V0 -> state.ordinal();
+                case StatusMenu.V1 -> volume;
+                case StatusMenu.V2 -> activeCrops;
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return StatusMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new StatusMenu(id, inventory, menuData, worldPosition, this);
+    }
     public int oxygen() { return oxygenOffset; }
     @Nullable public BlockPos leak() { return leak; }
     public boolean isActive() { return state == GreenhouseState.FORMED; }

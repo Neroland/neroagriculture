@@ -16,6 +16,30 @@ import za.co.neroland.neroagriculture.registry.ModDataComponents;
 public class MaterialVariantItem extends Item {
     public MaterialVariantItem(Properties properties) { super(properties); }
 
+    /** Display as "<Material> Fragment" / "<Material> Seed" (e.g. "Iron Seed") from the variant. */
+    @Override public Component getName(ItemStack stack) {
+        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        if (variant == null) return super.getName(stack);
+        return Component.translatable(nameKey(), materialName(variant.material()));
+    }
+
+    /** Translation key with a single {@code %s} for the material name. */
+    protected String nameKey() { return "item.neroagriculture.resource_fragment.named"; }
+
+    /** Title-case the material id's leaf path: {@code c:iron -> "Iron"}, {@code c:nether_star -> "Nether Star"}. */
+    public static String materialName(net.minecraft.resources.Identifier id) {
+        String path = id.getPath();
+        int slash = path.lastIndexOf('/');
+        if (slash >= 0) path = path.substring(slash + 1);
+        StringBuilder sb = new StringBuilder();
+        for (String word : path.split("_")) {
+            if (word.isEmpty()) continue;
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        return sb.toString();
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
             Consumer<Component> tooltip, TooltipFlag flag) {

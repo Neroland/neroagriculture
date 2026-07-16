@@ -18,6 +18,8 @@ import za.co.neroland.nerolandcore.progression.ProgressionGates;
 public final class ResourceSeedItem extends MaterialVariantItem {
     public ResourceSeedItem(Properties properties) { super(properties); }
 
+    @Override protected String nameKey() { return "item.neroagriculture.resource_seed.named"; }
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getClickedFace() != Direction.UP) return InteractionResult.PASS;
@@ -61,5 +63,41 @@ public final class ResourceSeedItem extends MaterialVariantItem {
     private static InteractionResult fail(ServerPlayer player, String key) {
         player.sendSystemMessage(Component.translatable(key));
         return InteractionResult.FAIL;
+    }
+
+    /**
+     * Silent slot-driven planting used by the grow bed's seed slot: validates the same catalog, bed-tier,
+     * gate/overlay and dimension rules as hand-planting (with {@code player} as the gate context, no chat
+     * feedback), then plants above {@code bedPos} and shrinks {@code stack}. Returns whether it planted.
+     */
+    public static boolean tryPlantAbove(net.minecraft.server.level.ServerLevel level, ServerPlayer player,
+            net.minecraft.core.BlockPos bedPos, ItemStack stack) {
+        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        if (variant == null) return false;
+        var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
+        if (!lookup.permitsGrowth()) return false;
+        var definition = lookup.material().orElseThrow().definition();
+        var bedTier = ModBlocks.growBedTier(level.getBlockState(bedPos).getBlock());
+        if (bedTier == null || bedTier.ordinal() < definition.tier().ordinal()) return false;
+        if ((definition.gate() != null && !ProgressionGates.isOpen(player, definition.gate()))
+                || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) {
+            return false;
+        }
+        if (definition.worldRestriction() != null
+                && !definition.worldRestriction().dimension().equals(level.dimension().identifier())) {
+            return false;
+        }
+        var cropPos = bedPos.above();
+        if (!level.getBlockState(cropPos).canBeReplaced()) return false;
+        if (!level.setBlock(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState(), 3)) return false;
+        if (!(level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop)) {
+            level.removeBlock(cropPos, false);
+            return false;
+        }
+        int harvests = stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0);
+        crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(), harvests));
+        crop.setGenetics(stack.get(ModDataComponents.GENETICS.get()));
+        stack.shrink(1);
+        return true;
     }
 }

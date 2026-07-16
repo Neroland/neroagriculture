@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.tower;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,9 +34,7 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
-            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
-                    level.dimension().identifier(), level.getGameTime());
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] crop tower " + tower.status() + " cycle=" + cycle));
+            player.openMenu(tower);
         }
         return InteractionResult.SUCCESS;
     }
