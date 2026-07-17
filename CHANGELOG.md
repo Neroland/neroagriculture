@@ -199,11 +199,41 @@ behaviour still want an in-client check on the dev machine.)
   the bed itself. Bed UI shows seed slot → output slots; side config exposes seed in / harvest out.
 - **Planter/Harvester/Applicator base area is 7x7** (3 blocks on either side), range upgrades now
   extend it up to 13x13.
+- **Area-machine UI overlap fixed** (Fertiliser Applicator screenshot): upgrades moved to the right
+  edge (x152) and the middle band stacks mode / range / "Show area" pill / energy on separate lines.
+  Same sweep tightened the other screens — compact tower status ("H12 · 48 slots"), two short lines on
+  the grow bed, the research pill nudged clear of the status text, genetics trait line raised 2px.
+- **Crops are walk-through**: all four crop blocks (resource, Prospora, food, alien) now use
+  `noCollision()` like vanilla crops — no more invisible solid blocks over the beds. (26.x renamed the
+  builder from the old `noCollission`, which is why the original registrations lacked it.)
 - **Gallery reworked**: the fluid blocks are excluded from the block grid (they flooded the display),
   and the exhibits are richer — the numbered fabrication chain (extract → infuse/ladder → **fusion
   demo** (Iron Fragments + Redstone → Nero Alloy Seed) → synthesize (fully staged) → research), a
   **Prospora farmland plot**, the Fertiliser Applicator, and a working farm whose beds are seeded for
   the hopping-pot loop, flanked by Planter + Harvester with their **area holograms switched on**.
+
+### Playtest round 4 fixes (2026-07-16)
+
+- **All machines now accept battery/pipe power.** Root cause of "machines not pulling power": only the
+  fabrication machines and grow beds registered an energy capability, so Core's battery push (which
+  pushes into adjacent receivers every tick) couldn't see the other nine machines. Every machine block
+  entity now exposes **energy + fluid** (through the gated side-config views) and **items** (when it is
+  a container) on all three loaders — batteries, hoppers and pipes reach the Genetics Station, Planter/
+  Harvester/Applicator, Crop Tower, Greenhouse, Bioreactor, Biofuel Converter, Fertiliser Processor,
+  Pollination Beacon and Terraforming Controller.
+
+- **Every material's fragments now convert into their resource.** Conversion previously required a
+  per-material recipe and only five existed (coal, iron, diamond, nether star, echo shard) — all other
+  materials' Resource Fragments were dead ends. A **generic conversion recipe** now backs every catalog
+  material: output and fragment cost come from the material definition (per-material recipe JSONs still
+  override when present).
+- **All UI gauges are labelled.** A shared labelled-bar style (caption drawn inside a taller bar) now
+  identifies every bar in every screen: **Energy** (amber, NeroFlux), **Nutrient** (teal),
+  **Progress/Splicing** (green) — across the fabrication machines, Genetics Station, Crop Tower, Grow
+  Bed, Planter/Harvester/Applicator, processors, and the status panels. Layouts were re-banded so
+  labels, slots and text never overlap (including the Fertiliser Applicator overlap from the
+  screenshot: upgrades moved to the right edge, the middle band stacks mode / range / Show-area /
+  Energy on separate lines).
 
 ## [0.0.1-alpha.2] - 2026-07-13
 

@@ -32,12 +32,12 @@ public final class ModBlocks {
     public static final RegistryEntry<GrowBedBlock> VOIDITE_GROW_BED = bed("voidite_grow_bed", za.co.neroland.neroagriculture.content.FragmentTier.VOIDITE, MapColor.COLOR_PURPLE);
     public static final RegistryEntry<ResourceCropBlock> RESOURCE_CROP = BLOCKS.register("resource_crop",
             key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
-                    .strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
+                    .strength(0.5F).sound(SoundType.CROP).noOcclusion().noCollision().randomTicks().noLootTable()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     // Base crop planted from the Prospora Seed; not in ALL, so no block item (placed via the seed).
     public static final RegistryEntry<ProsporaCropBlock> PROSPORA_CROP = BLOCKS.register("prospora_crop",
             key -> new ProsporaCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
-                    .strength(0.0F).sound(SoundType.CROP).noOcclusion().randomTicks()
+                    .instabreak().sound(SoundType.CROP).noOcclusion().noCollision().randomTicks()
                     .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     public static final RegistryEntry<SpeciesCropBlock> ENGINEERED_FOOD_CROP =
             speciesCrop("engineered_food_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD, MapColor.PLANT);
@@ -132,8 +132,8 @@ public final class ModBlocks {
     private static RegistryEntry<SpeciesCropBlock> speciesCrop(String name,
             za.co.neroland.neroagriculture.food.FoodDefinition.Kind kind, MapColor color) {
         return BLOCKS.register(name, key -> new SpeciesCropBlock(kind, BlockBehaviour.Properties.of().setId(key)
-                .mapColor(color).strength(0.5F).sound(SoundType.CROP).noOcclusion().randomTicks().noLootTable()
-                .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+                .mapColor(color).strength(0.5F).sound(SoundType.CROP).noOcclusion().noCollision().randomTicks()
+                .noLootTable().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
     }
 
     private static RegistryEntry<GrowBedBlock> bed(String name,

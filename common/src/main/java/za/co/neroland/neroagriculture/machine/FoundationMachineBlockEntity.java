@@ -298,14 +298,31 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
                     definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
         }
+        // Prefer a material-specific conversion recipe; otherwise fall back to the generic one so EVERY
+        // catalog material (auto-discovered included) can convert — output and cost come from the catalog.
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.CONVERSION.get(), candidate ->
                 candidate.material().isPresent() && candidate.material().get().equals(definition.id()));
-        if (recipe == null || recipe.inputCount() < definition.conversion()) return fail(MachineBlockedReason.NO_RECIPE);
-        ItemStack result = recipe.assemble(new SingleRecipeInput(items.get(PRIMARY)));
-        if (!BuiltInRegistries.ITEM.getKey(result.getItem()).equals(definition.output())) {
-            return fail(MachineBlockedReason.INVALID_COMPONENT);
+        boolean specific = recipe != null;
+        if (recipe == null) {
+            recipe = findRecipe(level, ModRecipeSerializers.CONVERSION.get(), candidate -> candidate.material().isEmpty());
         }
-        Operation operation = operation(recipe, recipe.inputCount(), 0, 0, result, ItemStack.EMPTY);
+        if (recipe == null) return fail(MachineBlockedReason.NO_RECIPE);
+        int cost = Math.max(definition.conversion(), specific ? recipe.inputCount() : 0);
+        if (items.get(PRIMARY).getCount() < cost) return fail(MachineBlockedReason.NO_RECIPE);
+        ItemStack result;
+        if (specific) {
+            result = recipe.assemble(new SingleRecipeInput(items.get(PRIMARY)));
+            if (!BuiltInRegistries.ITEM.getKey(result.getItem()).equals(definition.output())) {
+                return fail(MachineBlockedReason.INVALID_COMPONENT);
+            }
+        } else {
+            var output = BuiltInRegistries.ITEM.getValue(definition.output());
+            if (output == null || output == net.minecraft.world.item.Items.AIR) {
+                return fail(MachineBlockedReason.NO_RECIPE);
+            }
+            result = new ItemStack(output);
+        }
+        Operation operation = operation(recipe, cost, 0, 0, result, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
     }
 
@@ -456,7 +473,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 + recipe.family().map(Enum::name).orElse("") + "|"
                 + BuiltInRegistries.ITEM.getKey(recipe.resultTemplate().item().value()) + "|"
                 + recipe.resultTemplate().count() + "|" + recipe.inputCount() + "|" + recipe.energy()
-                + "|" + recipe.ticks();
+                + "|" + recipe.ticks() + "|" + BuiltInRegistries.ITEM.getKey(output.getItem());
         return new Operation(key, recipe, primary, secondary, tertiary, output, secondaryOutput);
     }
 

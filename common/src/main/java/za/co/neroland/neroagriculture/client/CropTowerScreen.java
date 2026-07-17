@@ -20,9 +20,6 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
     private static final int DIVIDER = 0xFFB4C0C8;
     private static final int WELL = 0xFF9AA6AE;
     private static final int WELL_EDGE = 0xFF3A444C;
-    private static final int TROUGH = 0xFF2A343C;
-    private static final int ENERGY = 0xFFE0B33A;
-    private static final int NUTRIENT = 0xFF42A880;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -58,18 +55,15 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         g.fill(x + 86, y + 27, x + 114, y + 28, DIVIDER);
         g.fill(x + 112, y + 25, x + 114, y + 30, ACCENT);
 
-        // energy + nutrient gauges
-        int energyFrac = Math.min(96, menu.energy() * 96 / 100_000);
-        g.fill(x + 8, y + 60, x + 104, y + 63, TROUGH);
-        if (energyFrac > 0) g.fill(x + 8, y + 60, x + 8 + energyFrac, y + 63, ENERGY);
-        int nutrientFrac = Math.min(96, menu.nutrient() * 96 / 8_000);
-        g.fill(x + 8, y + 65, x + 104, y + 68, TROUGH);
-        if (nutrientFrac > 0) g.fill(x + 8, y + 65, x + 8 + nutrientFrac, y + 68, NUTRIENT);
+        // labelled energy + nutrient gauges, side by side under the slots
+        Gauges.bar(g, font, x + 8, y + 59, x + 84, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
+        Gauges.bar(g, font, x + 88, y + 59, x + 168, "Nutrient", menu.nutrient(), 8_000, Gauges.NUTRIENT);
 
+        // Compact status beside the fertiliser slot, left of the output cluster (x115+).
         Component tower = menu.height() <= 0
                 ? Component.translatable("screen.neroagriculture.tower.unformed")
-                : Component.translatable("screen.neroagriculture.tower.status", menu.height(), menu.activeSlots());
-        g.text(font, tower, x + 8, y + 50, MUTED, false);
+                : Component.literal("H" + menu.height() + " · " + menu.activeSlots() + " slots");
+        g.text(font, tower, x + 48, y + 47, MUTED, false);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }

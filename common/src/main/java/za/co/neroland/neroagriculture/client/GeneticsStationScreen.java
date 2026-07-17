@@ -24,9 +24,6 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
     private static final int DIVIDER = 0xFFB4C0C8;
     private static final int WELL = 0xFF9AA6AE;
     private static final int WELL_EDGE = 0xFF3A444C;
-    private static final int TROUGH = 0xFF2A343C;
-    private static final int PROGRESS = 0xFF78C860;
-    private static final int ENERGY = 0xFFE0B33A;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -59,22 +56,18 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
         }
 
         // splice arrow from inputs toward the output
-        int ay = y + 43;
+        int ay = y + 40;
         g.fill(x + 86, ay, x + 114, ay + 1, DIVIDER);
         g.fill(x + 112, ay - 2, x + 114, ay + 3, ACCENT);
 
-        // energy gauge along the top of the machine row
-        int energyFrac = Math.min(160, menu.energy() * 160 / 100_000);
-        g.fill(x + 7, y + 20, x + 169, y + 23, TROUGH);
-        if (energyFrac > 0) g.fill(x + 7, y + 20, x + 7 + energyFrac, y + 23, ENERGY);
-        g.fill(x + 7, y + 20, x + 9, y + 23, ENERGY);
+        // labelled energy gauge above the slot row
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
 
-        // splice-progress bar under the machine row
-        g.fill(x + 8, y + 60, x + 168, y + 66, TROUGH);
-        int progressWidth = menu.maxProgress() <= 0 ? 0 : Math.min(160, menu.progress() * 160 / menu.maxProgress());
-        if (progressWidth > 0) g.fill(x + 8, y + 60, x + 8 + progressWidth, y + 66, PROGRESS);
+        // labelled splice-progress bar under the trait readout
+        Gauges.bar(g, font, x + 8, y + 60, x + 168, "Splicing", menu.progress(),
+                Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
 
-        // live trait readout for the input seed (slot 0)
+        // live trait readout for the input seed (slot 0), between the slots and the progress bar
         ItemStack input = menu.slots.get(0).getItem();
         Genetics genetics = input.get(ModDataComponents.GENETICS.get());
         Component traits = genetics == null
@@ -82,7 +75,7 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
                 : Component.literal("Y" + genetics.yield() + " S" + genetics.speed() + " H" + genetics.hardiness()
                         + " O" + genetics.oxygenOutput() + " P" + genetics.foodPotency()
                         + "  ∑" + genetics.total() + "/15");
-        g.text(font, traits, x + 8, y + 26, MUTED, false);
+        g.text(font, traits, x + 8, y + 50, MUTED, false);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }

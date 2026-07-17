@@ -35,8 +35,6 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
     private static final int WELL = 0xFF9AA6AE;
     private static final int WELL_EDGE = 0xFF3A444C;
     private static final int TROUGH = 0xFF2A343C;
-    private static final int PROGRESS = 0xFF78C860;   // bio-green
-    private static final int ENERGY = 0xFFE0B33A;     // amber
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
 
@@ -82,29 +80,24 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        // Energy gauge across the header band (the slot row starts at y30, so this is clear).
-        int energyFrac = Math.min(160, menu.energy() * 160 / 100_000);
-        g.fill(x + 8, y + 20, x + 168, y + 23, TROUGH);
-        if (energyFrac > 0) g.fill(x + 8, y + 20, x + 8 + energyFrac, y + 23, ENERGY);
-        g.fill(x + 8, y + 20, x + 10, y + 23, ENERGY);
+        // Labelled energy gauge in the header band (the slot row starts at y30, so this is clear).
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
 
         // Blocked/idle status, left-aligned in its own band under the slots.
         Component status = Component.translatable("machine.neroagriculture.status."
                 + menu.blockedReason().name().toLowerCase(java.util.Locale.ROOT));
-        g.text(font, status, x + 8, y + 51, MUTED, false);
+        g.text(font, status, x + 8, y + 49, MUTED, false);
 
-        // Work-progress bar in its own band (left half; the pill owns the right).
-        g.fill(x + 8, y + 62, x + 104, y + 68, TROUGH);
-        int progressWidth = menu.maxProgress() <= 0 ? 0
-                : Math.min(96, menu.progress() * 96 / menu.maxProgress());
-        if (progressWidth > 0) g.fill(x + 8, y + 62, x + 8 + progressWidth, y + 68, PROGRESS);
+        // Labelled work-progress bar (left half; the pill owns the right).
+        Gauges.bar(g, font, x + 8, y + 58, x + 112, "Progress", menu.progress(),
+                Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
 
         // Research bench: a clickable "discover" pill on the right of the status/progress bands.
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH) {
-            g.fill(x + 112, y + 50, x + 168, y + 68, TROUGH);
-            g.fill(x + 112, y + 50, x + 168, y + 51, ACCENT_ORBITE);
+            g.fill(x + 118, y + 50, x + 168, y + 68, TROUGH);
+            g.fill(x + 118, y + 50, x + 168, y + 51, ACCENT_ORBITE);
             Component research = Component.translatable("screen.neroagriculture.research");
-            g.text(font, research, x + 140 - font.width(research) / 2, y + 56, ACCENT_ORBITE, false);
+            g.text(font, research, x + 143 - font.width(research) / 2, y + 56, ACCENT_ORBITE, false);
         }
 
         super.extractContents(g, mouseX, mouseY, partialTick);

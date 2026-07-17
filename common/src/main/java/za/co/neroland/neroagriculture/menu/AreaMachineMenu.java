@@ -43,7 +43,7 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
         }
         for (int i = 0; i < 3; i++) {
             final int index = UPGRADE_START + i;
-            addSlot(new Slot(machine, index, 134, 18 + i * 18) {
+            addSlot(new Slot(machine, index, 152, 18 + i * 18) {
                 @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(index, s); }
             });
         }

@@ -34,13 +34,13 @@ public final class GeneticsStationMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
-        addSlot(new Slot(machine, GeneticsStationBlockEntity.INPUT_A, 44, 35) {
+        addSlot(new Slot(machine, GeneticsStationBlockEntity.INPUT_A, 44, 32) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(GeneticsStationBlockEntity.INPUT_A, stack); }
         });
-        addSlot(new Slot(machine, GeneticsStationBlockEntity.INPUT_B, 66, 35) {
+        addSlot(new Slot(machine, GeneticsStationBlockEntity.INPUT_B, 66, 32) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(GeneticsStationBlockEntity.INPUT_B, stack); }
         });
-        addSlot(new Slot(machine, GeneticsStationBlockEntity.OUTPUT, 116, 35) {
+        addSlot(new Slot(machine, GeneticsStationBlockEntity.OUTPUT, 116, 32) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
         for (int row = 0; row < 3; row++) {

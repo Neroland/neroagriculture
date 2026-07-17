@@ -21,7 +21,6 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
     private static final int WELL_EDGE = 0xFF3A444C;
     private static final int TROUGH = 0xFF2A343C;
     private static final int PROGRESS = 0xFF78C860;
-    private static final int ENERGY = 0xFFE0B33A;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -53,20 +52,17 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        // energy gauge
-        int energyFrac = Math.min(160, menu.energy() * 160 / 100_000);
-        g.fill(x + 8, y + 20, x + 168, y + 23, TROUGH);
-        if (energyFrac > 0) g.fill(x + 8, y + 20, x + 8 + energyFrac, y + 23, ENERGY);
+        // labelled energy gauge
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
 
         // progress arrow between inputs and output
         g.fill(x + 88, y + 37, x + 112, y + 39, TROUGH);
         int progressWidth = menu.maxProgress() <= 0 ? 0 : Math.min(24, menu.progress() * 24 / menu.maxProgress());
         if (progressWidth > 0) g.fill(x + 88, y + 37, x + 88 + progressWidth, y + 39, PROGRESS);
 
-        // work bar under the machine row
-        g.fill(x + 8, y + 58, x + 168, y + 64, TROUGH);
-        int barWidth = menu.maxProgress() <= 0 ? 0 : Math.min(160, menu.progress() * 160 / menu.maxProgress());
-        if (barWidth > 0) g.fill(x + 8, y + 58, x + 8 + barWidth, y + 64, PROGRESS);
+        // labelled work bar under the machine row
+        Gauges.bar(g, font, x + 8, y + 56, x + 168, "Progress", menu.progress(),
+                Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }

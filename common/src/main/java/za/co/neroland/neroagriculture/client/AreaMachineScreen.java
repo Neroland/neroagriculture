@@ -21,7 +21,6 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
     private static final int WELL = 0xFF9AA6AE;
     private static final int WELL_EDGE = 0xFF3A444C;
     private static final int TROUGH = 0xFF2A343C;
-    private static final int ENERGY = 0xFFE0B33A;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -57,29 +56,29 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        int energyFrac = Math.min(72, menu.energy() * 72 / 100_000);
-        g.fill(x + 92, y + 60, x + 164, y + 63, TROUGH);
-        if (energyFrac > 0) g.fill(x + 92, y + 60, x + 92 + energyFrac, y + 63, ENERGY);
-
+        // Middle band (between the 3x3 grid at x26..78 and the upgrade column at x152): mode, range,
+        // "Show area" pill and energy — each on its own line so nothing overlaps.
         int mode = menu.mode();
         String modeName = mode >= 0 && mode < MODES.length ? MODES[mode] : "Idle";
-        g.text(font, Component.literal(modeName + " — range " + menu.range() + "x" + menu.range()),
-                x + 92, y + 22, MUTED, false);
+        g.text(font, Component.literal(modeName), x + 84, y + 19, MUTED, false);
+        g.text(font, Component.literal(menu.range() + "x" + menu.range() + " area"), x + 84, y + 30, MUTED, false);
 
         // "Show area" toggle pill — outlines the working radius in-world with hologram particles.
         int pillColor = menu.showArea() ? ACCENT : MUTED;
-        g.fill(x + 92, y + 32, x + 164, y + 45, TROUGH);
-        g.fill(x + 92, y + 32, x + 164, y + 33, pillColor);
+        g.fill(x + 84, y + 41, x + 148, y + 54, TROUGH);
+        g.fill(x + 84, y + 41, x + 148, y + 42, pillColor);
         Component label = Component.translatable(menu.showArea()
                 ? "screen.neroagriculture.area.hide" : "screen.neroagriculture.area.show");
-        g.text(font, label, x + 128 - font.width(label) / 2, y + 35, pillColor, false);
+        g.text(font, label, x + 116 - font.width(label) / 2, y + 45, pillColor, false);
+
+        Gauges.bar(g, font, x + 84, y + 58, x + 148, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }
 
     @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
-        if (event.x() >= leftPos + 92 && event.x() < leftPos + 164
-                && event.y() >= topPos + 32 && event.y() < topPos + 45) {
+        if (event.x() >= leftPos + 84 && event.x() < leftPos + 148
+                && event.y() >= topPos + 41 && event.y() < topPos + 54) {
             if (machinePos == null) {
                 machinePos = za.co.neroland.neroagriculture.network.ClientMachineMenuPositions.poll(menu.containerId);
             }

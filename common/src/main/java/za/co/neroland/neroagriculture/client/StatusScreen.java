@@ -17,8 +17,6 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
     private static final int HULL_HI = 0xFFF3F7FA;
     private static final int EDGE = 0xFF59656F;
     private static final int DIVIDER = 0xFFB4C0C8;
-    private static final int TROUGH = 0xFF2A343C;
-    private static final int ENERGY = 0xFFE0B33A;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -40,10 +38,8 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
         g.fill(x + 7, y + 15, x + w - 7, y + 16, ACCENT);
         g.fill(x + 7, y + 16, x + w - 7, y + 17, DIVIDER);
 
-        // energy gauge
-        int energyFrac = Math.min(160, menu.value(StatusMenu.ENERGY) * 160 / 100_000);
-        g.fill(x + 8, y + 22, x + 168, y + 25, TROUGH);
-        if (energyFrac > 0) g.fill(x + 8, y + 22, x + 8 + energyFrac, y + 25, ENERGY);
+        // labelled energy gauge
+        Gauges.bar(g, font, x + 8, y + 20, x + 168, "Energy", menu.value(StatusMenu.ENERGY), 100_000, Gauges.ENERGY);
 
         // per-machine labelled readouts
         String[] labels = labels(menu.value(StatusMenu.MACHINE_ID));
@@ -52,7 +48,7 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
         for (int i = 0; i < labels.length && i < indices.length; i++) {
             if (labels[i] == null) continue;
             Component c = Component.literal(labels[i] + ": " + menu.value(indices[i]));
-            g.text(font, c, x + 8, y + 32 + line * 11, MUTED, false);
+            g.text(font, c, x + 8, y + 36 + line * 11, MUTED, false);
             line++;
         }
 

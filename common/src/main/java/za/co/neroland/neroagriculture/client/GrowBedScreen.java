@@ -20,9 +20,6 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
     private static final int DIVIDER = 0xFFB4C0C8;
     private static final int WELL = 0xFF9AA6AE;
     private static final int WELL_EDGE = 0xFF3A444C;
-    private static final int TROUGH = 0xFF2A343C;
-    private static final int ENERGY = 0xFFE0B33A;
-    private static final int NUTRIENT = 0xFF42A880;
     private static final int ACCENT = 0xFF78C860;
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
@@ -54,21 +51,19 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        int energyFrac = Math.min(160, menu.energy() * 160 / 100_000);
-        g.fill(x + 8, y + 20, x + 168, y + 23, TROUGH);
-        if (energyFrac > 0) g.fill(x + 8, y + 20, x + 8 + energyFrac, y + 23, ENERGY);
-        int nutrientFrac = Math.min(160, menu.nutrient() * 160 / 8_000);
-        g.fill(x + 8, y + 25, x + 168, y + 28, TROUGH);
-        if (nutrientFrac > 0) g.fill(x + 8, y + 25, x + 8 + nutrientFrac, y + 28, NUTRIENT);
+        // labelled energy gauge above the slot row
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
 
         // seed → harvest arrow
         g.fill(x + 48, y + 37, x + 74, y + 39, DIVIDER);
         g.fill(x + 72, y + 35, x + 74, y + 41, ACCENT);
 
+        // labelled nutrient gauge below the slot row
+        Gauges.bar(g, font, x + 8, y + 50, x + 168, "Nutrient", menu.nutrient(), 8_000, Gauges.NUTRIENT);
+
         FragmentTier[] tiers = FragmentTier.values();
         String tier = menu.tier() >= 0 && menu.tier() < tiers.length ? tiers[menu.tier()].name() : "?";
-        g.text(font, Component.literal("Tier: " + tier + " — auto-plants and harvests into its slots"),
-                x + 8, y + 56, MUTED, false);
+        g.text(font, Component.literal("Tier: " + tier + " · auto-farms"), x + 8, y + 63, MUTED, false);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }
