@@ -13,10 +13,10 @@ modpacks a cross-mod "link" feel.
 
 ## Config: `progression.sibling_overlays`
 
-- **`auto`** (default) — an overlay applies **only when the opener mod is loaded**. A Core-only game is
+- **`off`** (default) — only the native gates apply; overlays are opt-in.
+- **`auto`** — an overlay applies **only when the opener mod is loaded**. A Core-only game is
   never gated by an arc gate nothing could open, so **standalone play is never blocked**.
 - **`on`** — always require the arc gate (for packs that drive it by other means).
-- **`off`** — only the native gates apply.
 
 The overlay is layered onto every resource-tier check — machines, planting, growth, harvest,
 automation and towers — and is dormant-safe when the sibling is absent.

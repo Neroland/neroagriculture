@@ -16,12 +16,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 import za.co.neroland.neroagriculture.automation.AreaWork;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.crop.SpeciesCropBlock;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 
 /**
  * Optional NF-powered pollination booster. Over a bounded region it drives the same server-authoritative
@@ -36,7 +38,9 @@ public final class PollinationBeaconBlockEntity extends AbstractMachineBlockEnti
         @Override public int get(int index) {
             return switch (index) {
                 case StatusMenu.MACHINE_ID -> StatusMenu.ID_BEACON;
-                case StatusMenu.ENERGY -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                // Permille fraction: ContainerData syncs shorts and the capacity can exceed 32,767.
+                case StatusMenu.ENERGY -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
                 case StatusMenu.V0 -> 2 * AgricultureConfig.POLLINATION_BEACON_RANGE.get() + 1;
                 default -> 0;
             };
@@ -53,12 +57,15 @@ public final class PollinationBeaconBlockEntity extends AbstractMachineBlockEnti
     public PollinationBeaconBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.POLLINATION_BEACON.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),
                 AgricultureConfig.MACHINE_ENERGY_RATE.get(), 0, stack -> null);
-        installSideConfig(SideConfig.builder().channel(Channel.ENERGY).allow(Channel.ENERGY, SideMode.OUTPUT, false).build());
+        installSideConfig(SideConfig.builder().channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
+                .allow(Channel.ENERGY, SideMode.OUTPUT, false).build());
         this.workTimer = 1 + AreaWork.phaseOffset(pos, AgricultureConfig.AUTOMATION_INTERVAL.get());
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, PollinationBeaconBlockEntity beacon) {
         AbstractMachineBlockEntity.tick(level, pos, state, beacon);
+        SideConfigMigration.tick(beacon);
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (--beacon.workTimer > 0) return;
         beacon.workTimer = Math.max(1, AgricultureConfig.AUTOMATION_INTERVAL.get());
@@ -94,9 +101,11 @@ public final class PollinationBeaconBlockEntity extends AbstractMachineBlockEnti
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("Cursor", cursor);
+        SideConfigMigration.save(output);
     }
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
     }
 }

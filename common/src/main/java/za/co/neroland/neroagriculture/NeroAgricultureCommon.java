@@ -23,6 +23,13 @@ public final class NeroAgricultureCommon {
 
     /** Called once per loader during mod construction. */
     public static void init() {
+        // Resolve the ServiceLoader singletons now (mirroring how ModFluids.init() forces FluidFactory)
+        // so a missing platform impl fails fast at construction instead of mid-tick on first use —
+        // with telemetry opted out, nothing else touches Services during init.
+        java.util.Objects.requireNonNull(za.co.neroland.neroagriculture.platform.Services.NETWORK,
+                "network platform");
+        java.util.Objects.requireNonNull(za.co.neroland.neroagriculture.platform.Services.PLATFORM,
+                "platform info");
         AgricultureRegistries.init();
         AgricultureConfig.init();
         AgricultureNetwork.init();

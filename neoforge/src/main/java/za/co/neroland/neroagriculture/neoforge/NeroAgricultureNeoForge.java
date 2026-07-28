@@ -5,13 +5,19 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraft.server.level.ServerPlayer;
+
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
+import za.co.neroland.neroagriculture.compat.CompatContracts;
+import za.co.neroland.neroagriculture.lifecycle.ServerStateReset;
 import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
@@ -35,5 +41,14 @@ public final class NeroAgricultureNeoForge {
             if (event.getPlayer() == null) CatalogSync.reloadAndSync(event.getPlayerList().getServer());
             else CatalogSync.syncTo(event.getPlayer());
         });
+        // Optional Nerospace planet-visit adapter (join backfill + live dimension-change tracking).
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerJoined(player);
+        });
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerChangedDimensionEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerChangedDimension(player);
+        });
+        // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> ServerStateReset.serverStopped());
     }
 }

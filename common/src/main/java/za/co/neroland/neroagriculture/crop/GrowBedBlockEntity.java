@@ -34,6 +34,7 @@ import za.co.neroland.neroagriculture.fertiliser.FertilisableBed;
 import za.co.neroland.neroagriculture.fertiliser.FertiliserDose;
 import za.co.neroland.neroagriculture.fertiliser.FertiliserType;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
@@ -41,45 +42,77 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 
 /** Persistent NF/nutrient storage exposed through Core's cross-loader capabilities. */
 public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
-        implements FertilisableBed, WorldlyContainer, MenuProvider {
+        implements FertilisableBed, WorldlyContainer, MenuProvider,
+        za.co.neroland.neroagriculture.automation.AutomationOwner.Owned {
     public static final int SEED_SLOT = 0;
     public static final int OUTPUT_START = 1;
     public static final int SLOT_COUNT = 5;
     private static final int[] SLOTS = {0, 1, 2, 3, 4};
+    /** Half a second between blocked-reason recomputes; the status line does not need per-tick precision. */
+    private static final int REASON_REFRESH_TICKS = 10;
     private final FluidBuffer nutrient;
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private int plantTimer;
+    private int blockedReason = za.co.neroland.neroagriculture.menu.GrowBedMenu.NO_CROP;
+    private long blockedReasonTick = Long.MIN_VALUE;
     @org.jetbrains.annotations.Nullable private FertiliserDose speedDose;
     @org.jetbrains.annotations.Nullable private FertiliserDose yieldDose;
+    /** Placing player (progression owner for the crop above); opt-out via {@code automation.track_owner}. */
+    @org.jetbrains.annotations.Nullable private java.util.UUID owner;
 
     public GrowBedBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.GROW_BED.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),
                 AgricultureConfig.MACHINE_ENERGY_RATE.get(), 0, stack -> null);
-        this.nutrient = new FluidBuffer(AgricultureConfig.MACHINE_FLUID_CAPACITY.get(), this::changedAndSync);
+        this.nutrient = new FluidBuffer(AgricultureConfig.MACHINE_FLUID_CAPACITY.get(), this::setChanged);
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("input", SEED_SLOT),
                         za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("output", 1, 2, 3, 4))
                 .channel(Channel.ENERGY).channel(Channel.FLUID)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).allow(Channel.ENERGY, SideMode.IO, false)
                 .allow(Channel.FLUID, SideMode.OUTPUT, false).allow(Channel.FLUID, SideMode.IO, false).build())
                 .withItems(() -> this).withFluid(this::getFluid);
     }
 
+    // Gauge slots ship as permille fractions: ContainerData syncs shorts, and the configured energy
+    // and fluid capacities can exceed 32,767 (see menu.GaugeData).
     private final ContainerData menuData = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
-                case 0 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
-                case 1 -> (int) Math.min(Integer.MAX_VALUE, nutrient.getAmount());
+                case 0 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        nutrient.getAmount(), nutrient.getCapacity());
                 case 2 -> tier().ordinal();
+                case 3 -> blockedReasonOrdinal();
                 default -> 0;
             };
         }
         @Override public void set(int index, int value) { }
         @Override public int getCount() { return za.co.neroland.neroagriculture.menu.GrowBedMenu.DATA_COUNT; }
     };
+
+    /**
+     * Live growth blocker for the crop above this bed, cached because {@link ContainerData} is polled every
+     * tick for every open menu while the reasoning itself walks the catalogue, climate and greenhouse index.
+     * Nothing is computed unless a menu is actually open, so idle beds pay nothing at all.
+     */
+    private int blockedReasonOrdinal() {
+        if (!(level instanceof ServerLevel serverLevel)) return blockedReason;
+        long now = serverLevel.getGameTime();
+        if (blockedReasonTick != Long.MIN_VALUE && now - blockedReasonTick < REASON_REFRESH_TICKS) {
+            return blockedReason;
+        }
+        blockedReasonTick = now;
+        var reason = ResourceCropBlock.plantedGrowthReason(serverLevel, worldPosition);
+        blockedReason = reason == null
+                ? za.co.neroland.neroagriculture.menu.GrowBedMenu.NO_CROP : reason.ordinal();
+        return blockedReason;
+    }
 
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
@@ -92,6 +125,7 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
      */
     public static void tick(Level level, BlockPos pos, BlockState state, GrowBedBlockEntity bed) {
         AbstractMachineBlockEntity.tick(level, pos, state, bed);
+        SideConfigMigration.tick(bed);
         if (!(level instanceof ServerLevel serverLevel) || ++bed.plantTimer < 20) return;
         bed.plantTimer = 0;
         bed.autoHarvest(serverLevel, pos);
@@ -174,7 +208,7 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
     public boolean consumeGrowthResources() {
         if (!GrowBedResources.consume(getEnergy(), nutrient, ModFluids.NUTRIENT.get(),
                 AgricultureConfig.GROW_BED_ENERGY_COST.get(), AgricultureConfig.GROW_BED_NUTRIENT_COST.get())) return false;
-        changedAndSync();
+        setChanged();
         return true;
     }
 
@@ -182,7 +216,7 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         FertiliserDose current = type == FertiliserType.SPEED ? speedDose : yieldDose;
         FertiliserDose next = FertiliserDose.applied(current, type, amount, now, durationTicks, maxDose);
         if (type == FertiliserType.SPEED) speedDose = next; else yieldDose = next;
-        changedAndSync();
+        setChanged();
         return true;
     }
 
@@ -191,13 +225,34 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         return dose != null && dose.active(now) ? dose : null;
     }
 
-    private void changedAndSync() {
+    // No setChanged() broadcast override: nothing reads this block entity client-side (the screen uses
+    // ContainerData, crop tints read the crop's own BE), so per-dirty-mark sendBlockUpdated was pure
+    // network spam. Vanilla dirty-marking alone is enough.
+
+    @Override public @org.jetbrains.annotations.Nullable java.util.UUID automationOwner() { return owner; }
+    @Override public void clearAutomationOwner() { owner = null; setChanged(); }
+    public void setOwner(@org.jetbrains.annotations.Nullable java.util.UUID owner) {
+        this.owner = za.co.neroland.neroagriculture.automation.AutomationOwner.trackingEnabled() ? owner : null;
         setChanged();
     }
 
-    @Override public void setChanged() {
-        super.setChanged();
-        if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    @Override public void setRemoved() {
+        za.co.neroland.neroagriculture.automation.AutomationOwner.untrack(this);
+        super.setRemoved();
+    }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        za.co.neroland.neroagriculture.automation.AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = za.co.neroland.neroagriculture.automation.ErasedOwners.filter(owner, serverLevel.getServer());
+        }
+    }
+
+    /** Breaking/replacing the bed (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
     }
 
     @Override protected void saveAdditional(ValueOutput output) {
@@ -207,6 +262,8 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         output.putInt("NutrientAmount", nutrient.getRawAmount());
         saveDose(output, "Speed", speedDose);
         saveDose(output, "Yield", yieldDose);
+        za.co.neroland.neroagriculture.automation.AutomationOwner.save(output, owner);
+        SideConfigMigration.save(output);
     }
 
     private static void saveDose(ValueOutput output, String key, @org.jetbrains.annotations.Nullable FertiliserDose dose) {
@@ -216,12 +273,14 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
     }
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(
                 input.getStringOr("NutrientFluid", "minecraft:empty")));
         nutrient.setRaw(fluid == null ? Fluids.EMPTY : fluid, input.getIntOr("NutrientAmount", 0));
         speedDose = loadDose(input, "Speed", FertiliserType.SPEED);
         yieldDose = loadDose(input, "Yield", FertiliserType.YIELD);
+        owner = za.co.neroland.neroagriculture.automation.AutomationOwner.load(input);
     }
 
     @org.jetbrains.annotations.Nullable
@@ -231,5 +290,10 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         return new FertiliserDose(type, amount, input.getLongOr(key + "Expiry", 0L));
     }
     @Override public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
-    @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return saveCustomOnly(registries); }
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        // Data minimisation: the owner UUID is server-only; clients never need it.
+        CompoundTag tag = saveCustomOnly(registries);
+        tag.remove("Owner");
+        return tag;
+    }
 }

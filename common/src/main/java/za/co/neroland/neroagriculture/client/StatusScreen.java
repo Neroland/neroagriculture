@@ -38,8 +38,9 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
         g.fill(x + 7, y + 15, x + w - 7, y + 16, ACCENT);
         g.fill(x + 7, y + 16, x + w - 7, y + 17, DIVIDER);
 
-        // labelled energy gauge
-        Gauges.bar(g, font, x + 8, y + 20, x + 168, "Energy", menu.value(StatusMenu.ENERGY), 100_000, Gauges.ENERGY);
+        // labelled energy gauge (synced as a fraction of the live capacity — see menu.GaugeData)
+        Gauges.bar(g, font, x + 8, y + 20, x + 168, "Energy", menu.value(StatusMenu.ENERGY),
+                za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
         // per-machine labelled readouts
         String[] labels = labels(menu.value(StatusMenu.MACHINE_ID));

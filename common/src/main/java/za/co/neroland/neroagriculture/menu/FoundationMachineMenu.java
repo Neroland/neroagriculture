@@ -37,9 +37,17 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
         // One clean row: inputs | upgrades | outputs (status/progress live in their own bands below).
-        addSlot(new Slot(machine, 0, 17, 30));
-        addSlot(new Slot(machine, 1, 39, 30));
-        addSlot(new Slot(machine, 2, 61, 30));
+        // Inputs enforce the machine's own hopper filter so a click can't stash items the resolvers
+        // never consume (every other menu already routes mayPlace through canPlaceItem).
+        addSlot(new Slot(machine, 0, 17, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(0, stack); }
+        });
+        addSlot(new Slot(machine, 1, 39, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(1, stack); }
+        });
+        addSlot(new Slot(machine, 2, 61, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(2, stack); }
+        });
         addSlot(new Slot(machine, 3, 127, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
@@ -61,6 +69,8 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
     }
 
     public BlockPos blockPos() { return blockPos; }
+    // Gauge values are synced as permille fractions of the live server-side maxima (see GaugeData):
+    // progress() runs 0..maxProgress() (= GaugeData.SCALE) and energy() runs 0..GaugeData.SCALE.
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }

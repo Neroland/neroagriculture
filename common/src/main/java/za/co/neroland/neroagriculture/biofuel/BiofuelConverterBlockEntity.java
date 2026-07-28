@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import za.co.neroland.neroagriculture.api.AgricultureApi;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
@@ -35,6 +36,7 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /**
@@ -53,16 +55,21 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
     private final FluidBuffer biofuel;
     private int progress;
 
+    // Gauge slots ship as permille fractions: ContainerData syncs shorts, and both the configured
+    // energy capacity and process ticks can exceed 32,767 (see menu.GaugeData).
     private final ContainerData menuData = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
-                case 0 -> progress;
-                case 1 -> AgricultureConfig.BIOFUEL_TICKS.get();
-                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case 0 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        progress, AgricultureConfig.BIOFUEL_TICKS.get());
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.SCALE;
+                case 2 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
                 default -> 0;
             };
         }
-        @Override public void set(int index, int value) { if (index == 0) progress = value; }
+        // Only the client's SimpleContainerData copy ever receives set(); the slots are scaled fractions.
+        @Override public void set(int index, int value) { }
         @Override public int getCount() { return za.co.neroland.neroagriculture.menu.ProcessorMenu.DATA_COUNT; }
     };
 
@@ -81,6 +88,7 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, SlotGroup.of("input", BIOMASS), SlotGroup.of("output", WASTE_OUT))
                 .channel(Channel.FLUID).channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this).withFluid(this::getFluid);
     }
@@ -89,6 +97,7 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
 
     public static void tick(Level level, BlockPos pos, BlockState state, BiofuelConverterBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (!(level instanceof ServerLevel)) return;
         machine.process();
         machine.offerBiofuel();
@@ -167,6 +176,13 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
     @Override public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return slot == WASTE_OUT; }
     @Override public void clearContent() { items.clear(); setChanged(); }
 
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
+    }
+
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
@@ -174,9 +190,11 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
         output.putInt("BiofuelAmount", biofuel.getRawAmount());
         output.putInt("Progress", progress);
         output.putInt("Cycles", cycles);
+        SideConfigMigration.save(output);
     }
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(input.getStringOr("BiofuelFluid", "minecraft:empty")));
         biofuel.setRaw(fluid == null ? Fluids.EMPTY : fluid, input.getIntOr("BiofuelAmount", 0));

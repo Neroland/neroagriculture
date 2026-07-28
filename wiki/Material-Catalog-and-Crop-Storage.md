@@ -7,7 +7,8 @@ datapacks load. The precedence is:
 2. server blacklist and overrides
 3. Neroland Core meteor-material metadata
 4. explicit vanilla/Core defaults
-5. discovered `c:ores/*` tags; unknown third-party ores default to Orbite
+5. discovered `c:ores/*` tags; unknown third-party materials default to the configured
+   `discovery.default_tier` (Orbite unless changed; unknown gems are always Orbite)
 
 Core metadata is adapted read-only. Conflicts and validation failures are retained for operator
 diagnostics rather than silently discarded.
@@ -35,6 +36,10 @@ The file path defines the material id. For example,
 `null` means no gate. `dimension`, `enabled`, and `gate` are optional. Invalid identifiers, missing
 items/tags, impossible yield ranges, conversion values, colors, and oversized display keys produce an
 actionable catalog error.
+
+`color` accepts a 24-bit RGB value in any of `#RRGGBB`, `0xRRGGBB`, bare hex, decimal-integer, or JSON
+number form — datapack material and food definitions and the config override `color=` field all share one
+parser, so the same input never parses differently by source.
 
 The blacklist is a comma-separated material-id list. Overrides use semicolon-separated entries:
 

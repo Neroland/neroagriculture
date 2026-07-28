@@ -1,5 +1,6 @@
 package za.co.neroland.neroagriculture.registry;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.registries.Registries;
@@ -10,6 +11,7 @@ import za.co.neroland.neroagriculture.machine.FoundationMachineBlockEntity;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlockEntity;
 import za.co.neroland.neroagriculture.crop.SpeciesCropBlockEntity;
 import za.co.neroland.neroagriculture.crop.GrowBedBlockEntity;
+import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 
@@ -80,6 +82,27 @@ public final class ModBlockEntities {
             BLOCK_ENTITIES.register("bioreactor", key -> new BlockEntityType<>(
                     za.co.neroland.neroagriculture.lifesupport.BioreactorBlockEntity::new,
                     java.util.Set.of(ModBlocks.OXYGEN_PLANT.get())));
+
+    /**
+     * The canonical list of machine block-entity types (every type whose BE extends Core's
+     * {@link AbstractMachineBlockEntity}). The per-loader capability registrations iterate this, so a
+     * new machine added here gets its energy/fluid/item surfaces on every loader without touching the
+     * loader modules. Only callable once block-entity registration has run.
+     */
+    public static List<BlockEntityType<? extends AbstractMachineBlockEntity>> machineTypes() {
+        return List.of(
+                FOUNDATION_MACHINE.get(),
+                GROW_BED.get(),
+                GENETICS_STATION.get(),
+                AREA_MACHINE.get(),
+                CROP_TOWER_CONTROLLER.get(),
+                GREENHOUSE_CONTROLLER.get(),
+                BIOREACTOR.get(),
+                BIOFUEL_CONVERTER.get(),
+                FERTILISER_PROCESSOR.get(),
+                POLLINATION_BEACON.get(),
+                TERRAFORMING_CONTROLLER.get());
+    }
 
     private ModBlockEntities() { }
     public static void init() { }

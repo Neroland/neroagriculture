@@ -3,9 +3,6 @@ package za.co.neroland.neroagriculture.lifesupport;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Containers;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -30,12 +27,8 @@ public final class BioreactorBlock extends BaseEntityBlock {
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BioreactorBlockEntity(pos, state); }
 
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof BioreactorBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-    }
+    // Contents drop from BioreactorBlockEntity#preRemoveSideEffects (covers creative breaks and
+    // explosions too), so no playerDestroy override is needed here.
 
     @Override
     protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,

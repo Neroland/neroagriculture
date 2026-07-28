@@ -60,8 +60,9 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
         g.fill(x + 86, ay, x + 114, ay + 1, DIVIDER);
         g.fill(x + 112, ay - 2, x + 114, ay + 3, ACCENT);
 
-        // labelled energy gauge above the slot row
-        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
+        // labelled energy gauge above the slot row (synced as a fraction of the live capacity)
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
+                za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
         // labelled splice-progress bar under the trait readout
         Gauges.bar(g, font, x + 8, y + 60, x + 168, "Splicing", menu.progress(),

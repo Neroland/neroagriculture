@@ -81,7 +81,9 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         }
 
         // Labelled energy gauge in the header band (the slot row starts at y30, so this is clear).
-        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
+        // Values are synced as fractions of the live capacity (see menu.GaugeData).
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
+                za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
         // Blocked/idle status, left-aligned in its own band under the slots.
         Component status = Component.translatable("machine.neroagriculture.status."

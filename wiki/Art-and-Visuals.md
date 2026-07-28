@@ -66,15 +66,36 @@ Greenhouse glass is a dedicated `GreenhouseGlassBlock` that is `noOcclusion` and
 between adjacent glass (like vanilla glass), fixing the "transparent model on a solid block" render
 artefact so a glazed wall reads as one clean surface.
 
+## Fluid rendering
+
+Nutrient and Biofuel each ship an animated still and flowing sprite (`block/<fluid>_still`,
+`block/<fluid>_flow`). From 26.x a fluid is drawn from a **fluid model** rather than from a
+blockstate, and a fluid with no registered model falls back to the missing-texture checkerboard — so
+the model has to be registered on every loader, through a different entry point on each:
+
+| Loader | Registration |
+| ------ | ------------ |
+| NeoForge | `RegisterFluidModelsEvent` (unbaked model) |
+| Forge | `ModelEvent.BakeFluidModels` (baked with the event's material baker) |
+| Fabric | Fabric API `FluidRenderingRegistry.register` (unbaked model) |
+
+All three register the same still/flow pair with no overlay and no tint, and the still and flowing
+fluid share one model. The chunk render layer is chosen by vanilla from the sprite's transparency, so
+no per-block layer registration is needed. Each fluid is a distinct `FluidKind` with its own fluid
+type, bucket and liquid block; adding a fluid means adding a kind, its two sprites, and nothing else
+per loader.
+
 ## Demonstration farm
 
 `/neroagriculture gallery` builds a working farm: a 3×2 grid of tier grow beds, each powered
-(Creative Battery) and nutrient-filled, with a fully grown ore crop on top (Coal on Territe; Iron,
-Copper, Gold on Forgite; Diamond, Emerald on Orbite), flanked by a Planter and Harvester. Every
+(Creative Battery) and nutrient-filled, with a fully grown ore crop on top (Coal — a Territe crop — on a
+Forgite bed, because the Territe bed is deliberately a passive plain block with no seed/output slots;
+Iron, Copper, Gold on Forgite; Diamond, Emerald on Orbite), flanked by a Planter and Harvester. Every
 crop is at max age, so **right-clicking a grown crop harvests its fragment and leaves the crop planted**
 (age resets to 0). Higher-tier ores still need their Core progression gate open to harvest — intended
 behaviour. Note: a freshly placed crop block with no material variant (e.g. from the block-grid
-showcase) is not harvestable; plant a seed or use the farm.
+showcase) is not harvestable; plant a seed or use the farm. `/neroagriculture gallery clear` removes
+exactly what the gallery placed this session — never surrounding builds.
 
 ## Regenerating art
 

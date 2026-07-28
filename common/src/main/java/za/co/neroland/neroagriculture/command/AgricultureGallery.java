@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -44,18 +43,41 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
  * plus a set of live exhibits — a growing resource crop on a powered bed, the fabrication chain, a formed
  * greenhouse, a formed crop tower, the life-support/biofuel machines, the genetics pair, and a terraforming
  * controller — each fed and powered (a Core Creative Battery neighbour + a pre-charged buffer) with a
- * floating label. {@code /neroagriculture gallery clear} wipes that footprint so a rebuild never stacks.
+ * floating label. {@code /neroagriculture gallery clear} removes exactly the blocks and label stands the
+ * gallery itself placed (recorded per dimension for the session) so a rebuild never stacks — and never
+ * touches anything a player built inside the same footprint.
  *
- * <p><b>Privacy (POPIA/GDPR):</b> the command acts at the player's position and records nothing — no
- * positions, names or UUIDs are stored anywhere.
+ * <p><b>Privacy (POPIA/GDPR):</b> the command acts at the player's position and stores no personal data
+ * — the only record kept (in memory, for the session) is the set of block positions the gallery painted,
+ * so {@code clear} can remove them; no names or UUIDs are stored anywhere.
  */
 public final class AgricultureGallery {
     private static final int SPACING = 3;
     private static final int FLOAT_ABOVE = 3;
     private static final int EXHIBIT_STEP = 5;
     private static final Identifier SHOWCASE_MATERIAL = Identifier.parse("c:coal"); // Territe, ungated
+    /** Scoreboard-style entity tag on the gallery's own label stands, so clear() removes only those. */
+    private static final String LABEL_TAG = "neroagriculture_gallery";
+
+    /**
+     * Session-scoped record of every position the gallery painted, per dimension, so {@code clear}
+     * removes exactly what {@code build} placed and never a player's pre-existing blocks. Block
+     * positions only — no names, UUIDs or player data of any kind (POPIA/GDPR).
+     */
+    private static final java.util.Map<Identifier, java.util.Set<BlockPos>> PLACED =
+            new java.util.concurrent.ConcurrentHashMap<>();
 
     private AgricultureGallery() { }
+
+    /** Every gallery placement goes through here so the footprint is recorded for {@link #clear}. */
+    private static void place(ServerLevel level, BlockPos pos, BlockState state) {
+        level.setBlockAndUpdate(pos, state);
+        PLACED.computeIfAbsent(level.dimension().identifier(),
+                key -> java.util.concurrent.ConcurrentHashMap.newKeySet()).add(pos.immutable());
+    }
+
+    /** Server-stop hook (see {@code lifecycle.ServerStateReset}): the record must not outlive the world. */
+    public static void clearRecords() { PLACED.clear(); }
 
     public static int build(CommandSourceStack source) {
         ServerPlayer player = source.getPlayer();
@@ -87,18 +109,18 @@ public final class AgricultureGallery {
         int rows = (int) Math.ceil(blocks.size() / (double) cols);
         fillFloor(level, gx - 1, gz - 1, gx + cols * SPACING, gz + rows * SPACING, fy, floor);
         for (int i = 0; i < blocks.size(); i++) {
-            level.setBlockAndUpdate(new BlockPos(gx + (i % cols) * SPACING, fy + FLOAT_ABOVE, gz + (i / cols) * SPACING),
+            place(level, new BlockPos(gx + (i % cols) * SPACING, fy + FLOAT_ABOVE, gz + (i / cols) * SPACING),
                     blocks.get(i).defaultBlockState());
         }
 
         // GROWING CROP (centre): an Forgite Grow Bed, powered, with a mid-growth resource crop on top.
         BlockPos bedPos = new BlockPos(origin.getX() + 4, fy + 1, origin.getZ() - 5);
         fillFloor(level, bedPos.getX() - 1, bedPos.getZ() - 1, bedPos.getX() + 1, bedPos.getZ() + 1, fy, floor);
-        level.setBlockAndUpdate(bedPos, ModBlocks.FORGITE_GROW_BED.get().defaultBlockState());
+        place(level, bedPos, ModBlocks.FORGITE_GROW_BED.get().defaultBlockState());
         battery(level, bedPos.below());
         charge(level, bedPos);
         BlockPos cropPos = bedPos.above();
-        level.setBlockAndUpdate(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
+        place(level, cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
                 .setValue(ResourceCropBlock.AGE, 5));
         if (level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop) {
             crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, SHOWCASE_MATERIAL, FragmentTier.FORGITE, 3));
@@ -150,8 +172,8 @@ public final class AgricultureGallery {
         fillFloor(level, fx2 - 1, fz2 - 1, fx2 + 4, fz2 + 1, fy, floor);
         for (int i = 0; i < 4; i++) {
             BlockPos farm = new BlockPos(fx2 + i, fy + 1, fz2);
-            level.setBlockAndUpdate(farm, Blocks.FARMLAND.defaultBlockState());
-            level.setBlockAndUpdate(farm.above(), ModBlocks.PROSPORA_CROP.get().defaultBlockState()
+            place(level, farm, Blocks.FARMLAND.defaultBlockState());
+            place(level, farm.above(), ModBlocks.PROSPORA_CROP.get().defaultBlockState()
                     .setValue(net.minecraft.world.level.block.CropBlock.AGE, Math.min(7, 1 + i * 2)));
         }
         label(level, new BlockPos(fx2 + 2, fy + 4, fz2),
@@ -164,7 +186,7 @@ public final class AgricultureGallery {
         liveMachine(level, new BlockPos(ax, fy + 1, az), ModBlocks.GENETICS_STATION.get(),
                 resourceSeed(), 0, "Genetics Station — splicing traits");
         BlockPos beaconPos = new BlockPos(ax + EXHIBIT_STEP, fy + 1, az);
-        level.setBlockAndUpdate(beaconPos, ModBlocks.POLLINATION_BEACON.get().defaultBlockState());
+        place(level, beaconPos, ModBlocks.POLLINATION_BEACON.get().defaultBlockState());
         battery(level, beaconPos.below());
         charge(level, beaconPos);
         label(level, beaconPos.above(2), "Pollination Beacon — boosting crossing");
@@ -172,7 +194,7 @@ public final class AgricultureGallery {
         // TERRAFORMING (near centre): a powered controller ready to convert a hostile region.
         BlockPos terraPos = new BlockPos(origin.getX() + 5, fy + 1, origin.getZ() + 5);
         fillFloor(level, terraPos.getX() - 1, terraPos.getZ() - 1, terraPos.getX() + 1, terraPos.getZ() + 1, fy, floor);
-        level.setBlockAndUpdate(terraPos, ModBlocks.TERRAFORMING_CONTROLLER.get().defaultBlockState());
+        place(level, terraPos, ModBlocks.TERRAFORMING_CONTROLLER.get().defaultBlockState());
         battery(level, terraPos.below());
         charge(level, terraPos);
         label(level, terraPos.above(2), "Terraforming Controller — makes a region habitable");
@@ -191,6 +213,11 @@ public final class AgricultureGallery {
         return Command.SINGLE_SUCCESS;
     }
 
+    /**
+     * Removes exactly the blocks {@link #build} recorded for this dimension (never a blanket box wipe,
+     * which used to delete any pre-existing build inside the footprint) and only the gallery's own
+     * tagged label stands. Uses flag 3 (block update + client sync) so neighbours resettle properly.
+     */
     public static int clear(CommandSourceStack source) {
         ServerPlayer player = source.getPlayer();
         if (player == null) {
@@ -202,30 +229,36 @@ public final class AgricultureGallery {
             return 0;
         }
         ServerLevel level = player.level();
-        BlockPos origin = player.blockPosition();
-        int oy = origin.getY();
-        int minX = origin.getX() - 32;
-        int maxX = origin.getX() + 42;
-        int minZ = origin.getZ() - 32;
-        int maxZ = origin.getZ() + 30;
-        int topY = oy + 16;
+        java.util.Set<BlockPos> placed = PLACED.remove(level.dimension().identifier());
+        if (placed == null || placed.isEmpty()) {
+            source.sendFailure(Component.literal("[NeroAgriculture] No gallery build recorded in this dimension "
+                    + "this session — nothing cleared. The command only removes blocks the gallery itself placed."));
+            return 0;
+        }
         BlockState air = Blocks.AIR.defaultBlockState();
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         int cleared = 0;
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                for (int y = oy; y <= topY; y++) {
-                    cursor.set(x, y, z);
-                    if (!level.getBlockState(cursor).isAir()) {
-                        level.setBlock(cursor, air, 2);
-                        cleared++;
-                    }
-                }
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+        for (BlockPos pos : placed) {
+            minX = Math.min(minX, pos.getX());
+            minY = Math.min(minY, pos.getY());
+            minZ = Math.min(minZ, pos.getZ());
+            maxX = Math.max(maxX, pos.getX());
+            maxY = Math.max(maxY, pos.getY());
+            maxZ = Math.max(maxZ, pos.getZ());
+            if (!level.getBlockState(pos).isAir()) {
+                level.setBlock(pos, air, 3);
+                cleared++;
             }
         }
-        AABB box = new AABB(minX, oy - 1, minZ, maxX + 1, topY + 4, maxZ + 1);
+        AABB box = new AABB(minX - 1, minY - 1, minZ - 1, maxX + 2, maxY + 5, maxZ + 2);
         int removed = 0;
-        for (Entity entity : level.getEntitiesOfClass(Entity.class, box, e -> !(e instanceof Player))) {
+        for (Entity entity : level.getEntitiesOfClass(ArmorStand.class, box,
+                e -> e.entityTags().contains(LABEL_TAG))) {
             entity.discard();
             removed++;
         }
@@ -239,7 +272,7 @@ public final class AgricultureGallery {
     // --- helpers -----------------------------------------------------------
 
     private static void liveMachine(ServerLevel level, BlockPos pos, Block block, ItemStack input, int slot, String label) {
-        level.setBlockAndUpdate(pos, block.defaultBlockState());
+        place(level, pos, block.defaultBlockState());
         battery(level, pos.below());
         charge(level, pos);
         if (level.getBlockEntity(pos) instanceof Container container && slot < container.getContainerSize()) {
@@ -270,7 +303,7 @@ public final class AgricultureGallery {
     }
 
     private static void battery(ServerLevel level, BlockPos pos) {
-        level.setBlockAndUpdate(pos, za.co.neroland.nerolandcore.registry.ModBlocks.CREATIVE_BATTERY.get().defaultBlockState());
+        place(level, pos, za.co.neroland.nerolandcore.registry.ModBlocks.CREATIVE_BATTERY.get().defaultBlockState());
     }
 
     private static void charge(ServerLevel level, BlockPos pos) {
@@ -284,7 +317,7 @@ public final class AgricultureGallery {
     private static void fillFloor(ServerLevel level, int x0, int z0, int x1, int z1, int y, BlockState floor) {
         for (int x = x0; x <= x1; x++) {
             for (int z = z0; z <= z1; z++) {
-                level.setBlockAndUpdate(new BlockPos(x, y, z), floor);
+                place(level, new BlockPos(x, y, z), floor);
             }
         }
     }
@@ -302,12 +335,12 @@ public final class AgricultureGallery {
                     BlockPos pos = new BlockPos(bx + dx, y0 + dy, bz + dz);
                     boolean surface = dx == 0 || dx == size - 1 || dy == 0 || dy == size - 1 || dz == 0 || dz == size - 1;
                     if (pos.equals(controllerPos)) continue;
-                    if (!surface) level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                    else level.setBlockAndUpdate(pos, dy == size / 2 ? glass : frame);
+                    if (!surface) place(level, pos, Blocks.AIR.defaultBlockState());
+                    else place(level, pos, dy == size / 2 ? glass : frame);
                 }
             }
         }
-        level.setBlockAndUpdate(controllerPos, ModBlocks.GREENHOUSE_CONTROLLER.get().defaultBlockState());
+        place(level, controllerPos, ModBlocks.GREENHOUSE_CONTROLLER.get().defaultBlockState());
         battery(level, controllerPos.south());
         charge(level, controllerPos);
         label(level, new BlockPos(bx + size / 2, fy + size + 2, bz + size / 2), "Greenhouse — a sealed, powered dome");
@@ -316,11 +349,11 @@ public final class AgricultureGallery {
     private static void buildCropTower(ServerLevel level, BlockState floor, int bx, int bz, int fy) {
         fillFloor(level, bx - 1, bz - 1, bx + 1, bz + 1, fy, floor);
         BlockPos controllerPos = new BlockPos(bx, fy + 1, bz);
-        level.setBlockAndUpdate(controllerPos, ModBlocks.CROP_TOWER_CONTROLLER.get().defaultBlockState());
+        place(level, controllerPos, ModBlocks.CROP_TOWER_CONTROLLER.get().defaultBlockState());
         battery(level, controllerPos.north());
         charge(level, controllerPos);
         for (int dy = 1; dy <= 5; dy++) {
-            level.setBlockAndUpdate(controllerPos.above(dy), ModBlocks.CROP_TOWER_FRAME.get().defaultBlockState());
+            place(level, controllerPos.above(dy), ModBlocks.CROP_TOWER_FRAME.get().defaultBlockState());
         }
         if (level.getBlockEntity(controllerPos) instanceof Container container) {
             container.setItem(0, resourceSeed());
@@ -339,8 +372,11 @@ public final class AgricultureGallery {
         fillFloor(level, bx - 2, bz - 1, bx + cols * 3 + 1, bz + 2 * 3, fy, floor);
         label(level, new BlockPos(bx + 3, fy + 4, bz - 1),
                 "Farm — beds auto-harvest into their own slots and replant from their seed slot");
+        // The Territe bed is a deliberately passive plain block (no block entity, no seed/output slots
+        // — see GrowBedBlock), so it cannot demonstrate the auto-harvest/replant loop this farm is
+        // labelled with; the Territe crop sits on a Forgite bed instead (beds accept lower-tier crops).
         Object[][] plots = {
-            {ModBlocks.TERRITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe"},
+            {ModBlocks.FORGITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe (on a Forgite bed)"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:iron", FragmentTier.FORGITE, "Iron — Forgite"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:copper", FragmentTier.FORGITE, "Copper — Forgite"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:gold", FragmentTier.FORGITE, "Gold — Forgite"},
@@ -370,7 +406,7 @@ public final class AgricultureGallery {
 
     private static void plantBed(ServerLevel level, BlockPos bedPos, Block bed, Identifier material,
             FragmentTier tier, String label) {
-        level.setBlockAndUpdate(bedPos, bed.defaultBlockState());
+        place(level, bedPos, bed.defaultBlockState());
         battery(level, bedPos.below());
         charge(level, bedPos);
         if (level.getBlockEntity(bedPos) instanceof GrowBedBlockEntity growBed) {
@@ -381,7 +417,7 @@ public final class AgricultureGallery {
             growBed.setChanged();
         }
         BlockPos cropPos = bedPos.above();
-        level.setBlockAndUpdate(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
+        place(level, cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState()
                 .setValue(ResourceCropBlock.AGE, ResourceCropBlock.MAX_AGE));
         if (level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop) {
             crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, material, tier, 0));
@@ -391,6 +427,7 @@ public final class AgricultureGallery {
 
     private static void label(ServerLevel level, BlockPos pos, String text) {
         ArmorStand stand = new ArmorStand(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+        stand.addTag(LABEL_TAG); // clear() removes only stands carrying this tag
         stand.setCustomName(Component.literal(text));
         stand.setCustomNameVisible(true);
         stand.setInvisible(true);

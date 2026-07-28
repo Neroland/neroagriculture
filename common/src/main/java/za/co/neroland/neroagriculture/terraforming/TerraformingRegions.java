@@ -31,6 +31,11 @@ public final class TerraformingRegions {
                 terraformed(level, pos) ? Optional.of(EnvironmentProfile.HABITABLE) : Optional.empty());
     }
 
+    /** Drop every completed region when the server stops so nothing leaks into the next world (thread-safe). */
+    public static void clearAll() {
+        COMPLETED.clear();
+    }
+
     /** Pure square containment test for a region centred on (cx,cz) with the given radius. */
     public static boolean contains(int cx, int cz, int radius, int x, int z) {
         return Math.abs(x - cx) <= radius && Math.abs(z - cz) <= radius;

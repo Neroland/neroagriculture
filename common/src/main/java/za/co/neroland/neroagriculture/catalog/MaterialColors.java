@@ -40,6 +40,39 @@ public final class MaterialColors {
             Map.entry("platinum", 0xBFE0E6),
             Map.entry("iridium", 0xC8D0D8));
 
+    /**
+     * The one lenient colour parser shared by the datapack parsers and the config override parser, so
+     * the same conceptual input never parses differently by source. Accepts {@code #RRGGBB},
+     * {@code 0xRRGGBB}, bare hex of up to six digits (hex wins over decimal for all-digit strings up
+     * to six characters, matching the established config behaviour), or a plain decimal integer.
+     * Always a 24-bit RGB value; anything else throws {@link IllegalArgumentException}.
+     */
+    public static int parseColor(String raw) {
+        String text = raw.trim();
+        String hex = null;
+        if (text.startsWith("#")) hex = text.substring(1);
+        else if (text.startsWith("0x") || text.startsWith("0X")) hex = text.substring(2);
+        int value;
+        try {
+            if (hex != null) {
+                value = Integer.parseInt(hex, 16);
+            } else if (!text.isEmpty() && text.length() <= 6
+                    && text.chars().allMatch(c -> Character.digit(c, 16) >= 0)) {
+                value = Integer.parseInt(text, 16);
+            } else {
+                value = Integer.parseInt(text);
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "color must be a 24-bit RGB value (#RRGGBB, 0xRRGGBB or decimal): '" + raw + "'");
+        }
+        if (value < 0 || value > 0xFFFFFF) {
+            throw new IllegalArgumentException(
+                    "color must be a 24-bit RGB value (#RRGGBB, 0xRRGGBB or decimal): '" + raw + "'");
+        }
+        return value;
+    }
+
     /** Curated colour for {@code materialPath}, or a stable derived colour when unknown. */
     public static int resolve(String materialPath) {
         String path = materialPath.toLowerCase(Locale.ROOT);

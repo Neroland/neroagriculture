@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.automation;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -70,12 +69,8 @@ public final class AreaMachineBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof AreaMachineBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-    }
+    // Contents drop from AreaMachineBlockEntity#preRemoveSideEffects (covers creative breaks and
+    // explosions too), so no playerDestroy override is needed here.
 
     @Nullable
     @Override

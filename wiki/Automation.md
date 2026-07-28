@@ -33,8 +33,12 @@ cost, exactly as on the fabrication machines.
 ## Ownership and claims
 
 If owner tracking is enabled (config `automation.track_owner`, on by default), a machine records only the
-placing player's UUID — never a name — so a claims/protection mod can authorise its edits. Standalone, with
+placing player's UUID — never a name — so a claims/protection mod can authorise its edits. Fabrication
+machines and powered grow beds record their placer the same way, and progression checks (gate unlocks,
+research requirements) are made **owner-first**: they credit the machine's owner, falling back to the
+nearest player only when no owner is recorded, so opting out never bricks progression. Standalone, with
 no claims mod, machines work freely on loaded chunks. A player-data erasure request clears the stored owner
-from any loaded machine.
+from any loaded machine (and from unloaded ones when their chunks load — see
+[Privacy](Privacy-and-Erasure.md)).
 
 See also: [Fertiliser](Fertiliser.md), [Side Configuration](Side-Configuration.md).

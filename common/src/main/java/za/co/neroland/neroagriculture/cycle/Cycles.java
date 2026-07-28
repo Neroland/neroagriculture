@@ -24,6 +24,11 @@ public final class Cycles {
 
     private Cycles() { }
 
+    /** Drop every cached bucket when the server stops so stale modifiers never leak into the next world (thread-safe). */
+    public static void clearCache() {
+        CACHE.clear();
+    }
+
     public static CycleModifier current(@Nullable MinecraftServer server, Identifier dimension, long time) {
         if (!AgricultureConfig.CYCLES_ENABLED.get()) return CycleModifier.IDENTITY;
         long bucket = Math.floorDiv(time, COARSE_TICKS);

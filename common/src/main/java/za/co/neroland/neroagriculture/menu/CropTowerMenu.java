@@ -13,11 +13,16 @@ import net.minecraft.world.item.ItemStack;
 
 import za.co.neroland.neroagriculture.registry.ModMenuTypes;
 
-/** Crop Tower menu: three seed slots + a fertiliser slot feed the virtual tower; six output slots collect fragments. */
+/**
+ * Crop Tower menu: three seed slots + a fertiliser slot feed the virtual tower; six output slots collect
+ * fragments. Alongside height/slots/energy/nutrient it carries the tower's aggregate growth blocker.
+ */
 public final class CropTowerMenu extends AbstractContainerMenu {
     private static final int MACHINE_SLOTS = 10;
     private static final int OUTPUT_START = 4;
-    private static final int DATA_COUNT = 4;
+    public static final int DATA_COUNT = 5;
+    /** Blocked-reason data value used when no tower slot is planted yet. */
+    public static final int NO_CROP = -1;
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
@@ -45,18 +50,30 @@ public final class CropTowerMenu extends AbstractContainerMenu {
             final int slotIndex = OUTPUT_START + i;
             addSlot(new Slot(machine, slotIndex, out[i][0], out[i][1]) { @Override public boolean mayPlace(ItemStack s) { return false; } });
         }
+        // Player inventory sits 12px lower than the vanilla 176x166 layout: the screen grew to 178 tall to
+        // make room for the status line under the gauges.
         for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 96 + row * 18));
         }
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 142));
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 154));
         addDataSlots(data);
     }
 
     public BlockPos blockPos() { return blockPos; }
     public int height() { return data.get(0); }
     public int activeSlots() { return data.get(1); }
+    /** Permille fraction of the live energy capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
     public int energy() { return data.get(2); }
+    /** Permille fraction of the live nutrient capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
     public int nutrient() { return data.get(3); }
+
+    /** Aggregate growth blocker across the tower's planted slots; {@code null} when nothing is planted. */
+    @org.jetbrains.annotations.Nullable
+    public za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason blockedReason() {
+        var reasons = za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason.values();
+        int value = data.get(4);
+        return value >= 0 && value < reasons.length ? reasons[value] : null;
+    }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

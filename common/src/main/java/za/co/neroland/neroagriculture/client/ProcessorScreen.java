@@ -52,8 +52,9 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        // labelled energy gauge
-        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
+        // labelled energy gauge (synced as a fraction of the live capacity — see menu.GaugeData)
+        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
+                za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
         // progress arrow between inputs and output
         g.fill(x + 88, y + 37, x + 112, y + 39, TROUGH);

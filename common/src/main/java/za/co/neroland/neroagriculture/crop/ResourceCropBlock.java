@@ -160,7 +160,14 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 AgricultureConfig.YIELD_MULTIPLIER.get(), tierCap(definition.tier())) * cycleYield)
                 + za.co.neroland.neroagriculture.fertiliser.Fertilisers.yieldBonus(level, pos.below())
                 + za.co.neroland.neroagriculture.genetics.GeneticEffects.yieldBonus(crop.genetics());
-        if (amount <= 0) return java.util.List.of();
+        if (amount <= 0) {
+            // Zero yield still completes the harvest: reset age (and advance the harvest count) so a
+            // mature, yieldless crop doesn't leave auto-harvesters spinning on it forever.
+            crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
+                    crop.variant().harvestCount()).harvested());
+            level.setBlock(pos, state.setValue(AGE, 0), 3);
+            return java.util.List.of();
+        }
         java.util.List<ItemStack> drops = new java.util.ArrayList<>();
         int remaining = amount;
         while (remaining > 0) {
@@ -184,6 +191,18 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         return drops;
     }
 
+    /**
+     * Shared read-only view of {@link #growthReason} for the grow bed's own screen: the live blocker for
+     * the crop planted directly above {@code bedPos}, or {@code null} when the bed is bare. Reusing the
+     * random-tick reasoning keeps the status line and the actual growth decision from ever disagreeing.
+     */
+    @Nullable
+    public static GrowthRules.BlockedReason plantedGrowthReason(ServerLevel level, BlockPos bedPos) {
+        BlockPos cropPos = bedPos.above();
+        if (!(level.getBlockEntity(cropPos) instanceof ResourceCropBlockEntity crop)) return null;
+        return growthReason(level, cropPos, crop, null);
+    }
+
     private static GrowthRules.BlockedReason growthReason(ServerLevel level, BlockPos pos,
             ResourceCropBlockEntity crop, @Nullable ServerPlayer explicitPlayer) {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
@@ -193,9 +212,11 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         FragmentTier bedTier = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
         ServerPlayer player = explicitPlayer;
         if (player == null) {
-            Player nearest = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                    32.0, false);
-            if (nearest instanceof ServerPlayer serverPlayer) player = serverPlayer;
+            // Owner-first: gates are checked against the grow bed's recorded owner where one exists;
+            // the nearest player is only a fallback for ownerless beds (owner tracking opted out).
+            java.util.UUID owner = level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed
+                    ? bed.automationOwner() : null;
+            player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, pos, owner, 32.0);
         }
         boolean gate = (definition == null || definition.gate() == null
                 || player != null && ProgressionGates.isOpen(player, definition.gate()))
@@ -239,9 +260,11 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof ResourceCropBlockEntity crop) {
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
-            var lookup = level.getServer() == null ? MaterialCatalog.current().lookup(crop.variant().material())
-                    : MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
-            FragmentTier family = lookup.material().map(material -> material.definition().tier()).orElse(crop.variant().family());
+            // Server-side only (guarded above), so getServer() is available; the stored family is the
+            // fallback — never MaterialCatalog.current(), which is builtins-only off the server thread.
+            FragmentTier family = level.getServer() == null ? crop.variant().family()
+                    : MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
+                            .material().map(material -> material.definition().tier()).orElse(crop.variant().family());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(crop.variant().material(), family));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, crop.variant().material());
             seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());

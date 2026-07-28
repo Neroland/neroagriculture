@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.genetics;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -47,12 +46,8 @@ public final class GeneticsStationBlock extends BaseEntityBlock {
         return useWithoutItem(state, level, pos, player, hit);
     }
 
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof GeneticsStationBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-    }
+    // Contents drop from GeneticsStationBlockEntity#preRemoveSideEffects (covers creative breaks and
+    // explosions too), so no playerDestroy override is needed here.
 
     @Nullable
     @Override

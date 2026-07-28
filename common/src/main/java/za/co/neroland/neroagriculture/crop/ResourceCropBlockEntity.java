@@ -1,6 +1,11 @@
 package za.co.neroland.neroagriculture.crop;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,16 +27,36 @@ public final class ResourceCropBlockEntity extends BlockEntity {
     }
 
     public CropVariantState variant() { return variant; }
-    public void setVariant(CropVariantState variant) { this.variant = variant; setChanged(); }
+    public void setVariant(CropVariantState variant) {
+        boolean changed = !this.variant.equals(variant);
+        this.variant = variant;
+        setChanged();
+        // The client tints the crop from this BE's material, so a real change must be broadcast.
+        if (changed && level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
     public za.co.neroland.neroagriculture.genetics.Genetics genetics() { return genetics; }
     public void setGenetics(za.co.neroland.neroagriculture.genetics.Genetics genetics) {
         this.genetics = genetics == null ? za.co.neroland.neroagriculture.genetics.Genetics.EMPTY : genetics;
         setChanged();
     }
 
+    /**
+     * Server side this is the authoritative catalog. Client side (dedicated-server clients included,
+     * where {@code level.getServer()} is always {@code null}) the only truthful source is the synced
+     * display catalog — {@code MaterialCatalog.current()} would be builtins-only there, so datapack
+     * materials would wrongly resolve UNKNOWN. The client lookup carries status only (no definition):
+     * the server never syncs rules, and client callers only ever ask {@link #permitsGrowth()}.
+     */
     public ResolvedCatalog.Lookup catalogState() {
-        if (level == null || level.getServer() == null) return MaterialCatalog.current().lookup(variant.material());
-        return MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
+        if (level != null && level.getServer() != null) {
+            return MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
+        }
+        return new ResolvedCatalog.Lookup(
+                za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog.entries().containsKey(variant.material())
+                        ? ResolvedCatalog.Status.ACTIVE : ResolvedCatalog.Status.UNKNOWN,
+                java.util.Optional.empty());
     }
 
     public boolean permitsGrowth() { return catalogState().permitsGrowth(); }
@@ -60,4 +85,8 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         }
         genetics = GeneticsCodecs.load(input);
     }
+
+    // Client sync (chunk load + explicit updates) so in-world tints see the real material, not the default.
+    @Override public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return saveCustomOnly(registries); }
 }

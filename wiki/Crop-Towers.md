@@ -19,12 +19,37 @@ Feed the controller through Core [side configuration](Side-Configuration.md):
 - **Resource seeds** into the seed slots — the tower plants empty slots from them.
 - **Nero Flux and Nutrient** — each growth step costs the same NF and nutrient as a powered grow bed.
 - An optional **Speed or Yield Fertiliser** in the fertiliser slot boosts growth or harvest within the same
-  caps as field fertiliser.
-- **Resource Fragment** is deposited into the output slots on harvest; pull it with hoppers or pipes.
+  caps as field fertiliser. A Yield Fertiliser dose is only consumed when a harvest actually banks its
+  yield — a jammed output cluster costs nothing.
+- **Resource Fragments** are deposited into the output slots on harvest — the full yield, split across as
+  many stacks as needed; pull them with hoppers or pipes. A harvest is all-or-nothing: if the whole yield
+  does not fit, the slot stays mature and retries once space is freed, and nothing is ever discarded. A
+  zero-yield harvest still resets the slot so the tower keeps cycling.
 
 Each cycle the controller works a bounded number of slots from a rolling cursor: it plants an empty slot,
 advances a growing one (paying NF/nutrient), or harvests a mature one. Planting, the progression gate,
 capped yield, and genetics/fertiliser bonuses all use the **same shared logic** as ordinary crops.
+
+### Environment surcharge
+
+Towers keep working in hostile environments, but not for free. Each layer runs the **same climate check
+a grow bed uses** (habitability, and the sealed-greenhouse requirement for high tiers, relaxed by the
+crop's hardiness genetics). Where a grow bed would refuse to grow the crop, the tower layer instead pays
+an NF surcharge — the growth step costs
+`grow_beds.energy_per_growth x crop_tower.hostile_environment_nf_multiplier` (default 4x). Sealing the
+tower inside a powered [greenhouse](Greenhouse-Construction.md), terraforming the region, or breeding
+hardier crops removes the surcharge.
+
+## The controller screen
+
+Alongside the slots, gauges and the `height / active slots` readout the controller shows:
+
+- A **status line** with the tower's current blocker — progression gate closed, out of NF, out of
+  nutrient, or a disabled/unknown material. Nothing planted reads as idle.
+- A scrollable **seed panel** listing every material in the server's catalog. Unlike a grow bed the tower
+  has **no tier gate**: any resource seed it accepts is a seed it will grow, whatever its tier. What still
+  bites is checked at growth time — the progression gate, and the NF and nutrient the slot draws each
+  step. The panel says so above the list rather than implying a bed-tier restriction that does not exist.
 
 ## Genetics, contents, and safety
 

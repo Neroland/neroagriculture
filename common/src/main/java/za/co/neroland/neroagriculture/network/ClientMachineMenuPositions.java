@@ -15,4 +15,6 @@ public final class ClientMachineMenuPositions {
         }
     }
     public static BlockPos poll(int containerId) { return POSITIONS.remove(containerId); }
+    /** Drop unpolled entries on disconnect (see {@code lifecycle.ClientStateReset}); ids restart per session. */
+    public static void clear() { POSITIONS.clear(); }
 }

@@ -15,6 +15,9 @@ public final class AgricultureConfig {
             true, "Comma-separated material ids disabled before exposure");
     public static final ConfigValue<String> MATERIAL_OVERRIDES = SCHEMA.string("discovery.material_overrides", "",
             true, "Semicolon entries: id|tier=orbite|gate=id|yield=min:max:ramp|conversion=n|enabled=true");
+    public static final ConfigValue<String> DISCOVERY_DEFAULT_TIER = SCHEMA.string("discovery.default_tier", "orbite",
+            true, "Tier assigned to auto-discovered materials no heuristic recognises "
+            + "(territe|forgite|orbite|colonite|voidite); invalid values fall back to orbite");
     public static final ConfigValue<Integer> CONDENSATION_TICKS = integer("condensation.ticks", 200, 1, 72_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_CAPACITY = integer("machines.energy_capacity", 100_000, 1_000, 10_000_000);
     public static final ConfigValue<Integer> MACHINE_ENERGY_RATE = integer("machines.energy_rate", 80, 1, 32_000);
@@ -50,17 +53,25 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_LAYER = integer("crop_tower.slots_per_layer", 4, 1, 64);
     public static final ConfigValue<Integer> TOWER_SLOTS_PER_PASS = integer("crop_tower.slots_per_pass", 6, 1, 4_096);
     public static final ConfigValue<Integer> TOWER_REVALIDATE_TICKS = integer("crop_tower.revalidate_ticks", 100, 20, 12_000);
+    public static final ConfigValue<Integer> TOWER_HOSTILE_NF_MULTIPLIER = SCHEMA.intRange(
+            "crop_tower.hostile_environment_nf_multiplier", 4, 1, 64, true,
+            "NF cost multiplier a tower layer pays when its environment would fail the crop's climate "
+            + "check (towers keep growing in hostile environments, at this surcharge)");
     public static final ConfigValue<Boolean> FUSION_ENABLED = SCHEMA.bool("fusion.enabled", true, true,
             "Enable fragment-fusion (alloy) recipes that combine two resources into an alloy seed");
     public static final ConfigValue<String> FUSION_MAX_TIER = SCHEMA.string("fusion.max_tier", "voidite", true,
             "Highest tier an alloy seed may be fused at (territe|forgite|orbite|colonite|voidite); "
             + "alloys whose resource sits above this tier cannot be fused");
-    public static final ConfigValue<Boolean> REQUIRE_RESEARCH = SCHEMA.bool("progression.require_research", false,
+    public static final ConfigValue<Boolean> REQUIRE_RESEARCH = SCHEMA.bool("progression.require_research", true,
             true, "Require materials to be researched at the Seed Research Bench before synthesis/conversion "
-            + "(off by default — no hard unlocks)");
+            + "(on by default; hard tier gates remain off)");
     public static final ConfigValue<String> SIBLING_OVERLAYS = SCHEMA.string("progression.sibling_overlays", "off",
             true, "Whether higher tiers ALSO require a sibling mod's Core arc gate: off (default — no "
             + "hard gates), auto (only when the opener mod is loaded), or on (always)");
+    public static final ConfigValue<Boolean> NEROSPACE_VISITS = SCHEMA.bool("compat.nerospace_visits", true,
+            true, "Grant material_discovered for planet-bound materials from Nerospace planet visits — "
+            + "live dimension entry plus, with Nerospace 1.0.0-beta.8+, historical visit backfill on join; "
+            + "off leaves planet-bound research locked to visits that are never recorded");
     public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
             "Enable seasonal/stellar-cycle growth and yield modifiers");
     public static final ConfigValue<Boolean> TERRAFORM_ENABLED = SCHEMA.bool("terraforming.enabled", true, true,
@@ -76,6 +87,10 @@ public final class AgricultureConfig {
     public static final ConfigValue<Integer> AUTOMATION_ENERGY_PER_OP = integer("automation.energy_per_op", 60, 0, 100_000);
     public static final ConfigValue<Boolean> AUTOMATION_TRACK_OWNER = SCHEMA.bool("automation.track_owner", true,
             true, "Record the placing player's UUID (only) on automation machines for claim checks; opt-out");
+    public static final ConfigValue<Integer> ERASURE_RETENTION_DAYS = SCHEMA.intRange(
+            "privacy.erasure_retention_days", 90, 1, 3650, true,
+            "Days an erasure request's UUID tombstone is kept so owners saved in unloaded chunks are "
+            + "still purged when those chunks load; pruned automatically afterwards");
     public static final ConfigValue<Integer> FERTILISER_MAX_DOSE = integer("fertiliser.max_dose", 8, 1, 64);
     public static final ConfigValue<Integer> FERTILISER_DURATION_TICKS = integer("fertiliser.duration_ticks", 6_000, 20, 720_000);
     public static final ConfigValue<Integer> FERTILISER_ENERGY_PER_APPLY = integer("fertiliser.energy_per_apply", 40, 0, 100_000);

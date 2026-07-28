@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-07-29 audit remediation (build-verified across the six cells)
+
+Full code + design audit follow-up (`neroland-mc-ecosystem/audits/2026-07-28-neroagriculture-audit.md`).
+
+#### Fixed
+
+- **Recipe lookup no longer scans and sorts the whole server recipe manager every tick** — per-type
+  id-sorted cache plus an input-dirty/20-tick idle gate on fabrication machines; material matching is
+  cached per resolved catalog. (H1)
+- **Breaking a Grow Bed or Foundation Machine no longer voids its inventory**; all machines now drop
+  contents from the block-removal hook, covering creative breaks and explosions too. (H2)
+- **Resource/species crop block entities sync to the client** — in-world crop tints now render the
+  real material colour instead of the fallback; grow beds no longer broadcast a full-NBT update
+  packet on every dirty-mark. (H3, M4)
+- **Server-scoped static caches (terraforming regions, greenhouse index, cycles, material catalog,
+  gallery records, visit tracking) are cleared on server stop** instead of leaking into the next
+  single-player world. (H4)
+- **Forge capability layer now honours per-side machine side-config dynamically**, matching
+  Fabric/NeoForge semantics. (H5)
+- **Platform services are preloaded at mod construction** even when telemetry is opted out,
+  eliminating a lazy mid-tick ServiceLoader crash class. (M1)
+- **Player-data erasure now reaches machines in unloaded chunks** via a persisted tombstone set with
+  a configurable retention window (`privacy.erasure_retention_days`, default 90). (M2, POPIA/GDPR)
+- **Greenhouse oxygen contributions are retracted** on breach/unpower/removal. (M9)
+- Seed Synthesizer hopper filter matches its actual recipe inputs; crop-tower harvests no longer
+  burn fertiliser when the output is jammed and split yields across stacks (all-or-nothing);
+  dedicated-server clients resolve materials/species via the synced client catalog; gauge values sync
+  as permille of live capacity (no more hard-coded maxima or 16-bit truncation); compatibility panels
+  are cached per screen; plus the full low-severity sweep (menu slot filters, parser hardening,
+  unified colour parsing, aggregated reload logging, gallery clear made surgical, network action
+  validation, Fabric dedicated-server classloading, zero-yield age reset, client cache clearing on
+  disconnect). (M5–M8, M11, Low)
+
+#### Changed
+
+- **`progression.require_research` now defaults to `true`** — the Seed Research Bench is part of the
+  default loop; hard tier gates remain off by default (2026-07-16 decision) and sibling overlays
+  remain opt-in. (D1)
+- **Crop towers now evaluate per-layer climate** and pay a configurable NeroFlux surcharge in hostile
+  environments (`crop_tower.hostile_environment_nf_multiplier`, default 4) instead of bypassing the
+  environment system. (D3)
+- **Unknown discovered materials default to Orbite** (was Forgite), restoring the documented
+  anti-inflation stance; configurable via `discovery.default_tier`. (D4)
+- **Gate unlocks and machine/crop/pollination gate checks are owner-bound** (placer-recorded,
+  erasure-covered), with nearest-player fallback only for ownerless blocks. (D5)
+- Terraforming controllers record their owner only after authorization succeeds.
+
+#### Added
+
+- **Nerospace planet-visit adapter** (runtime-guarded, no hard dependency): planet visits grant
+  Core `material_discovered` milestones for planet-bound materials, making Nerospace-restricted
+  materials researchable; historical visits backfill reflectively when Nerospace ≥ 1.0.0-beta.8 is
+  present. Toggle: `compat.nerospace_visits` (default on). Live tracking is event-driven on
+  Forge/NeoForge and tick-diffed on Fabric.
+- Consolidated cross-loader tables: canonical machine block-entity list and screen-binding list in
+  `common` consumed by all loaders — new machines can no longer silently miss capabilities/screens.
+
+---
+
 Resource & progression rework — reframing the mod around a resource-seed economy with standalone,
 NeroAgriculture-native progression. In progress; each stage is build-verified across the six cells.
 
@@ -160,8 +219,8 @@ behaviour still want an in-client check on the dev machine.)
   (26.x `useBlockDescriptionPrefix()`), fixing raw keys like `item.neroagriculture.oxygen_plant`.
 - **Fluids have textures**: new `nutrient_still/flow` and `biofuel_still/flow` sprites, and the fluid
   models are registered on **NeoForge** (`RegisterFluidModelsEvent`) — this was the magenta/black
-  checkerboard "liquid" (and the untextured source-block shape). *Forge/Fabric fluid visuals still
-  pending (different APIs; tracked).*
+  checkerboard "liquid" (and the untextured source-block shape). *Forge and Fabric followed on
+  2026-07-25; see "Fluid rendering on Forge and Fabric" below.*
 - **Fabrication screens un-squished**: the shared machine screen grew to 176x172 with banded layout —
   energy gauge, slot row, status line, progress bar and the research pill no longer overlap.
 - **Bioreactor, Biofuel Converter and Fertiliser Processor are now interactable** with real UIs (a
@@ -234,6 +293,27 @@ behaviour still want an in-client check on the dev machine.)
   labels, slots and text never overlap (including the Fertiliser Applicator overlap from the
   screenshot: upgrades moved to the right edge, the middle band stacks mode / range / Show-area /
   Energy on separate lines).
+
+### Fluid rendering on Forge and Fabric (2026-07-25)
+
+- **Fluid models are now registered on all three loaders.** Nutrient and biofuel previously rendered
+  as the missing-texture checkerboard on Forge and Fabric, because only NeoForge had the 26.x
+  `FluidModel` registration. Forge now bakes and registers the models from
+  `ModelEvent.BakeFluidModels`; Fabric registers the unbaked models through Fabric API's
+  `FluidRenderingRegistry`. All three build the same still/flow materials
+  (`block/<fluid>_still`, `block/<fluid>_flow`, no overlay, no tint), and the chunk render layer is
+  derived from sprite transparency by vanilla, so no per-block layer registration is needed.
+- **Biofuel is a fluid in its own right.** Both fluids were being built from one shared set of
+  properties keyed to nutrient, so biofuel reported nutrient's source/flowing pair, handed out the
+  nutrient bucket, and placed a nutrient liquid block — a biofuel source became nutrient on contact
+  with the world, which no amount of model registration would have fixed. A new common `FluidKind`
+  enum (`NUTRIENT`, `BIOFUEL`) carries each fluid's registry id, density, viscosity, bucket and
+  liquid block; `FluidFactory.createSource`/`createFlowing` take the kind, and every loader now
+  builds one fluid type and one property set **per fluid**. Biofuel is also lighter and runnier than
+  nutrient (density 900 / viscosity 1000 against 1050 / 1100) rather than identical to it.
+- Fabric's `NutrientFluid` became `ModFlowingFluid`, parameterised by `FluidKind`, since it backs
+  both fluids. The per-loader property sets are built lazily on first use so they can never capture
+  a registry entry before `ModFluids` has finished initialising.
 
 ## [0.0.1-alpha.2] - 2026-07-13
 

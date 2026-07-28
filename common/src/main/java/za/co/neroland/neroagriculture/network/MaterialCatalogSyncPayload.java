@@ -41,6 +41,12 @@ public record MaterialCatalogSyncPayload(List<Entry> entries) implements CustomP
             values.add(entry);
             bytes += next;
         }
+        if (values.size() < catalog.exposed().size()) {
+            // Counts only — no ids, no player identity (POPIA/GDPR).
+            NeroAgricultureCommon.LOGGER.warn(
+                    "[NeroAgriculture] Material catalog sync truncated to {} of {} materials; clients will not see the rest.",
+                    values.size(), catalog.exposed().size());
+        }
         return new MaterialCatalogSyncPayload(values);
     }
 

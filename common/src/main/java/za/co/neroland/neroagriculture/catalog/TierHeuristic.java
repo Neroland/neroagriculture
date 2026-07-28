@@ -60,12 +60,19 @@ public final class TierHeuristic {
     /**
      * Resolve a tier for {@code materialPath} discovered under tag category {@code category}
      * (one of {@code ingots}, {@code gems}, {@code ores}, {@code dusts}, {@code raw_materials}).
+     * Unknown/uncategorised materials get the configured {@code discovery.default_tier} (Orbite by
+     * default — an unrecognised modded resource reads as space-age rather than early-game).
      */
     public static FragmentTier assign(String materialPath, String category) {
+        return assign(materialPath, category, configuredDefault());
+    }
+
+    /** Pure variant (unit-testable without a server/config): {@code fallback} replaces the config default. */
+    static FragmentTier assign(String materialPath, String category, FragmentTier fallback) {
         String path = materialPath.toLowerCase(Locale.ROOT);
         FragmentTier known = KNOWN.get(path);
         if (known != null) return known;
-        FragmentTier best = categoryDefault(category);
+        FragmentTier best = categoryDefault(category, fallback);
         for (Map.Entry<String, FragmentTier> keyword : KEYWORDS.entrySet()) {
             if (path.contains(keyword.getKey()) && keyword.getValue().ordinal() > best.ordinal()) {
                 best = keyword.getValue();
@@ -74,10 +81,20 @@ public final class TierHeuristic {
         return best;
     }
 
-    private static FragmentTier categoryDefault(String category) {
+    /** The validated {@code discovery.default_tier} config value; fails closed to Orbite. */
+    static FragmentTier configuredDefault() {
+        try {
+            return FragmentTier.valueOf(za.co.neroland.neroagriculture.config.AgricultureConfig
+                    .DISCOVERY_DEFAULT_TIER.get().trim().toUpperCase(Locale.ROOT));
+        } catch (RuntimeException e) {
+            return FragmentTier.ORBITE;
+        }
+    }
+
+    private static FragmentTier categoryDefault(String category, FragmentTier fallback) {
         return switch (category.toLowerCase(Locale.ROOT)) {
             case "gems" -> FragmentTier.ORBITE;
-            default -> FragmentTier.FORGITE;
+            default -> fallback;
         };
     }
 }

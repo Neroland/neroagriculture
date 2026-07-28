@@ -19,15 +19,23 @@ versioned tier component. Destination gates are checked when work begins and aga
 
 ## Seed Synthesizer
 
-The Synthesizer uses three inputs: a real material sample, matching Resource Fragment, and a Charged Seed
-of the resolved catalog tier. It also requires the player's Core material-discovery and Agriculture
-research milestones. The server rechecks the recipe, catalog, gate, milestones, components, output space,
-and physical inputs before producing a fresh Resource Seed.
+The Synthesizer uses three inputs: a real material sample (first slot), enough matching neutral **Tier
+Fragments** of the material's tier (second slot), and a **Prospora Seed** base (third slot). It also
+requires the player's Core material-discovery and Agriculture research milestones. The server rechecks the
+recipe, catalog, gate, milestones, components, output space, and physical inputs before producing a fresh
+Resource Seed. Hoppers and pipes can feed all three inputs — the machine's slot filter accepts exactly
+what the recipes consume (Tier Fragments in the second slot, Prospora Seeds in the third).
 
 Putting Resource Fragment in the first slot selects a conservative material-conversion recipe instead.
 The recipe must name the same material, meet its catalog conversion cost, and output the catalog's exact
 resource item.
 
-Player- or team-scoped checks use an eligible player within 16 blocks; no player UUID is stored on the
-machine. The screen shows progress, NF, and explicit blocked states such as no power, closed gate, missing
-research, invalid components, or full output.
+Player- or team-scoped checks (gates, research milestones, tier unlocks) are **owner-bound**: each
+machine records its placer's UUID (opt-out via `automation.track_owner`; server-only, erasure-aware —
+see [Privacy](Privacy-and-Erasure.md)) and credits that player. Only an ownerless machine falls back to
+an eligible player within 16 blocks, so opting out never bricks progression. The screen shows progress,
+NF, and explicit blocked states such as no power, closed gate, missing research, invalid components, or
+full output.
+
+Removing a machine by any means — survival or creative break, or an explosion — drops its inventory,
+including installed upgrade modules; nothing inside is ever voided.

@@ -71,7 +71,9 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
                 ? "screen.neroagriculture.area.hide" : "screen.neroagriculture.area.show");
         g.text(font, label, x + 116 - font.width(label) / 2, y + 45, pillColor, false);
 
-        Gauges.bar(g, font, x + 84, y + 58, x + 148, "Energy", menu.energy(), 100_000, Gauges.ENERGY);
+        // Energy is synced as a fraction of the live capacity (see menu.GaugeData).
+        Gauges.bar(g, font, x + 84, y + 58, x + 148, "Energy", menu.energy(),
+                za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
     }

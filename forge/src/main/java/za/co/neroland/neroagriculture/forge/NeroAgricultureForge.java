@@ -6,10 +6,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+
+import net.minecraft.server.level.ServerPlayer;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
+import za.co.neroland.neroagriculture.compat.CompatContracts;
+import za.co.neroland.neroagriculture.lifecycle.ServerStateReset;
 import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
@@ -32,5 +38,14 @@ public final class NeroAgricultureForge {
             if (event.getPlayer() == null) CatalogSync.reloadAndSync(event.getPlayerList().getServer());
             else CatalogSync.syncTo(event.getPlayer());
         });
+        // Optional Nerospace planet-visit adapter (join backfill + live dimension-change tracking).
+        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(event -> {
+            if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerJoined(player);
+        });
+        PlayerEvent.PlayerChangedDimensionEvent.BUS.addListener(event -> {
+            if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerChangedDimension(player);
+        });
+        // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
+        ServerStoppedEvent.BUS.addListener(event -> ServerStateReset.serverStopped());
     }
 }

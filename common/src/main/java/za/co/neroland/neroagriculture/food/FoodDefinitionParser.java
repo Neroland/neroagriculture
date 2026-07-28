@@ -28,7 +28,7 @@ public final class FoodDefinitionParser {
             int potencyCap = optionalInt(json, "potency_cap", amplifier);
             int durationCap = optionalInt(json, "duration_cap", durationTicks);
             int nutrition = requiredInt(json, "nutrition");
-            float saturation = (float) json.get("saturation").getAsDouble();
+            float saturation = (float) requiredDouble(json, "saturation");
             FragmentTier tier = enumValue(FragmentTier.class, requiredString(json, "tier"), "tier");
             PlanetTheme theme = json.has("theme") && !json.get("theme").isJsonNull()
                     ? enumValue(PlanetTheme.class, json.get("theme").getAsString(), "theme")
@@ -56,14 +56,16 @@ public final class FoodDefinitionParser {
         catch (RuntimeException e) { throw new IllegalArgumentException(field + " is not a valid identifier: '" + raw + "'"); }
     }
 
+    /** JSON numbers are decimal RGB; strings go through the shared lenient parser (#/0x/hex/decimal). */
     private static int parseColor(JsonObject json) {
         if (!json.has("color") || json.get("color").isJsonNull()) throw new IllegalArgumentException("missing color");
         var element = json.get("color");
-        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) return element.getAsInt();
-        String raw = element.getAsString().trim();
-        if (raw.startsWith("#")) raw = raw.substring(1);
-        try { return Integer.parseInt(raw, 16); }
-        catch (NumberFormatException e) { throw new IllegalArgumentException("color must be RGB integer or #RRGGBB"); }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
+            int value = element.getAsInt();
+            if ((value & 0xFF000000) != 0) throw new IllegalArgumentException("color must be a 24-bit RGB value");
+            return value;
+        }
+        return za.co.neroland.neroagriculture.catalog.MaterialColors.parseColor(element.getAsString());
     }
 
     private static String requiredString(JsonObject json, String field) {
@@ -80,5 +82,11 @@ public final class FoodDefinitionParser {
 
     private static int optionalInt(JsonObject json, String field, int fallback) {
         return json.has(field) && !json.get(field).isJsonNull() ? json.get(field).getAsInt() : fallback;
+    }
+
+    /** Fail closed with a field-specific error, like every other required accessor in this parser. */
+    private static double requiredDouble(JsonObject json, String field) {
+        if (!json.has(field) || json.get(field).isJsonNull()) throw new IllegalArgumentException("missing " + field);
+        return json.get(field).getAsDouble();
     }
 }

@@ -24,9 +24,13 @@ class TaggedDiscoveryTest {
 
     @Test
     void categoryDefaultsAndKeywordsBumpUnknownMaterials() {
-        // Unknown ingot falls back to the forgite default; an unknown gem to orbite.
-        assertEquals(FragmentTier.FORGITE, TierHeuristic.assign("mythril", "ingots"));
+        // Unknown/uncategorised materials fall back to the configured discovery.default_tier (orbite by
+        // default); unknown gems stay orbite regardless.
+        assertEquals(FragmentTier.ORBITE, TierHeuristic.assign("mythril", "ingots"));
         assertEquals(FragmentTier.ORBITE, TierHeuristic.assign("ruby", "gems"));
+        // The pure overload pins the fallback: gems ignore it, everything else uses it.
+        assertEquals(FragmentTier.TERRITE, TierHeuristic.assign("mythril", "ingots", FragmentTier.TERRITE));
+        assertEquals(FragmentTier.ORBITE, TierHeuristic.assign("ruby", "gems", FragmentTier.TERRITE));
         // Rarity keywords pull a material up but never below the category default.
         assertEquals(FragmentTier.VOIDITE, TierHeuristic.assign("void_crystal", "ingots"));
         assertEquals(FragmentTier.VOIDITE, TierHeuristic.assign("starsteel", "ingots"));

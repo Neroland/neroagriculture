@@ -1,7 +1,7 @@
 package za.co.neroland.neroagriculture.machine;
 
-import java.util.Comparator;
 import java.util.Optional;
+import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
@@ -27,6 +27,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.neroagriculture.automation.AutomationOwner;
+import za.co.neroland.neroagriculture.automation.ErasedOwners;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.catalog.ResolvedMaterial;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
@@ -52,11 +54,12 @@ import za.co.neroland.nerolandcore.progression.ProgressionGates;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /** Persistent, automatable Stage 5 fabrication machine shared by the finite machine ids. */
 public final class FoundationMachineBlockEntity extends AbstractMachineBlockEntity
-        implements WorldlyContainer, MenuProvider {
+        implements WorldlyContainer, MenuProvider, AutomationOwner.Owned {
     public static final int SLOT_COUNT = 5;
     public static final int PRIMARY = 0;
     public static final int SECONDARY = 1;
@@ -66,32 +69,36 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     public static final int UPGRADE_START = 5;
     public static final int TOTAL_MENU_SLOTS = 7;
     private static final int[] SLOTS = {0, 1, 2, 3, 4};
+    /** Idle machines re-resolve on this fallback cadence when nothing marked the inputs dirty. */
+    private static final int IDLE_RECHECK_TICKS = 20;
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final FluidBuffer fluid;
     private int fabricationProgress;
     private int fabricationMax;
     private MachineBlockedReason blockedReason = MachineBlockedReason.IDLE;
     private String activeRecipe = "";
+    /** Placing player (progression owner); opt-out via {@code automation.track_owner}, erasure-aware. */
+    @Nullable private UUID owner;
+    private boolean inputsDirty = true;
+    private int idleRecheck;
 
+    // Gauge slots ship as permille fractions: ContainerData syncs shorts, and both the configured
+    // energy capacity and datapack recipe ticks can exceed 32,767 (see menu.GaugeData).
     private final ContainerData menuData = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
-                case 0 -> fabricationProgress;
-                case 1 -> fabricationMax;
-                case 2 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case 0 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(fabricationProgress, fabricationMax);
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.SCALE;
+                case 2 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
                 case 3 -> blockedReason.ordinal();
                 case 4 -> kind().ordinal();
                 default -> 0;
             };
         }
-        @Override public void set(int index, int value) {
-            switch (index) {
-                case 0 -> fabricationProgress = value;
-                case 1 -> fabricationMax = value;
-                case 3 -> blockedReason = MachineBlockedReason.byOrdinal(value);
-                default -> { }
-            }
-        }
+        // set() is only ever invoked on the client's SimpleContainerData copy, never on this
+        // server-side view — and the gauge slots are scaled fractions, not raw state — so no-op.
+        @Override public void set(int index, int value) { }
         @Override public int getCount() { return 5; }
     };
 
@@ -104,6 +111,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 .channel(Channel.ITEM, SlotGroup.of("input", PRIMARY, SECONDARY, TERTIARY),
                         SlotGroup.of("output", OUTPUT, SECONDARY_OUTPUT))
                 .channel(Channel.FLUID).channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this).withFluid(this::getFluid);
     }
@@ -116,6 +124,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
 
     public static void tick(Level level, BlockPos pos, BlockState state, FoundationMachineBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (level instanceof ServerLevel serverLevel) machine.tickFabrication(serverLevel);
     }
 
@@ -124,6 +133,12 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             stop(MachineBlockedReason.IDLE);
             return;
         }
+        // Idle gate: while nothing is fabricating, re-resolving (recipe index + catalog walk) only
+        // happens when the inventory changed or on a slow fallback cadence, never every tick.
+        boolean active = fabricationProgress > 0 || blockedReason == MachineBlockedReason.RUNNING;
+        if (!active && !inputsDirty && --idleRecheck > 0) return;
+        idleRecheck = IDLE_RECHECK_TICKS;
+        inputsDirty = false;
         Resolution resolution = resolve(level);
         if (resolution.operation == null) {
             stop(resolution.reason);
@@ -268,7 +283,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 || !items.get(TERTIARY).is(ModItems.PROSPORA_SEED.get())) {
             return fail(MachineBlockedReason.INVALID_COMPONENT);
         }
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
         if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
             if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
@@ -290,7 +305,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (!lookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
         var definition = lookup.material().orElseThrow().definition();
         if (variant.family() != definition.tier()) return fail(MachineBlockedReason.INVALID_COMPONENT);
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
         if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
             if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
@@ -389,33 +404,31 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     private FabricationRecipe findRecipe(ServerLevel level, RecipeType<FabricationRecipe> type,
             java.util.function.Predicate<FabricationRecipe> extra) {
         SingleRecipeInput input = new SingleRecipeInput(items.get(PRIMARY));
-        return level.recipeAccess().getRecipes().stream()
-                .sorted(Comparator.comparing(holder -> holder.id().identifier().toString()))
-                .map(RecipeHolder::value)
-                .filter(recipe -> recipe.getType().equals(type))
-                .map(recipe -> (FabricationRecipe) recipe)
-                .filter(recipe -> recipe.matches(input, level) && extra.test(recipe))
-                .findFirst().orElse(null);
+        for (FabricationRecipe recipe : FabricationRecipeCache.recipes(level, type)) {
+            if (recipe.matches(input, level) && extra.test(recipe)) return recipe;
+        }
+        return null;
     }
 
     private boolean gateOpen(ServerLevel level, FragmentTier family) {
         if (MachineProgression.gate(family) == null) return true;
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         return player != null && gateOpen(player, family);
     }
 
     /**
      * When the machine finishes producing a tier fragment, open the next tier's native gate for the
-     * nearby player (respecting the gate's prerequisites via {@link ProgressionGates#tryOpen}). This is
-     * the standalone unlock: extracting Territe opens Refinement, condensing Forgite opens Synthesis,
-     * and so on up the ladder — no sibling mod required.
+     * machine's owner — or, only when no owner is recorded, the nearest player — (respecting the gate's
+     * prerequisites via {@link ProgressionGates#tryOpen}). This is the standalone unlock: extracting
+     * Territe opens Refinement, condensing Forgite opens Synthesis, and so on up the ladder — no sibling
+     * mod required.
      */
     private void unlockNextTier(ServerLevel level, ItemStack output) {
         FragmentTier produced = fragmentTierOf(output);
         if (produced == null) return;
         var gate = za.co.neroland.neroagriculture.progression.AgricultureGates.gateUnlockedByProducing(produced);
         if (gate == null) return;
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         if (player != null) ProgressionGates.tryOpen(player, gate);
     }
 
@@ -435,11 +448,33 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 && za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, family);
     }
 
+    /** Owner-first (nearest-player fallback only when no owner is recorded) — see {@link AutomationOwner#gatePlayer}. */
     @Nullable
-    private ServerPlayer nearbyPlayer(ServerLevel level) {
-        Player player = level.getNearestPlayer(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5,
-                worldPosition.getZ() + 0.5, 16.0, false);
-        return player instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+    private ServerPlayer gatePlayer(ServerLevel level) {
+        return AutomationOwner.gatePlayer(level, worldPosition, owner, 16.0);
+    }
+
+    @Override public @Nullable UUID automationOwner() { return owner; }
+    @Override public void clearAutomationOwner() { owner = null; setChanged(); }
+    public void setOwner(@Nullable UUID owner) {
+        this.owner = AutomationOwner.trackingEnabled() ? owner : null;
+        setChanged();
+    }
+
+    @Override public void setRemoved() { AutomationOwner.untrack(this); super.setRemoved(); }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = ErasedOwners.filter(owner, serverLevel.getServer());
+        }
+    }
+
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) Containers.dropContents(this.level, pos, this);
     }
 
     private boolean canOutput(Operation operation) {
@@ -459,6 +494,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         items.get(PRIMARY).shrink(operation.consumePrimary);
         items.get(SECONDARY).shrink(operation.consumeSecondary);
         items.get(TERTIARY).shrink(operation.consumeTertiary);
+        inputsDirty = true; // consumed/produced in place — re-resolve next tick, not on the idle cadence
     }
 
     private void merge(int slot, ItemStack addition) {
@@ -498,10 +534,13 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         output.putInt("FabricationMax", fabricationMax);
         output.putInt("BlockedReason", blockedReason.ordinal());
         output.putString("ActiveRecipe", activeRecipe);
+        AutomationOwner.save(output, owner);
+        SideConfigMigration.save(output);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         fluid.setRaw(BuiltInRegistries.FLUID.getValue(
                 net.minecraft.resources.Identifier.parse(input.getStringOr("Fluid", "minecraft:empty"))),
@@ -510,6 +549,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         fabricationMax = Math.max(0, input.getIntOr("FabricationMax", 0));
         blockedReason = MachineBlockedReason.byOrdinal(input.getIntOr("BlockedReason", 0));
         activeRecipe = input.getStringOr("ActiveRecipe", "");
+        owner = AutomationOwner.load(input);
+        inputsDirty = true;
     }
 
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
@@ -535,10 +576,14 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     @Override public ItemStack removeItem(int slot, int amount) {
         ItemStack out = slot < SLOT_COUNT ? ContainerHelper.removeItem(items, slot, amount)
                 : upgrades.getStack(slot - UPGRADE_START).split(amount);
-        if (!out.isEmpty()) setChanged();
+        if (!out.isEmpty()) {
+            inputsDirty = true;
+            setChanged();
+        }
         return out;
     }
     @Override public ItemStack removeItemNoUpdate(int slot) {
+        inputsDirty = true;
         if (slot < SLOT_COUNT) return ContainerHelper.takeItem(items, slot);
         ItemStack out = upgrades.getStack(slot - UPGRADE_START);
         upgrades.setStack(slot - UPGRADE_START, ItemStack.EMPTY);
@@ -548,6 +593,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         ItemStack bounded = stack.copyWithCount(Math.min(stack.getCount(), getMaxStackSize(stack)));
         if (slot < SLOT_COUNT) items.set(slot, bounded);
         else upgrades.setStack(slot - UPGRADE_START, bounded);
+        inputsDirty = true;
         setChanged();
     }
     @Override public boolean canPlaceItem(int slot, ItemStack stack) {
@@ -556,8 +602,12 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         return switch (kind()) {
             case EXTRACTOR, RESEARCH_BENCH -> slot == PRIMARY;
             case INFUSER -> slot == PRIMARY || slot == SECONDARY && stack.is(ModItems.BLANK_SEED.get());
-            case SYNTHESIZER -> slot == PRIMARY || slot == SECONDARY && stack.is(ModItems.RESOURCE_FRAGMENT.get())
-                    || slot == TERTIARY && stack.is(ModItems.CHARGED_SEED.get());
+            // Mirrors what the resolvers actually consume: synthesis (resolveSynthesis) takes neutral
+            // Tier Fragments in SECONDARY and a Prospora Seed in TERTIARY; conversion (resolveConversion)
+            // takes only the PRIMARY resource fragment. The old filter accepted RESOURCE_FRAGMENT /
+            // CHARGED_SEED here, which no synthesizer recipe reads — hoppers could never feed it.
+            case SYNTHESIZER -> slot == PRIMARY || slot == SECONDARY && fragmentTierOf(stack) != null
+                    || slot == TERTIARY && stack.is(ModItems.PROSPORA_SEED.get());
             default -> slot <= TERTIARY;
         };
     }
@@ -566,6 +616,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     @Override public void clearContent() {
         items.clear();
         for (int index = 0; index < upgrades.slots(); index++) upgrades.setStack(index, ItemStack.EMPTY);
+        inputsDirty = true;
         setChanged();
     }
 

@@ -21,11 +21,13 @@ import za.co.neroland.nerolandcore.progression.ProgressionGates;
  *
  * <p>Controlled by {@code progression.sibling_overlays}:
  * <ul>
- *   <li><b>auto</b> (default) — overlay a tier only when the sibling mod that can open that arc gate is
+ *   <li><b>off</b> (default) — never overlay; only the native gates apply;</li>
+ *   <li><b>auto</b> — overlay a tier only when the sibling mod that can open that arc gate is
  *       actually loaded, so a Core-only game is never gated by an arc gate nothing can open;</li>
- *   <li><b>on</b> — always overlay (for packs that drive the arc gates by other means);</li>
- *   <li><b>off</b> — never overlay; only the native gates apply.</li>
+ *   <li><b>on</b> — always overlay (for packs that drive the arc gates by other means).</li>
  * </ul>
+ *
+ * <p>Note the config <em>default</em> is {@code off}; an unrecognised value falls back to {@code auto}.
  */
 public final class SiblingOverlays {
     private SiblingOverlays() { }
@@ -86,11 +88,18 @@ public final class SiblingOverlays {
         };
     }
 
+    /** Loaded-mod lookups are cached for the JVM's life — the mod list cannot change at runtime, and
+     * this is evaluated on every gate check, which used to walk the whole list each time. */
+    private static final java.util.concurrent.ConcurrentHashMap<String, Boolean> LOADED_MODS =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
     private static boolean isModLoaded(String modId) {
         if (modId.isEmpty()) return false;
-        for (String entry : Services.PLATFORM.getLoadedModIds()) {
-            if (entry.equals(modId) || entry.startsWith(modId + " ")) return true;
-        }
-        return false;
+        return LOADED_MODS.computeIfAbsent(modId, id -> {
+            for (String entry : Services.PLATFORM.getLoadedModIds()) {
+                if (entry.equals(id) || entry.startsWith(id + " ")) return true;
+            }
+            return false;
+        });
     }
 }

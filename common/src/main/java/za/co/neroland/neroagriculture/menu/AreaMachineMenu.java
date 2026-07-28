@@ -56,6 +56,7 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
 
     public BlockPos blockPos() { return blockPos; }
     public int mode() { return data.get(0); }
+    /** Permille fraction of the live energy capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
     public int energy() { return data.get(1); }
     public int range() { return data.get(2); }
     public boolean showArea() { return data.get(3) != 0; }

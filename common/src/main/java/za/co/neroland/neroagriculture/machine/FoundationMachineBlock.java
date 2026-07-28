@@ -41,6 +41,16 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
     }
 
     @Override
+    public void setPlacedBy(net.minecraft.world.level.Level level, BlockPos pos, BlockState state,
+            @Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide() && placer instanceof Player player
+                && level.getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine) {
+            machine.setOwner(player.getUUID());
+        }
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
             BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine) {

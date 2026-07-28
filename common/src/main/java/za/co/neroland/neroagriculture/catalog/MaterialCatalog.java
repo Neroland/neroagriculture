@@ -36,7 +36,9 @@ public final class MaterialCatalog {
     private static final String SUFFIX = ".json";
 
     @Nullable private static MinecraftServer loadedFor;
-    private static ResolvedCatalog current = CatalogResolver.resolve(BuiltinMaterials.candidates(),
+    // volatile: reloads write this under the class lock, but current() reads it lock-free from other
+    // threads (render/menu paths); without the fence those could see a stale or half-published snapshot.
+    private static volatile ResolvedCatalog current = CatalogResolver.resolve(BuiltinMaterials.candidates(),
             java.util.Set.of(), java.util.Map.of(), 512, List.of());
 
     private MaterialCatalog() { }
@@ -68,12 +70,37 @@ public final class MaterialCatalog {
         for (String error : current.errors()) {
             NeroAgricultureCommon.LOGGER.warn("[NeroAgriculture] Catalog: {}", error);
         }
+        // Per-id shadowing detail lives at debug level; the errors list carries only the aggregate count.
+        for (Map.Entry<Identifier, ResolvedMaterial> entry : current.all().entrySet()) {
+            if (entry.getValue().shadowedSources().isEmpty()) continue;
+            NeroAgricultureCommon.LOGGER.debug("[NeroAgriculture] Catalog: {} selected {}:{}; shadowed {}",
+                    entry.getKey(), entry.getValue().source().name().toLowerCase(java.util.Locale.ROOT),
+                    entry.getValue().sourceDetail(), String.join(", ", entry.getValue().shadowedSources()));
+        }
+        // Blacklist entries that matched nothing used to be silent; one aggregate line makes typos visible.
+        List<Identifier> unmatched = config.blacklist().stream()
+                .filter(id -> !current.all().containsKey(id))
+                .sorted(Comparator.comparing(Identifier::toString)).toList();
+        if (!unmatched.isEmpty()) {
+            NeroAgricultureCommon.LOGGER.info(
+                    "[NeroAgriculture] Catalog: {} blacklist entry(ies) matched no material id: {}",
+                    unmatched.size(), unmatched);
+        }
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Material catalog resolved {} active / {} total entries.",
                 current.exposed().size(), current.all().size());
         return current;
     }
 
     public static ResolvedCatalog current() { return current; }
+
+    /**
+     * Forget the stopped server so its whole object graph can be collected; the next server triggers a
+     * fresh {@link #reload} via {@link #forServer}. The resolved catalog itself only references global
+     * registry objects, so it may safely outlive the server (e.g. for main-menu tooltips).
+     */
+    public static synchronized void reset() {
+        loadedFor = null;
+    }
 
     private static List<Candidate> loadDatapacks(ResourceManager resources, List<String> errors) {
         List<Candidate> result = new ArrayList<>();

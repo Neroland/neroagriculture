@@ -27,6 +27,7 @@ public final class StatusMenu extends AbstractContainerMenu {
     public static final int ID_BEACON = 2;
 
     public static final int MACHINE_ID = 0;
+    /** Synced as a permille fraction of the live energy capacity, 0..{@link GaugeData#SCALE}. */
     public static final int ENERGY = 1;
     public static final int V0 = 2;
     public static final int V1 = 3;

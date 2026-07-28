@@ -3,8 +3,10 @@ package za.co.neroland.neroagriculture.compat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 import za.co.neroland.neroagriculture.api.AgricultureApi;
+import za.co.neroland.neroagriculture.compat.nerospace.NerospaceVisitBridge;
 import za.co.neroland.neroagriculture.cycle.CycleApi;
 import za.co.neroland.neroagriculture.cycle.CycleModifier;
 import za.co.neroland.neroagriculture.environment.EnvironmentApi;
@@ -37,6 +39,16 @@ public final class CompatContracts {
     // --- Weather / events (Nerospace / NeroEvents) ------------------------
     public static void registerCycleProvider(CycleApi.Provider provider) { CycleApi.PROVIDERS.add(provider); }
     public static void removeCycleProvider(CycleApi.Provider provider) { CycleApi.PROVIDERS.remove(provider); }
+
+    // --- Nerospace planet visits (runtime-guarded, no compile-time dep) ---
+    // Each loader entry point wires its player join / dimension-change events into these hooks; the
+    // bridge grants Core material_discovered milestones for planet-bound materials. Dormant (one
+    // config read + one namespace compare) when Nerospace is absent or compat.nerospace_visits=false.
+    public static void playerJoined(ServerPlayer player) { NerospaceVisitBridge.onPlayerJoin(player); }
+    public static void playerChangedDimension(ServerPlayer player) { NerospaceVisitBridge.onDimensionChange(player); }
+    /** Tick-driven fallback for loaders without a server-side dimension-change event (Fabric). */
+    public static void serverTick(net.minecraft.server.MinecraftServer server) { NerospaceVisitBridge.onServerTick(server); }
+    public static void playerDisconnected(ServerPlayer player) { NerospaceVisitBridge.playerDisconnected(player); }
 
     // --- Assistance (NeroCreatures / drones) ------------------------------
     public static void registerDroneProvider(AgricultureApi.DroneAssistanceProvider provider) { AgricultureApi.DRONES.add(provider); }

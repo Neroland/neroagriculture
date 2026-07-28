@@ -69,15 +69,8 @@ public final class CatalogConfigParser {
         return new Parsed(Set.copyOf(blocked), Map.copyOf(parsedOverrides), List.copyOf(errors));
     }
 
-    /** Accepts a 24-bit RGB integer or a {@code #RRGGBB}/{@code RRGGBB} hex string. */
+    /** Shared lenient parser ({@link MaterialColors#parseColor}): #RRGGBB, 0xRRGGBB, bare hex or decimal. */
     private static int parseColor(String raw) {
-        String hex = raw.trim();
-        if (hex.startsWith("#")) hex = hex.substring(1);
-        int value;
-        try { value = hex.length() <= 6 && !hex.isEmpty() && hex.chars().allMatch(c -> Character.digit(c, 16) >= 0)
-                ? Integer.parseInt(hex, 16) : Integer.parseInt(raw.trim()); }
-        catch (NumberFormatException e) { throw new IllegalArgumentException("color must be an RGB integer or #RRGGBB"); }
-        if ((value & 0xFF000000) != 0) throw new IllegalArgumentException("color must be a 24-bit RGB value");
-        return value;
+        return MaterialColors.parseColor(raw);
     }
 }

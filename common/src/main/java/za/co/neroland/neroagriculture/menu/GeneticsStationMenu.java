@@ -51,6 +51,8 @@ public final class GeneticsStationMenu extends AbstractContainerMenu {
     }
 
     public BlockPos blockPos() { return blockPos; }
+    // Gauge values are synced as permille fractions of the live server-side maxima (see GaugeData):
+    // progress() runs 0..maxProgress() (= GaugeData.SCALE) and energy() runs 0..GaugeData.SCALE.
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }

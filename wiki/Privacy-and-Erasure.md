@@ -7,9 +7,12 @@ and everything it does keep can be exported and erased through Neroland Core.
 
 Only two kinds, both keyed by **UUID only** (never a username or display name):
 
-- **Machine ownership** — the Planter, Harvester, Fertiliser Applicator and Terraforming Controller may
-  record the placing player's UUID so a claims/protection mod can authorise their edits. This is opt-out
-  via `automation.track_owner = false`, in which case no owner is stored at all.
+- **Machine ownership** — the Planter, Harvester, Fertiliser Applicator, Terraforming Controller,
+  fabrication machines (Extractor/Infuser/Synthesizer/Research Bench) and powered grow beds may record
+  the placing player's UUID so a claims/protection mod can authorise their edits and so progression
+  (gate unlocks, research checks) is credited to the machine's owner rather than whoever stands nearby.
+  This is opt-out via `automation.track_owner = false`, in which case no owner is stored at all and
+  progression falls back to the nearest player. The UUID is server-only — it is never sent to clients.
 - **Material milestones / research** — which materials and seeds a player has discovered or researched is
   tracked through Core's shared progression store, not by this mod directly.
 
@@ -44,6 +47,10 @@ transparency rules:
 - **Machine ownership** registers its own eraser with the same hook: an erasure request clears the owner
   UUID from every loaded owned machine (the machine simply becomes unowned). Breaking a machine also drops
   its owner.
+- **Unloaded chunks:** an erasure request additionally stores a UUID **tombstone** in world saved data so
+  machines whose chunks were unloaded at erasure time drop the owner the moment they load. Tombstones are
+  pruned after a retention window (`privacy.erasure_retention_days`, default 90 days) and the UUIDs in
+  them are never logged.
 
 ## For administrators
 

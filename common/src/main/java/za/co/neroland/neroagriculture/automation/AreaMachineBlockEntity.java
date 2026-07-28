@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.AgricultureUpgradeItem;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.menu.AreaMachineMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
@@ -34,6 +35,7 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.upgrade.UpgradeType;
 
 /** Bounded, interval-batched Planter/Harvester. One BE serves both modes, selected from its block. */
@@ -57,7 +59,9 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("input", SLOTS),
                         za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("output", SLOTS))
-                .channel(Channel.ENERGY).allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
+                .channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
+                .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this);
         this.workTimer = 1 + AreaWork.phaseOffset(pos, AgricultureConfig.AUTOMATION_INTERVAL.get());
     }
@@ -71,11 +75,14 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
 
     private boolean showArea;
 
+    // The energy slot ships as a permille fraction: ContainerData syncs shorts, and the configured
+    // energy capacity can exceed 32,767 (see menu.GaugeData).
     private final ContainerData menuData = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
                 case 0 -> mode().ordinal();
-                case 1 -> (int) Math.min(Integer.MAX_VALUE, getEnergy().getAmount());
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
                 case 2 -> 2 * AreaWork.radius(upgrades.count(UpgradeType.RANGE)) + 1;
                 case 3 -> showArea ? 1 : 0;
                 default -> 0;
@@ -108,6 +115,7 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
 
     public static void tick(Level level, BlockPos pos, BlockState state, AreaMachineBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (machine.showArea && level.getGameTime() % 10 == 0) machine.emitAreaHologram(serverLevel);
         if (--machine.workTimer > 0) return;
@@ -320,10 +328,12 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         output.putInt("Cursor", cursor);
         output.putBoolean("ShowArea", showArea);
         AutomationOwner.save(output, owner);
+        SideConfigMigration.save(output);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
         showArea = input.getBooleanOr("ShowArea", false);
@@ -331,5 +341,18 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
     }
 
     @Override public void setRemoved() { AutomationOwner.untrack(this); super.setRemoved(); }
-    @Override public void clearRemoved() { super.clearRemoved(); AutomationOwner.track(this); }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = ErasedOwners.filter(owner, serverLevel.getServer());
+        }
+    }
+
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
+    }
 }

@@ -1,6 +1,7 @@
 package za.co.neroland.neroagriculture.machine;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,10 +26,25 @@ public final class MaterialOperations {
 
     public static Optional<ResolvedMaterial> matchAny(ItemStack stack, ResolvedCatalog catalog) {
         if (stack.isEmpty()) return Optional.empty();
-        return catalog.all().values().stream()
-                .sorted(Comparator.comparing(value -> value.definition().id().toString()))
-                .filter(value -> matches(stack, value.definition().input()))
-                .findFirst();
+        for (ResolvedMaterial value : sortedMaterials(catalog)) {
+            if (matches(stack, value.definition().input())) return Optional.of(value);
+        }
+        return Optional.empty();
+    }
+
+    /** One-slot cache of the id-sorted material list, keyed on the immutable catalog snapshot's identity. */
+    private record SortedCache(ResolvedCatalog catalog, List<ResolvedMaterial> sorted) { }
+
+    private static volatile SortedCache sortedCache;
+
+    private static List<ResolvedMaterial> sortedMaterials(ResolvedCatalog catalog) {
+        SortedCache cache = sortedCache;
+        if (cache == null || cache.catalog() != catalog) {
+            cache = new SortedCache(catalog, catalog.all().values().stream()
+                    .sorted(Comparator.comparing(value -> value.definition().id().toString())).toList());
+            sortedCache = cache;
+        }
+        return cache.sorted();
     }
 
     public static boolean matches(ItemStack stack, MaterialDefinition.InputSelector selector) {

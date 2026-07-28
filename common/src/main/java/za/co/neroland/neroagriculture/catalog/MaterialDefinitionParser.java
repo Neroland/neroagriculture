@@ -66,13 +66,15 @@ public final class MaterialDefinitionParser {
         catch (RuntimeException e) { throw new IllegalArgumentException(field + " is not a valid identifier: '" + raw + "'"); }
     }
 
+    /** JSON numbers are decimal RGB; strings go through the shared lenient parser (#/0x/hex/decimal). */
     private static int parseColor(@Nullable JsonElement element) {
         if (element == null || element.isJsonNull()) throw new IllegalArgumentException("missing color");
-        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) return element.getAsInt();
-        String raw = element.getAsString().trim();
-        if (raw.startsWith("#")) raw = raw.substring(1);
-        try { return Integer.parseInt(raw, 16); }
-        catch (NumberFormatException e) { throw new IllegalArgumentException("color must be RGB integer or #RRGGBB"); }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
+            int value = element.getAsInt();
+            if ((value & 0xFF000000) != 0) throw new IllegalArgumentException("color must be a 24-bit RGB value");
+            return value;
+        }
+        return MaterialColors.parseColor(element.getAsString());
     }
 
     private static JsonObject requiredObject(JsonObject json, String field) {

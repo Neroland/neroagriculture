@@ -4,7 +4,8 @@ Each random growth attempt is server-authoritative and local to the crop. It fai
 invalid condition:
 
 1. The material must exist and remain enabled in the current server catalog.
-2. Any material progression gate must be open for a nearby player.
+2. Any material progression gate must be open for the grow bed's recorded owner (falling back to a
+   nearby player only when the bed has no owner — see [Automation](Automation.md)).
 3. The supporting grow bed must meet or exceed the material tier.
 4. Block light must be at least 9.
 5. Any catalog dimension restriction must match the current dimension.

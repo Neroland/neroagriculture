@@ -28,6 +28,7 @@ See [Resource-seed economy](Resource-Seed-Economy.md) for the full walkthrough.
 - [Resource-seed economy](Resource-Seed-Economy.md)
 - [Fusion and alloy seeds](Fusion-and-Alloy-Seeds.md)
 - [Sibling-mod progression overlays](Sibling-Overlays.md)
+- [Nerospace integration (planet visits)](Nerospace-Integration.md)
 - [Material catalog and crop storage](Material-Catalog-and-Crop-Storage.md)
 - [Resource crops](Resource-Crops.md)
 - [Resource fragment](Resource-Fragment.md)
