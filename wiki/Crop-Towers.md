@@ -44,6 +44,9 @@ hardier crops removes the surcharge.
 
 Alongside the slots, gauges and the `height / active slots` readout the controller shows:
 
+- A **growth bar** summarising the planted slots: the fill is the **average growth** across every planted
+  slot and the label counts how many are ready to harvest (e.g. "Ripe 3/12"). It appears once at least one
+  slot is planted and disappears again when the tower is empty.
 - A **status line** with the tower's current blocker — progression gate closed, out of NF, out of
   nutrient, or a disabled/unknown material. Nothing planted reads as idle.
 - A scrollable **seed panel** listing every material in the server's catalog. Unlike a grow bed the tower

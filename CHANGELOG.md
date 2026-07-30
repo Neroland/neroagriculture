@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-07-29 UX additions (build-verified across the six cells)
+
+#### Added
+
+- **Growth progress readouts**: Grow Bed screens show a live growth bar with percentage for the
+  planted crop; Crop Tower screens show average growth plus a "Ripe n/m" mature-slot counter
+  (aggregate — towers are config-sized). Synced as permille gauge data alongside the existing
+  energy/fluid gauges.
+- **Greenhouse Door** — a two-block metal-and-glass door in the greenhouse aesthetic that acts as an
+  airlock: it counts as sealed shell whether open or closed, so players can enter without breaching
+  the greenhouse. Hand-openable, crafted 2×3 from Greenhouse Glass over Greenhouse Frame (yields 3),
+  drops itself, listed in the creative tab, and demonstrated in the `/neroagriculture gallery` dome.
+
+#### Fixed
+
+- **Gallery: the greenhouse controller is clickable again** — the showcase's Creative Battery was
+  placed on the controller's only exposed face; it now powers it from below the wall, and the dome
+  gained a Greenhouse Door so the exhibit can be walked into.
+
 ### 2026-07-29 audit remediation (build-verified across the six cells)
 
 Full code + design audit follow-up (`neroland-mc-ecosystem/audits/2026-07-28-neroagriculture-audit.md`).

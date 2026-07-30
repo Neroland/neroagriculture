@@ -91,12 +91,42 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
                 case 3 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
                         nutrient.getAmount(), nutrient.getCapacity());
                 case 4 -> blockedReasonOrdinal();
+                case 5 -> growthStat(0);
+                case 6 -> growthStat(1);
+                case 7 -> growthStat(2);
                 default -> 0;
             };
         }
         @Override public void set(int index, int value) { }
         @Override public int getCount() { return CropTowerMenu.DATA_COUNT; }
     };
+
+    /**
+     * Growth summary over the planted <em>active</em> slots (the same slice {@link #runCycle} works, so a
+     * planted slot stranded above a shrunken tower never skews the readout): {@code stat} 0 = average age
+     * as a permille of {@link TowerSlot#MAX_AGE} ({@link CropTowerMenu#NO_CROP} when nothing is planted),
+     * 1 = mature planted slots, 2 = planted slots. A plain array walk per poll — the slot array is small
+     * (height x slots-per-layer) and only open menus poll it.
+     */
+    private int growthStat(int stat) {
+        int active = Math.min(activeSlots(), slots.length);
+        int planted = 0;
+        int mature = 0;
+        long totalPermille = 0;
+        for (int i = 0; i < active; i++) {
+            TowerSlot slot = slots[i];
+            if (slot.isEmpty()) continue;
+            planted++;
+            if (slot.mature()) mature++;
+            totalPermille += za.co.neroland.neroagriculture.menu.GaugeData.permille(slot.age(), TowerSlot.MAX_AGE);
+        }
+        return switch (stat) {
+            case 0 -> planted == 0 ? CropTowerMenu.NO_CROP : (int) (totalPermille / planted);
+            case 1 -> mature;
+            case 2 -> planted;
+            default -> 0;
+        };
+    }
 
     /**
      * Aggregate blocker the tower reports to its screen, cached because {@link ContainerData} is polled

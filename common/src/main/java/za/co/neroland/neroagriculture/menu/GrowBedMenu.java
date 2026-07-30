@@ -18,7 +18,7 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
  * growth blocker for whatever is planted above the bed.
  */
 public final class GrowBedMenu extends AbstractContainerMenu {
-    public static final int DATA_COUNT = 4;
+    public static final int DATA_COUNT = 5;
     /** Blocked-reason data value used when the bed has no crop above it at all. */
     public static final int NO_CROP = -1;
     private final Container machine;
@@ -72,6 +72,12 @@ public final class GrowBedMenu extends AbstractContainerMenu {
         int value = data.get(3);
         return value >= 0 && value < reasons.length ? reasons[value] : null;
     }
+
+    /**
+     * Growth of the crop planted above the bed as a permille of its max age,
+     * 0..{@link GaugeData#SCALE}, or {@link #NO_CROP} when the bed is bare.
+     */
+    public int growth() { return data.get(4); }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

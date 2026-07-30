@@ -95,11 +95,14 @@ public final class AgricultureGallery {
         BlockState floor = ModBlocks.GREENHOUSE_FRAME.get().defaultBlockState();
 
         // BLOCK GRID (EAST): every block registered under this namespace, floating two blocks above a
-        // frame. Fluids are excluded — placing a liquid source here floods the gallery.
+        // frame. Fluids are excluded — placing a liquid source here floods the gallery. Doors are excluded
+        // too: a floating lower half has no support or upper half, so the Greenhouse Door is demonstrated
+        // in the greenhouse exhibit's wall instead.
         List<Block> blocks = new ArrayList<>();
         for (Block block : BuiltInRegistries.BLOCK) {
             if (NeroAgricultureCommon.MOD_ID.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())
-                    && !(block instanceof net.minecraft.world.level.block.LiquidBlock)) {
+                    && !(block instanceof net.minecraft.world.level.block.LiquidBlock)
+                    && !(block instanceof net.minecraft.world.level.block.DoorBlock)) {
                 blocks.add(block);
             }
         }
@@ -341,9 +344,21 @@ public final class AgricultureGallery {
             }
         }
         place(level, controllerPos, ModBlocks.GREENHOUSE_CONTROLLER.get().defaultBlockState());
-        battery(level, controllerPos.south());
+        // Power from BELOW, replacing a wall frame block (the battery is solid, so the seal holds) —
+        // a battery in front of the controller used to block its only clickable exterior face.
+        battery(level, controllerPos.below());
         charge(level, controllerPos);
-        label(level, new BlockPos(bx + size / 2, fy + size + 2, bz + size / 2), "Greenhouse — a sealed, powered dome");
+        // Walk-in airlock: a Greenhouse Door in the front wall beside the controller column. Both halves
+        // count as sealing shell whether open or closed, so visitors can step inside without breaching.
+        BlockPos doorPos = new BlockPos(bx + 1, y0 + 1, bz + size - 1);
+        BlockState door = ModBlocks.GREENHOUSE_DOOR.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.DoorBlock.FACING, net.minecraft.core.Direction.SOUTH);
+        place(level, doorPos, door.setValue(net.minecraft.world.level.block.DoorBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER));
+        place(level, doorPos.above(), door.setValue(net.minecraft.world.level.block.DoorBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        label(level, new BlockPos(bx + size / 2, fy + size + 2, bz + size / 2),
+                "Greenhouse — a sealed, powered dome (walk in through the door)");
     }
 
     private static void buildCropTower(ServerLevel level, BlockState floor, int bx, int bz, int fy) {

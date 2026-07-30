@@ -1,0 +1,1 @@
+{"parent": "minecraft:block/door_bottom_left_open", "render_type": "minecraft:cutout", "textures": {"bottom": "neroagriculture:block/greenhouse_door_bottom", "top": "neroagriculture:block/greenhouse_door_top"}}

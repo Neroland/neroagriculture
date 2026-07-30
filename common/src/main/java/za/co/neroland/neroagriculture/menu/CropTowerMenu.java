@@ -20,7 +20,7 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
 public final class CropTowerMenu extends AbstractContainerMenu {
     private static final int MACHINE_SLOTS = 10;
     private static final int OUTPUT_START = 4;
-    public static final int DATA_COUNT = 5;
+    public static final int DATA_COUNT = 8;
     /** Blocked-reason data value used when no tower slot is planted yet. */
     public static final int NO_CROP = -1;
     private final Container machine;
@@ -74,6 +74,16 @@ public final class CropTowerMenu extends AbstractContainerMenu {
         int value = data.get(4);
         return value >= 0 && value < reasons.length ? reasons[value] : null;
     }
+
+    /**
+     * Average growth across the tower's planted (active) slots as a permille of max age,
+     * 0..{@link GaugeData#SCALE}, or {@link #NO_CROP} when nothing is planted.
+     */
+    public int growthAvg() { return data.get(5); }
+    /** How many planted slots are mature (ready to harvest). */
+    public int matureSlots() { return data.get(6); }
+    /** How many active slots currently hold a planted crop. */
+    public int plantedSlots() { return data.get(7); }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

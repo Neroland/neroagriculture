@@ -26,6 +26,9 @@ nothing in it is ever voided.
 Open a powered bed to see:
 
 - **Energy** and **Nutrient** gauges, the bed's tier, and its seed and harvest-output slots.
+- A **Growth gauge** beside the nutrient bar showing how far the crop planted above the bed has grown —
+  the bar fills with the crop's age and the label reads the percentage (e.g. "Growth 71%"). It works for
+  resource and species crops alike, and reads "Growth —" while the bed is bare.
 - A **status line** naming the live reason the crop above the bed is not advancing — not enough light,
   wrong dimension, hostile environment, needs a greenhouse, gate closed, out of NF or nutrient, and so on.
   It reads straight off the same rules the growth tick uses, so it can never disagree with them. A bare

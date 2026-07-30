@@ -48,6 +48,12 @@ public final class ModBlocks {
             BLOCKS.register("greenhouse_glass", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseGlassBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.COLOR_LIGHT_BLUE)
                             .strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()));
+    // Not in ALL: needs a DoubleHighBlockItem (registered in ModItems), not the auto plain BlockItem.
+    public static final RegistryEntry<za.co.neroland.neroagriculture.greenhouse.GreenhouseDoorBlock> GREENHOUSE_DOOR =
+            BLOCKS.register("greenhouse_door", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseDoorBlock(
+                    BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.0F, 6.0F)
+                            .sound(SoundType.METAL).noOcclusion()
+                            .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
     public static final RegistryEntry<Block> CROP_TOWER_FRAME = plain("crop_tower_frame", MapColor.METAL);
     public static final RegistryEntry<Block> TERRITE_FRAGMENT_BLOCK = plain("territe_fragment_block", MapColor.GRASS);
     public static final RegistryEntry<Block> FORGITE_FRAGMENT_BLOCK = plain("forgite_fragment_block", MapColor.METAL);

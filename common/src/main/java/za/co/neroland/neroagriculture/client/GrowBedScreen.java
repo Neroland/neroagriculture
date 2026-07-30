@@ -87,8 +87,16 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
         g.fill(x + 48, y + 37, x + 74, y + 39, DIVIDER);
         g.fill(x + 72, y + 35, x + 74, y + 41, ACCENT);
 
-        // labelled nutrient gauge below the slot row (synced as a fraction of the live capacity)
-        Gauges.bar(g, font, x + 8, y + 50, x + 168, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        // labelled nutrient + growth gauges side by side below the slot row (the tower screen's
+        // paired-bar idiom): nutrient is a capacity fraction, growth is the planted crop's age as a
+        // permille of max age with the percentage in the label — an em-dash label on a bare bed.
+        Gauges.bar(g, font, x + 8, y + 50, x + 84, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        int growth = menu.growth();
+        String growthLabel = (growth < 0
+                ? Component.translatable("screen.neroagriculture.growth.none")
+                : Component.translatable("screen.neroagriculture.growth", growth * 100 / GaugeData.SCALE))
+                .getString();
+        Gauges.bar(g, font, x + 88, y + 50, x + 168, growthLabel, Math.max(0, growth), GaugeData.SCALE, Gauges.PROGRESS);
 
         FragmentTier bedTier = bedTier();
         String tier = bedTier == null ? "?" : bedTier.name();

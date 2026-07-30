@@ -171,8 +171,15 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
                         level.dimension().identifier(), worldPosition.asLong(), 0));
     }
 
+    /**
+     * A position the interior flood fill may spread into. Everything else is shell. The Greenhouse Door is
+     * called out explicitly: as an airlock, BOTH halves count as sealing shell blocks whether the door is
+     * open or closed, so walking through it never reads as a breach and revalidation never flags an open
+     * door. (Door states are neither air nor replaceable, so the guard is belt-and-braces documentation.)
+     */
     private static boolean passable(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof GreenhouseDoorBlock) return false;
         return state.isAir() || state.canBeReplaced()
                 || state.getBlock() instanceof ResourceCropBlock || state.getBlock() instanceof SpeciesCropBlock;
     }

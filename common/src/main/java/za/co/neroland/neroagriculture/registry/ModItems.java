@@ -61,6 +61,18 @@ public final class ModItems {
         }
     }
 
+    // Doors place two halves, so they use the vanilla two-high block item (clears the upper space first)
+    // instead of the plain BlockItem the ALL loop registers.
+    public static final RegistryEntry<BlockItem> GREENHOUSE_DOOR = doorItem();
+
+    private static RegistryEntry<BlockItem> doorItem() {
+        RegistryEntry<BlockItem> entry = ITEMS.register(ModBlocks.GREENHOUSE_DOOR.id().getPath(), key ->
+                new net.minecraft.world.item.DoubleHighBlockItem(ModBlocks.GREENHOUSE_DOOR.get(),
+                        new Item.Properties().setId(key).useBlockDescriptionPrefix()));
+        TAB_ITEMS.add(entry);
+        return entry;
+    }
+
     private static RegistryEntry<Item> item(String name) {
         RegistryEntry<Item> entry = ITEMS.register(name, key -> new Item(new Item.Properties().setId(key)));
         TAB_ITEMS.add(entry);

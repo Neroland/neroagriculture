@@ -89,12 +89,32 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
                         nutrient.getAmount(), nutrient.getCapacity());
                 case 2 -> tier().ordinal();
                 case 3 -> blockedReasonOrdinal();
+                case 4 -> growthPermille();
                 default -> 0;
             };
         }
         @Override public void set(int index, int value) { }
         @Override public int getCount() { return za.co.neroland.neroagriculture.menu.GrowBedMenu.DATA_COUNT; }
     };
+
+    /**
+     * Growth of the crop planted above the bed as a permille of its max age (0..{@code GaugeData.SCALE}),
+     * or {@link za.co.neroland.neroagriculture.menu.GrowBedMenu#NO_CROP} when the bed is bare. A single
+     * block-state read per poll — no caching needed (the chunk is already loaded while a menu is open).
+     */
+    private int growthPermille() {
+        if (level == null) return za.co.neroland.neroagriculture.menu.GrowBedMenu.NO_CROP;
+        BlockState above = level.getBlockState(worldPosition.above());
+        if (above.getBlock() instanceof ResourceCropBlock) {
+            return za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                    above.getValue(ResourceCropBlock.AGE), ResourceCropBlock.MAX_AGE);
+        }
+        if (above.getBlock() instanceof SpeciesCropBlock) {
+            return za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                    above.getValue(SpeciesCropBlock.AGE), SpeciesCropBlock.MAX_AGE);
+        }
+        return za.co.neroland.neroagriculture.menu.GrowBedMenu.NO_CROP;
+    }
 
     /**
      * Live growth blocker for the crop above this bed, cached because {@link ContainerData} is polled every

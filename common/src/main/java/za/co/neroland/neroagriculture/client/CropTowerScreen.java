@@ -87,11 +87,21 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         Gauges.bar(g, font, x + 8, y + 59, x + 84, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
         Gauges.bar(g, font, x + 88, y + 59, x + 168, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
 
+        // Average growth across the planted slots as a mini labelled bar (fill = average age, label =
+        // ripe count), tucked between the seed wells and the tower readout; hidden while nothing is
+        // planted so an empty tower stays uncluttered. Synced as a permille of max age (see GaugeData).
+        int growthAvg = menu.growthAvg();
+        if (growthAvg >= 0) {
+            String ripe = Component.translatable("screen.neroagriculture.tower.ripe",
+                    menu.matureSlots(), menu.plantedSlots()).getString();
+            Gauges.bar(g, font, x + 48, y + 38, x + 112, ripe, growthAvg, GaugeData.SCALE, Gauges.PROGRESS);
+        }
+
         // Compact status beside the fertiliser slot, left of the output cluster (x115+).
         Component tower = menu.height() <= 0
                 ? Component.translatable("screen.neroagriculture.tower.unformed")
                 : Component.literal("H" + menu.height() + " · " + menu.activeSlots() + " slots");
-        g.text(font, tower, x + 48, y + 47, MUTED, false);
+        g.text(font, tower, x + 48, y + 50, MUTED, false);
 
         // Aggregate blocker for the tower's planted slots; nothing planted reads as idle.
         GrowthRules.BlockedReason reason = menu.blockedReason();
