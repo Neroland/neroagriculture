@@ -39,7 +39,7 @@ public final class TerraformingControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
             InteractionHand hand, BlockHitResult hit) {
-        if (!stack.is(ModItems.TERRAFORMING_SEED.get())) return InteractionResult.PASS;
+        if (!stack.is(ModItems.TERRAFORMING_SEED.get())) return useWithoutItem(state, level, pos, player, hit);
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof TerraformingControllerBlockEntity controller
@@ -60,7 +60,7 @@ public final class TerraformingControllerBlock extends BaseEntityBlock {
                 serverPlayer.sendSystemMessage(Component.literal(rolled
                         ? "[NeroAgriculture] Terraforming rolled back." : "[NeroAgriculture] Not authorised to roll back."));
             } else {
-                serverPlayer.sendSystemMessage(Component.literal("[NeroAgriculture] terraforming " + controller.status()));
+                serverPlayer.openMenu(controller);
             }
         }
         return InteractionResult.SUCCESS;

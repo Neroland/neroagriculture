@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:seed_synthesizing", "ingredient": "#c:ores/iron", "result": { "id": "neroagriculture:resource_seed" }, "energy": 2400, "ticks": 140, "material": "c:iron", "family": "industrial" }
+{ "type": "neroagriculture:seed_synthesizing", "ingredient": "#c:ores/iron", "result": { "id": "neroagriculture:resource_seed" }, "energy": 2400, "ticks": 140, "material": "c:iron", "family": "forgite" }

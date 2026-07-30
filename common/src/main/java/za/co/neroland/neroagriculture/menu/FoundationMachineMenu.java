@@ -36,30 +36,41 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
-        addSlot(new Slot(machine, 0, 26, 26));
-        addSlot(new Slot(machine, 1, 48, 26));
-        addSlot(new Slot(machine, 2, 70, 26));
-        addSlot(new Slot(machine, 3, 116, 26) {
+        // One clean row: inputs | upgrades | outputs (status/progress live in their own bands below).
+        // Inputs enforce the machine's own hopper filter so a click can't stash items the resolvers
+        // never consume (every other menu already routes mayPlace through canPlaceItem).
+        addSlot(new Slot(machine, 0, 17, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(0, stack); }
+        });
+        addSlot(new Slot(machine, 1, 39, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(1, stack); }
+        });
+        addSlot(new Slot(machine, 2, 61, 30) {
+            @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(2, stack); }
+        });
+        addSlot(new Slot(machine, 3, 127, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 4, 138, 26) {
+        addSlot(new Slot(machine, 4, 149, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return false; }
         });
-        addSlot(new Slot(machine, 5, 92, 20) {
+        addSlot(new Slot(machine, 5, 83, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(5, stack); }
         });
-        addSlot(new Slot(machine, 6, 92, 38) {
+        addSlot(new Slot(machine, 6, 105, 30) {
             @Override public boolean mayPlace(ItemStack stack) { return machine.canPlaceItem(6, stack); }
         });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9,
-                    8 + col * 18, 68 + row * 18));
+                    8 + col * 18, 88 + row * 18));
         }
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 126));
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 146));
         addDataSlots(data);
     }
 
     public BlockPos blockPos() { return blockPos; }
+    // Gauge values are synced as permille fractions of the live server-side maxima (see GaugeData):
+    // progress() runs 0..maxProgress() (= GaugeData.SCALE) and energy() runs 0..GaugeData.SCALE.
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }

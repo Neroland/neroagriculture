@@ -11,6 +11,17 @@ Operator commands (require gamemaster/permission level) print material metadata 
 - `/neroagriculture catalog errors` — datapack parse errors and conflicts.
 - `/neroagriculture catalog report` — effective tier/gate/yield ramp/conversion and override source per material.
 
+Reload logging is aggregate-first: shadowed lower-priority definitions (common on big packs, where a
+datapack overrides many builtins) log one summary WARN per reload with per-material detail at DEBUG
+level, and blacklist entries that match no material id log one aggregate INFO line so typos are visible.
+
+## Showcase gallery
+
+`/neroagriculture gallery` (creative, operator) builds the block/exhibit showcase around the player;
+`/neroagriculture gallery clear` removes **exactly the blocks and label stands the gallery itself placed**
+(recorded per dimension for the server session) — it never wipes pre-existing builds inside the same
+footprint. See [Art and Visuals](Art-and-Visuals.md) for what the gallery demonstrates.
+
 ## Datapacks
 
 Data-driven content is hand-authored under `data/neroagriculture/neroagriculture/`:

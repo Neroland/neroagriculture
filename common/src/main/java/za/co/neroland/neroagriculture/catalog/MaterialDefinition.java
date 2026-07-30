@@ -6,10 +6,10 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Complete immutable server-side definition of one component-backed resource material. */
-public record MaterialDefinition(Identifier id, InputSelector input, Identifier output, EssenceFamily tier,
+public record MaterialDefinition(Identifier id, InputSelector input, Identifier output, FragmentTier tier,
         @Nullable Identifier gate, Yield yield, int conversion, String displayKey, int color, boolean enabled,
         @Nullable WorldRestriction worldRestriction) {
 
@@ -34,13 +34,14 @@ public record MaterialDefinition(Identifier id, InputSelector input, Identifier 
     }
 
     public MaterialDefinition withOverrides(MaterialOverride override) {
-        EssenceFamily resolvedTier = override.tier() == null ? tier : override.tier();
+        FragmentTier resolvedTier = override.tier() == null ? tier : override.tier();
         Identifier resolvedGate = override.gateSpecified() ? override.gate() : gate;
         Yield resolvedYield = override.yield() == null ? yield : override.yield();
         int resolvedConversion = override.conversion() == null ? conversion : override.conversion();
         boolean resolvedEnabled = override.enabled() == null ? enabled : override.enabled();
+        int resolvedColor = override.color() == null ? color : override.color();
         return new MaterialDefinition(id, input, output, resolvedTier, resolvedGate, resolvedYield,
-                resolvedConversion, displayKey, color, resolvedEnabled, worldRestriction);
+                resolvedConversion, displayKey, resolvedColor, resolvedEnabled, worldRestriction);
     }
 
     public MaterialDefinition disabled() {

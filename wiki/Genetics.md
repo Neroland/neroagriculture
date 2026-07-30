@@ -26,7 +26,7 @@ The NF-powered **Genetics Station** works on seeds:
 - **Analyse** — right-click the station with a seed in hand to print its traits and total.
 - **Splice** — two seeds in the input slots produce one output seed whose every trait is the higher of the
   two parents, then clamped to the total cap.
-- **Upgrade** — a seed plus Material Essence raises the seed's lowest trait by one.
+- **Upgrade** — a seed plus Resource Fragment raises the seed's lowest trait by one.
 
 All of these use the same deterministic, capped maths, so an operation can never push a seed past its caps.
 

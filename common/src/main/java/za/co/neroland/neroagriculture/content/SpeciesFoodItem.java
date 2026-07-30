@@ -8,7 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import za.co.neroland.neroagriculture.food.FoodCatalog;
-import za.co.neroland.neroagriculture.food.FoodDefinition;
 import za.co.neroland.neroagriculture.food.FoodEffects;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 
@@ -37,12 +36,19 @@ public final class SpeciesFoodItem extends Item {
         return result;
     }
 
+    /**
+     * Named from the species id's leaf path alone — the same client/server name-parity technique as
+     * {@link SpeciesSeedItem#variantLabel}: {@code FoodCatalog.forServer(null)} is the built-in-only
+     * snapshot on a dedicated server's clients, so a catalog-derived name would disagree between the
+     * sides (container titles, {@code /give} feedback and {@code AnvilMenu.createResult} all run
+     * server-side). The catalogued display name stays a client-only tooltip concern.
+     */
     @Override
     public Component getName(ItemStack stack) {
         SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
         if (variant != null) {
-            FoodDefinition definition = FoodCatalog.forServer(null).get(variant.species());
-            if (definition != null) return Component.translatable(definition.displayKey());
+            return Component.translatable("item.neroagriculture.engineered_food.named",
+                    MaterialVariantItem.materialName(variant.species()));
         }
         return super.getName(stack);
     }

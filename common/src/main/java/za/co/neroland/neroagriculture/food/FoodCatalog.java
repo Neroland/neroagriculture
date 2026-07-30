@@ -2,6 +2,7 @@ package za.co.neroland.neroagriculture.food;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,7 +62,10 @@ public final class FoodCatalog {
         Map<Identifier, FoodDefinition> ordered = new LinkedHashMap<>();
         merged.keySet().stream().sorted(Comparator.comparing(Identifier::toString))
                 .forEach(id -> ordered.put(id, merged.get(id)));
-        return Map.copyOf(ordered);
+        // Deliberately not Map.copyOf: that would discard the sort above for a JVM-randomised iteration
+        // order, and SpeciesCatalogSyncPayload#from walks values() in order — a different arbitrary subset
+        // would ship on every server start once the payload cap bites. Same idiom as ResolvedCatalog.
+        return Collections.unmodifiableMap(ordered);
     }
 
     private static List<FoodDefinition> loadDatapacks(ResourceManager resources, List<String> errors) {

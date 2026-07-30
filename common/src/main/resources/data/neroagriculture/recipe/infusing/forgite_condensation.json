@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:territe_fragment", "result": { "id": "neroagriculture:forgite_fragment" }, "input_count": 4, "energy": 1200, "ticks": 80, "family": "forgite" }

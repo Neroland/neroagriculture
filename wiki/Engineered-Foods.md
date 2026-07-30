@@ -13,6 +13,11 @@ catalogue resolves that id to a full definition (nutrition, saturation, effect, 
 theme). Datapacks may add or replace species under
 `data/neroagriculture/neroagriculture/foods/food/<name>.json`.
 
+Item **names** are derived from the species id's leaf path alone (e.g. `neroagriculture:food/starleaf`
+reads as "Starleaf") — the same rule seeds use — so the name a dedicated server computes for container
+titles, `/give` feedback and anvils always matches what the client renders. The catalogue's translated
+display name still appears in the seed tooltip.
+
 ## Growing and harvesting
 
 Food seeds are planted on a grow bed whose tier meets or exceeds the species tier, exactly like

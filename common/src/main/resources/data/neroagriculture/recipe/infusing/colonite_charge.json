@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:colonite_fragment", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 3800, "ticks": 120, "family": "colonite" }

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:wheat_seeds",
+    "neroagriculture:territe_fragment",
+    "neroagriculture:territe_fragment"
+  ],
+  "result": {
+    "id": "neroagriculture:prospora_seed",
+    "count": 1
+  }
+}

@@ -3,6 +3,11 @@ package za.co.neroland.neroagriculture.lifesupport;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
@@ -29,13 +35,14 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /**
  * NF bioreactor closing the life-support loop: farmed Biomass becomes Nutrient fluid (with an explicit loss)
  * plus a periodic recoverable Crop Waste byproduct. Losses mean the loop can never mint net items or energy.
  */
-public final class BioreactorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class BioreactorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     public static final int BIOMASS = 0;
     public static final int WASTE_OUT = 1;
     public static final int ENERGY_PER_TICK = 8;
@@ -44,6 +51,31 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
     private final NonNullList<ItemStack> items = NonNullList.withSize(2, ItemStack.EMPTY);
     private final FluidBuffer nutrient;
     private int progress;
+
+    // Gauge slots ship as permille fractions: ContainerData syncs shorts, and both the configured
+    // energy capacity and process ticks can exceed 32,767 (see menu.GaugeData).
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        progress, AgricultureConfig.BIOREACTOR_TICKS.get());
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.SCALE;
+                case 2 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                default -> 0;
+            };
+        }
+        // Only the client's SimpleContainerData copy ever receives set(); the slots are scaled fractions.
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return za.co.neroland.neroagriculture.menu.ProcessorMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
+        return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
+                za.co.neroland.neroagriculture.registry.ModMenuTypes.CONVERTER.get(), id, inventory, this,
+                menuData, worldPosition, 1);
+    }
     private int cycles;
 
     public BioreactorBlockEntity(BlockPos pos, BlockState state) {
@@ -53,6 +85,7 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, SlotGroup.of("input", BIOMASS), SlotGroup.of("output", WASTE_OUT))
                 .channel(Channel.FLUID).channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this).withFluid(this::getFluid);
     }
@@ -61,6 +94,7 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
 
     public static void tick(Level level, BlockPos pos, BlockState state, BioreactorBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (level instanceof ServerLevel) machine.process();
     }
 
@@ -120,6 +154,13 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
     @Override public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return slot == WASTE_OUT; }
     @Override public void clearContent() { items.clear(); setChanged(); }
 
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
+    }
+
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
@@ -127,9 +168,11 @@ public final class BioreactorBlockEntity extends AbstractMachineBlockEntity impl
         output.putInt("NutrientAmount", nutrient.getRawAmount());
         output.putInt("Progress", progress);
         output.putInt("Cycles", cycles);
+        SideConfigMigration.save(output);
     }
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(input.getStringOr("NutrientFluid", "minecraft:empty")));
         nutrient.setRaw(fluid == null ? Fluids.EMPTY : fluid, input.getIntOr("NutrientAmount", 0));

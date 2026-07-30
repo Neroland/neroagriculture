@@ -1,1 +1,1 @@
-{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:twisting_vines", "result": {"id": "neroagriculture:alien_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:alien/greenxertz_sporepod", "family": "colonial"}
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:twisting_vines", "result": {"id": "neroagriculture:alien_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:alien/greenxertz_sporepod", "family": "colonite"}

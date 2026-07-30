@@ -4,7 +4,7 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Central tier-gate and research milestone ids used at start and completion. */
 public final class MachineProgression {
@@ -15,14 +15,10 @@ public final class MachineProgression {
     private MachineProgression() { }
 
     @Nullable
-    public static Identifier gate(EssenceFamily family) {
-        return switch (family) {
-            case TERRAN -> null;
-            case INDUSTRIAL -> Identifier.parse("nerolandcore:industrial_power");
-            case ORBITAL -> Identifier.parse("nerolandcore:reached_orbit");
-            case COLONIAL -> Identifier.parse("nerolandcore:first_colony");
-            case DEEPVOID -> Identifier.parse("nerolandcore:deep_space");
-        };
+    public static Identifier gate(FragmentTier family) {
+        // No hard tier gates (playtest decision 2026-07-16): machine steps are never gate-blocked.
+        // The native gates still exist and open via milestones for packs that reference them.
+        return null;
     }
 
     private static Identifier id(String path) {

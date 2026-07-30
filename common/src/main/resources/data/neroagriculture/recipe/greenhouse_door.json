@@ -1,0 +1,1 @@
+{"type": "minecraft:crafting_shaped", "pattern": ["GG", "GG", "FF"], "key": {"G": "neroagriculture:greenhouse_glass", "F": "neroagriculture:greenhouse_frame"}, "result": {"id": "neroagriculture:greenhouse_door", "count": 3}}

@@ -3,8 +3,6 @@ package za.co.neroland.neroagriculture.automation;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,6 +53,9 @@ public final class AreaMachineBlock extends BaseEntityBlock {
                 if (!player.getAbilities().instabuild) player.setItemInHand(hand, leftover);
                 return InteractionResult.CONSUME;
             }
+            // Nothing to insert: open the UI rather than letting vanilla place the held block.
+            player.openMenu(machine);
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
     }
@@ -63,17 +64,13 @@ public final class AreaMachineBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
             BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AreaMachineBlockEntity machine) {
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] " + machine.status()));
+            player.openMenu(machine);
         }
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof AreaMachineBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-    }
+    // Contents drop from AreaMachineBlockEntity#preRemoveSideEffects (covers creative breaks and
+    // explosions too), so no playerDestroy override is needed here.
 
     @Nullable
     @Override

@@ -15,14 +15,14 @@ import org.junit.jupiter.api.Test;
 class MaterialVariantTest {
     @Test
     void persistentCodecRoundTrips() {
-        MaterialVariant value = MaterialVariant.of(Identifier.parse("nerospace:nerosium_ingot"), EssenceFamily.ORBITAL);
+        MaterialVariant value = MaterialVariant.of(Identifier.parse("nerospace:nerosium_ingot"), FragmentTier.ORBITE);
         var json = MaterialVariant.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow();
         assertEquals(value, MaterialVariant.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
     }
 
     @Test
     void streamCodecRoundTrips() {
-        MaterialVariant value = MaterialVariant.of(Identifier.parse("minecraft:iron_ingot"), EssenceFamily.INDUSTRIAL);
+        MaterialVariant value = MaterialVariant.of(Identifier.parse("minecraft:iron_ingot"), FragmentTier.FORGITE);
         RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
         MaterialVariant.STREAM_CODEC.encode(buffer, value);
         assertEquals(value, MaterialVariant.STREAM_CODEC.decode(buffer));
@@ -34,6 +34,6 @@ class MaterialVariantTest {
         assertThrows(RuntimeException.class, () -> Identifier.parse("not an id"));
         String oversized = "test:" + "a".repeat(MaterialVariant.MAX_ID_LENGTH);
         assertThrows(IllegalStateException.class,
-                () -> MaterialVariant.of(Identifier.parse(oversized), EssenceFamily.TERRAN));
+                () -> MaterialVariant.of(Identifier.parse(oversized), FragmentTier.TERRITE));
     }
 }

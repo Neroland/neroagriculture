@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class BiofuelTest {
-    private static final int COMPRESSION_RATIO = 9; // 9 essence <-> 1 compacted block
+    private static final int COMPRESSION_RATIO = 9; // 9 fragment <-> 1 compacted block
 
     @Test
     void energyValueIsLinearAndNonNegative() {
@@ -26,9 +26,9 @@ class BiofuelTest {
     @Test
     void compactionRoundTripConservesExactly() {
         int blocks = 4;
-        int essence = blocks * COMPRESSION_RATIO;      // decompress
-        assertEquals(36, essence);
-        assertEquals(blocks, essence / COMPRESSION_RATIO, "compressing back conserves the exact count");
-        assertEquals(0, essence % COMPRESSION_RATIO, "no essence is created or lost in the round trip");
+        int fragment = blocks * COMPRESSION_RATIO;      // decompress
+        assertEquals(36, fragment);
+        assertEquals(blocks, fragment / COMPRESSION_RATIO, "compressing back conserves the exact count");
+        assertEquals(0, fragment % COMPRESSION_RATIO, "no fragment is created or lost in the round trip");
     }
 }

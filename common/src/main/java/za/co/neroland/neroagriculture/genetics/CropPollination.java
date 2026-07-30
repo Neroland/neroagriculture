@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
@@ -56,7 +55,11 @@ public final class CropPollination {
 
     private static boolean researchOk(ServerLevel level, BlockPos pos, BreedingCatalog.Definition definition) {
         if (definition.research() == null) return true;
-        Player nearest = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 48.0, false);
-        return nearest instanceof ServerPlayer player && ProgressionGates.isOpen(player, definition.research());
+        // Owner-first: the research gate is checked against the grow bed's recorded owner where one
+        // exists; the nearest player is only a fallback for ownerless beds (owner tracking opted out).
+        java.util.UUID owner = level.getBlockEntity(pos.below())
+                instanceof za.co.neroland.neroagriculture.crop.GrowBedBlockEntity bed ? bed.automationOwner() : null;
+        ServerPlayer player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, pos, owner, 48.0);
+        return player != null && ProgressionGates.isOpen(player, definition.research());
     }
 }

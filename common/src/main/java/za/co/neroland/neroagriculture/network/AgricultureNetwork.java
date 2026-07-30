@@ -39,6 +39,8 @@ public final class AgricultureNetwork {
     public static void init() {
         clientbound(MaterialCatalogSyncPayload.TYPE, MaterialCatalogSyncPayload.STREAM_CODEC,
                 za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog::accept);
+        clientbound(SpeciesCatalogSyncPayload.TYPE, SpeciesCatalogSyncPayload.STREAM_CODEC,
+                za.co.neroland.neroagriculture.catalog.ClientSpeciesCatalog::accept);
         clientbound(MachineMenuPositionPayload.TYPE, MachineMenuPositionPayload.STREAM_CODEC,
                 ClientMachineMenuPositions::accept);
         serverbound(MachineActionPayload.TYPE, MachineActionPayload.STREAM_CODEC, AgricultureNetwork::handleMachineAction);
@@ -51,13 +53,25 @@ public final class AgricultureNetwork {
     private static void handleMachineAction(MachineActionPayload payload, ServerPlayer player) {
         // Direction and player identity are supplied by the serverbound loader handler. The fixed codec is
         // at most 30 bytes; action/value bounds, proximity, menu context and target type are checked here.
-        if (payload.action() < 0 || payload.action() > 7 || payload.value() < 0 || payload.value() > 1_000) return;
+        // Only actions 0 (research) and 1 (area hologram) exist — widen this bound with the dispatch below.
+        if (payload.action() < 0 || payload.action() > 1 || payload.value() < 0 || payload.value() > 1_000) return;
         var pos = payload.blockPos();
         if (!player.level().isLoaded(pos) || player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5,
                 pos.getZ() + 0.5) > 64.0) return;
-        if (!(player.containerMenu instanceof za.co.neroland.neroagriculture.menu.FoundationMachineMenu menu)
-                || !menu.blockPos().equals(pos)) return;
-        if (!(player.level().getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine)) return;
-        if (payload.action() == 0) machine.tryResearch(player);
+        if (payload.action() == 0) {
+            if (!(player.containerMenu instanceof za.co.neroland.neroagriculture.menu.FoundationMachineMenu menu)
+                    || !menu.blockPos().equals(pos)) return;
+            if (player.level().getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine) {
+                machine.tryResearch(player);
+            }
+        } else if (payload.action() == 1) {
+            // Working-area hologram toggle: requires the machine's own menu to be open.
+            if (!(player.containerMenu instanceof za.co.neroland.neroagriculture.menu.AreaMachineMenu menu)
+                    || !menu.blockPos().equals(pos)) return;
+            if (player.level().getBlockEntity(pos)
+                    instanceof za.co.neroland.neroagriculture.automation.AreaMachineBlockEntity machine) {
+                machine.toggleShowArea();
+            }
+        }
     }
 }

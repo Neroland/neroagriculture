@@ -29,6 +29,6 @@ interval.
 A formed, powered greenhouse only helps crops **inside** its interior. Confirm the crop block sits within
 the sealed pocket (on a grow bed whose tier meets the crop) and that the controller reads `formed`, not
 `unpowered`. Remember the other [growth conditions](Growth-Conditions.md) still apply: light level, the
-material gate, bed tier, and powered-bed NF/nutrient for Industrial-and-above crops.
+material gate, bed tier, and powered-bed NF/nutrient for Forgite-and-above crops.
 
 See also: [Greenhouse Construction](Greenhouse-Construction.md).

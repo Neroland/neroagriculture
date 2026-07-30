@@ -4,8 +4,14 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -19,6 +25,8 @@ import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.crop.ResourceCropBlock;
 import za.co.neroland.neroagriculture.crop.SpeciesCropBlock;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
+import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
@@ -26,15 +34,18 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 
 /** NF/nutrient-powered controller that maintains a sealed, cached interior and publishes it to the index. */
-public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockEntity {
+public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockEntity implements MenuProvider {
     private final FluidBuffer nutrient;
     private GreenhouseState state = GreenhouseState.UNFORMED;
     private Set<Long> interior = Set.of();
     private int volume;
     private int activeCrops;
     private int oxygenOffset;
+    /** Last oxygen amount published to the seam, so leaving FORMED can retract it (never persisted). */
+    private int publishedOxygen;
     @Nullable private BlockPos leak;
     private int revalidateTimer;
     private int upkeepTimer;
@@ -44,6 +55,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
                 AgricultureConfig.MACHINE_ENERGY_RATE.get(), 0, stack -> null);
         this.nutrient = new FluidBuffer(AgricultureConfig.MACHINE_FLUID_CAPACITY.get(), this::setChanged);
         installSideConfig(SideConfig.builder().channel(Channel.ENERGY).channel(Channel.FLUID)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).allow(Channel.ENERGY, SideMode.IO, false)
                 .allow(Channel.FLUID, SideMode.OUTPUT, false).allow(Channel.FLUID, SideMode.IO, false).build())
                 .withFluid(this::getFluid);
@@ -53,12 +65,35 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
     public GreenhouseState state() { return state; }
     public int volume() { return volume; }
     public int activeCrops() { return activeCrops; }
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case StatusMenu.MACHINE_ID -> StatusMenu.ID_GREENHOUSE;
+                // Permille fraction: ContainerData syncs shorts and the capacity can exceed 32,767.
+                case StatusMenu.ENERGY -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                case StatusMenu.V0 -> state.ordinal();
+                case StatusMenu.V1 -> volume;
+                case StatusMenu.V2 -> activeCrops;
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return StatusMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new StatusMenu(id, inventory, menuData, worldPosition, this);
+    }
     public int oxygen() { return oxygenOffset; }
     @Nullable public BlockPos leak() { return leak; }
     public boolean isActive() { return state == GreenhouseState.FORMED; }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, GreenhouseControllerBlockEntity be) {
         AbstractMachineBlockEntity.tick(level, pos, blockState, be);
+        SideConfigMigration.tick(be);
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (--be.revalidateTimer <= 0) {
             be.revalidateTimer = AgricultureConfig.GREENHOUSE_REVALIDATE_TICKS.get();
@@ -86,6 +121,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
             setStructuralState(result.structure() == GreenhouseValidation.Structure.BREACHED
                     ? GreenhouseState.BREACHED : GreenhouseState.UNFORMED);
             GreenhouseIndex.clear(level, worldPosition);
+            retractOxygen(level);
         }
         setChanged();
     }
@@ -112,6 +148,7 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         } else {
             setStructuralState(GreenhouseState.UNPOWERED);
             GreenhouseIndex.clear(level, worldPosition);
+            retractOxygen(level);
         }
     }
 
@@ -122,8 +159,27 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         }
     }
 
+    /**
+     * Publish a zero contribution when leaving FORMED (breach, unformed, unpowered) or on removal, so
+     * seam consumers ({@code OxygenApi}) never hold a stale positive for this controller.
+     */
+    private void retractOxygen(ServerLevel level) {
+        if (publishedOxygen == 0) return;
+        publishedOxygen = 0;
+        za.co.neroland.neroagriculture.environment.OxygenApi.contribute(
+                new za.co.neroland.neroagriculture.environment.OxygenApi.Contribution(
+                        level.dimension().identifier(), worldPosition.asLong(), 0));
+    }
+
+    /**
+     * A position the interior flood fill may spread into. Everything else is shell. The Greenhouse Door is
+     * called out explicitly: as an airlock, BOTH halves count as sealing shell blocks whether the door is
+     * open or closed, so walking through it never reads as a breach and revalidation never flags an open
+     * door. (Door states are neither air nor replaceable, so the guard is belt-and-braces documentation.)
+     */
     private static boolean passable(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof GreenhouseDoorBlock) return false;
         return state.isAir() || state.canBeReplaced()
                 || state.getBlock() instanceof ResourceCropBlock || state.getBlock() instanceof SpeciesCropBlock;
     }
@@ -164,11 +220,15 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         za.co.neroland.neroagriculture.environment.OxygenApi.contribute(
                 new za.co.neroland.neroagriculture.environment.OxygenApi.Contribution(
                         level.dimension().identifier(), worldPosition.asLong(), capped));
+        publishedOxygen = capped;
         return capped;
     }
 
     @Override public void setRemoved() {
-        if (level instanceof ServerLevel serverLevel) GreenhouseIndex.clear(serverLevel, worldPosition);
+        if (level instanceof ServerLevel serverLevel) {
+            GreenhouseIndex.clear(serverLevel, worldPosition);
+            retractOxygen(serverLevel);
+        }
         super.setRemoved();
     }
 
@@ -178,10 +238,12 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         output.putInt("NutrientAmount", nutrient.getRawAmount());
         output.putInt("GreenhouseState", state.ordinal());
         output.putInt("Volume", volume);
+        SideConfigMigration.save(output);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(input.getStringOr("NutrientFluid", "minecraft:empty")));
         nutrient.setRaw(fluid == null ? Fluids.EMPTY : fluid, input.getIntOr("NutrientAmount", 0));
         state = GreenhouseState.byOrdinal(input.getIntOr("GreenhouseState", 0));

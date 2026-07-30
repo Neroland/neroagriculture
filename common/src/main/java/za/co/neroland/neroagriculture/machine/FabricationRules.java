@@ -2,8 +2,8 @@ package za.co.neroland.neroagriculture.machine;
 
 import net.minecraft.resources.Identifier;
 
-import za.co.neroland.neroagriculture.content.EssenceCharge;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentCharge;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 
 /** Pure accounting/component checks shared by fabrication runtime and boundary tests. */
@@ -15,17 +15,26 @@ public final class FabricationRules {
         return (total + ticks - 1) / ticks;
     }
 
-    public static boolean materialMatches(MaterialVariant variant, Identifier material, EssenceFamily family) {
+    public static boolean materialMatches(MaterialVariant variant, Identifier material, FragmentTier family) {
         return variant != null && variant.version() == MaterialVariant.CURRENT_VERSION
                 && variant.material().equals(material) && variant.family() == family;
     }
 
-    public static boolean chargeMatches(EssenceCharge charge, EssenceFamily family) {
-        return charge != null && charge.version() == EssenceCharge.CURRENT_VERSION && charge.family() == family;
+    public static boolean chargeMatches(FragmentCharge charge, FragmentTier family) {
+        return charge != null && charge.version() == FragmentCharge.CURRENT_VERSION && charge.family() == family;
     }
 
-    public static boolean transitionAllowed(EssenceFamily source, EssenceFamily destination) {
+    public static boolean transitionAllowed(FragmentTier source, FragmentTier destination) {
         return source != null && destination != null && destination.ordinal() == source.ordinal() + 1;
+    }
+
+    /**
+     * Number of matching Tier Fragments consumed, alongside one Prospora Seed base and the real
+     * resource, to synthesize one Resource Seed. Scales with tier so higher-tier seeds cost more of the
+     * (harder-won) higher-tier fragments.
+     */
+    public static int fragmentsPerSeed(FragmentTier tier) {
+        return 2 + tier.ordinal();
     }
 
     public static boolean mayComplete(boolean recipeValid, boolean outputFits, boolean hasPower,

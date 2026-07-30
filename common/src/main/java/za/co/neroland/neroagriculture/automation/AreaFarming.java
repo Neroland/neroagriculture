@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
 import za.co.neroland.neroagriculture.content.SpeciesVariant;
 import za.co.neroland.neroagriculture.crop.CropVariantState;
@@ -40,7 +40,7 @@ public final class AreaFarming {
     /** Plant one seed from the stack onto the bed at {@code bedPos}; returns true if a crop was placed. */
     public static boolean plant(ServerLevel level, BlockPos bedPos, ItemStack seed, @Nullable ServerPlayer gatePlayer) {
         if (seed.isEmpty()) return false;
-        EssenceFamily bedTier = ModBlocks.growBedTier(level.getBlockState(bedPos).getBlock());
+        FragmentTier bedTier = ModBlocks.growBedTier(level.getBlockState(bedPos).getBlock());
         if (bedTier == null) return false;
         BlockPos cropPos = bedPos.above();
         if (!level.getBlockState(cropPos).canBeReplaced()) return false;
@@ -51,7 +51,7 @@ public final class AreaFarming {
         return false;
     }
 
-    private static boolean plantResource(ServerLevel level, BlockPos cropPos, EssenceFamily bedTier, ItemStack seed,
+    private static boolean plantResource(ServerLevel level, BlockPos cropPos, FragmentTier bedTier, ItemStack seed,
             @Nullable ServerPlayer gatePlayer) {
         MaterialVariant variant = seed.get(ModDataComponents.MATERIAL_VARIANT.get());
         if (variant == null) return false;
@@ -59,7 +59,8 @@ public final class AreaFarming {
         if (!lookup.permitsGrowth()) return false;
         var definition = lookup.material().orElseThrow().definition();
         if (bedTier.ordinal() < definition.tier().ordinal()) return false;
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         if (definition.worldRestriction() != null
                 && !definition.worldRestriction().dimension().equals(level.dimension().identifier())) return false;
         if (!level.setBlock(cropPos, ModBlocks.RESOURCE_CROP.get().defaultBlockState(), 3)) return false;
@@ -74,7 +75,7 @@ public final class AreaFarming {
         return true;
     }
 
-    private static boolean plantSpecies(ServerLevel level, BlockPos cropPos, EssenceFamily bedTier, ItemStack seed,
+    private static boolean plantSpecies(ServerLevel level, BlockPos cropPos, FragmentTier bedTier, ItemStack seed,
             @Nullable ServerPlayer gatePlayer) {
         SpeciesVariant variant = seed.get(ModDataComponents.SPECIES_VARIANT.get());
         if (variant == null) return false;
@@ -83,7 +84,8 @@ public final class AreaFarming {
         boolean alien = definition.kind() == FoodDefinition.Kind.ALIEN;
         if (seed.is(ModItems.ALIEN_SEED.get()) != alien) return false;
         if (bedTier.ordinal() < definition.tier().ordinal()) return false;
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         BlockState cropState = (alien ? ModBlocks.ALIEN_CROP.get() : ModBlocks.ENGINEERED_FOOD_CROP.get()).defaultBlockState();
         if (!level.setBlock(cropPos, cropState, 3)) return false;
         if (!(level.getBlockEntity(cropPos) instanceof SpeciesCropBlockEntity crop)) {
@@ -123,7 +125,8 @@ public final class AreaFarming {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
         if (!lookup.permitsGrowth()) return false;
         var definition = lookup.material().orElseThrow().definition();
-        if (definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate()))) return false;
+        if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
+                || (gatePlayer != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier()))) return false;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
         int amount = YieldCurve.scaledCapped(definition.yield(), crop.variant().harvestCount(),
@@ -133,7 +136,7 @@ public final class AreaFarming {
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
                 crop.variant().harvestCount()).harvested());
         level.setBlock(cropPos, state.setValue(ResourceCropBlock.AGE, 0), 3);
-        emitEssence(sink, definition.id(), definition.tier(), amount);
+        emitFragment(sink, definition.id(), definition.tier(), amount);
         return true;
     }
 
@@ -151,10 +154,10 @@ public final class AreaFarming {
         return true;
     }
 
-    private static void emitEssence(Consumer<ItemStack> sink, Identifier material, EssenceFamily family, int amount) {
+    private static void emitFragment(Consumer<ItemStack> sink, Identifier material, FragmentTier family, int amount) {
         int remaining = amount;
         while (remaining > 0) {
-            ItemStack stack = new ItemStack(ModItems.MATERIAL_ESSENCE.get(), Math.min(64, remaining));
+            ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
             stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
             remaining -= stack.getCount();
             sink.accept(stack);

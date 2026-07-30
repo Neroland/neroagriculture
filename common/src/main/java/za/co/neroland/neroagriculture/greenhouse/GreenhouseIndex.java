@@ -40,13 +40,22 @@ public final class GreenhouseIndex {
         for (long pos : interior) forward.remove(pos, controllerKey);
     }
 
+    /** Drop every published interior when the server stops (server-thread, like the rest of the index). */
+    public static void clearAll() {
+        INTERIOR_TO_CONTROLLER.clear();
+        CONTROLLER_TO_INTERIOR.clear();
+    }
+
     /** True when the position sits inside a formed, powered greenhouse whose controller is loaded. */
     public static boolean sealedAt(ServerLevel level, BlockPos pos) {
         Map<Long, Long> forward = INTERIOR_TO_CONTROLLER.get(level.dimension().identifier());
         if (forward == null) return false;
         Long controllerKey = forward.get(pos.asLong());
         if (controllerKey == null) return false;
-        return level.getBlockEntity(BlockPos.of(controllerKey)) instanceof GreenhouseControllerBlockEntity controller
+        BlockPos controllerPos = BlockPos.of(controllerKey);
+        // Guard the loaded check so a random-tick query can never force-load the controller's chunk.
+        return level.isLoaded(controllerPos)
+                && level.getBlockEntity(controllerPos) instanceof GreenhouseControllerBlockEntity controller
                 && controller.isActive();
     }
 }

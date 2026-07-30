@@ -1,1 +1,0 @@
-{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:deepvoid_essence", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 5600, "ticks": 160, "family": "deepvoid" }

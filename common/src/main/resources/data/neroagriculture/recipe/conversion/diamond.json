@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:material_essence", "result": { "id": "minecraft:diamond" }, "input_count": 16, "energy": 1400, "ticks": 80, "material": "c:diamond", "family": "orbital" }
+{ "type": "neroagriculture:material_conversion", "ingredient": "neroagriculture:resource_fragment", "result": { "id": "minecraft:diamond" }, "input_count": 16, "energy": 1400, "ticks": 80, "material": "c:diamond", "family": "orbite" }

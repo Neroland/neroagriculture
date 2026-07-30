@@ -3,9 +3,6 @@ package za.co.neroland.neroagriculture.fertiliser;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Containers;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -30,11 +27,23 @@ public final class FertiliserProcessorBlock extends BaseEntityBlock {
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new FertiliserProcessorBlockEntity(pos, state); }
 
+    // Contents drop from FertiliserProcessorBlockEntity#preRemoveSideEffects (covers creative breaks
+    // and explosions too), so no playerDestroy override is needed here.
+
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof FertiliserProcessorBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FertiliserProcessorBlockEntity machine) {
+            player.openMenu(machine);
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
     }
 
     @Nullable

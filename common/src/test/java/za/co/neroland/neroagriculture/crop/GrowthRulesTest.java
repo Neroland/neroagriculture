@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import za.co.neroland.neroagriculture.catalog.ResolvedCatalog;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason;
 import za.co.neroland.neroagriculture.crop.GrowthRules.Conditions;
 import za.co.neroland.neroagriculture.environment.CropClimate;
@@ -13,9 +13,9 @@ import za.co.neroland.neroagriculture.environment.CropClimate;
 class GrowthRulesTest {
     @Test
     void oneMaterialPerTierRequiresItsBedAndPoweredTiersRequireResources() {
-        for (EssenceFamily tier : EssenceFamily.values()) {
+        for (FragmentTier tier : FragmentTier.values()) {
             assertEquals(BlockedReason.NONE, GrowthRules.evaluate(valid(tier)));
-            EssenceFamily lower = tier == EssenceFamily.TERRAN ? null : EssenceFamily.values()[tier.ordinal() - 1];
+            FragmentTier lower = tier == FragmentTier.TERRITE ? null : FragmentTier.values()[tier.ordinal() - 1];
             if (lower != null) {
                 assertEquals(BlockedReason.WRONG_BED, GrowthRules.evaluate(new Conditions(
                         ResolvedCatalog.Status.ACTIVE, tier, lower, true, true, true, CropClimate.Result.OK, true, true)));
@@ -29,7 +29,7 @@ class GrowthRulesTest {
 
     @Test
     void catalogGateLightAndDimensionFailClosedInStableOrder() {
-        Conditions valid = valid(EssenceFamily.ORBITAL);
+        Conditions valid = valid(FragmentTier.ORBITE);
         assertEquals(BlockedReason.UNKNOWN_MATERIAL, GrowthRules.evaluate(new Conditions(
                 ResolvedCatalog.Status.UNKNOWN, valid.materialTier(), valid.bedTier(), true, true, true,
                 CropClimate.Result.OK, true, true)));
@@ -49,7 +49,7 @@ class GrowthRulesTest {
 
     @Test
     void hostileEnvironmentAndGreenhouseRequirementFailClosedAfterDimension() {
-        Conditions base = valid(EssenceFamily.INDUSTRIAL);
+        Conditions base = valid(FragmentTier.FORGITE);
         assertEquals(BlockedReason.HOSTILE_ENVIRONMENT, GrowthRules.evaluate(new Conditions(
                 base.catalogStatus(), base.materialTier(), base.bedTier(), true, true, true,
                 CropClimate.Result.HOSTILE_ENVIRONMENT, true, true)));
@@ -58,7 +58,65 @@ class GrowthRulesTest {
                 CropClimate.Result.NEEDS_GREENHOUSE, true, true)));
     }
 
-    private static Conditions valid(EssenceFamily tier) {
+    @Test
+    void towerHasNoBedTierButChargesEveryTierForPowerAndNutrient() {
+        assertEquals(BlockedReason.NONE, GrowthRules.evaluateTower(ResolvedCatalog.Status.ACTIVE, true, true, true));
+        assertEquals(BlockedReason.UNKNOWN_MATERIAL,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.UNKNOWN, true, true, true));
+        assertEquals(BlockedReason.DISABLED_MATERIAL,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.DISABLED, true, true, true));
+        assertEquals(BlockedReason.GATE_CLOSED,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.ACTIVE, false, true, true));
+        assertEquals(BlockedReason.NO_POWER,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.ACTIVE, true, false, true));
+        assertEquals(BlockedReason.NO_NUTRIENT,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.ACTIVE, true, true, false));
+        // A TERRITE crop is exempt from the bed's resource draw but never from the tower's.
+        assertEquals(BlockedReason.NONE, GrowthRules.evaluate(new Conditions(ResolvedCatalog.Status.ACTIVE,
+                FragmentTier.TERRITE, FragmentTier.TERRITE, true, true, true, CropClimate.Result.OK, false, false)));
+        assertEquals(BlockedReason.NO_POWER,
+                GrowthRules.evaluateTower(ResolvedCatalog.Status.ACTIVE, true, false, false));
+    }
+
+    @Test
+    void aMatureTowerSlotIsBlockedByAFullOutputClusterRatherThanByPowerOrNutrient() {
+        assertEquals(BlockedReason.NONE,
+                GrowthRules.evaluateTowerHarvest(ResolvedCatalog.Status.ACTIVE, true, true));
+        assertEquals(BlockedReason.OUTPUT_FULL,
+                GrowthRules.evaluateTowerHarvest(ResolvedCatalog.Status.ACTIVE, true, false));
+        // Catalogue and gate still come first, in the same fail-closed order growth uses.
+        assertEquals(BlockedReason.UNKNOWN_MATERIAL,
+                GrowthRules.evaluateTowerHarvest(ResolvedCatalog.Status.UNKNOWN, true, false));
+        assertEquals(BlockedReason.DISABLED_MATERIAL,
+                GrowthRules.evaluateTowerHarvest(ResolvedCatalog.Status.DISABLED, true, false));
+        assertEquals(BlockedReason.GATE_CLOSED,
+                GrowthRules.evaluateTowerHarvest(ResolvedCatalog.Status.ACTIVE, false, false));
+    }
+
+    @Test
+    void aggregatingSlotsNeverHidesABlockedOneBehindAHealthyOne() {
+        assertEquals(BlockedReason.NONE, GrowthRules.worst(BlockedReason.NONE, BlockedReason.NONE));
+        assertEquals(BlockedReason.OUTPUT_FULL, GrowthRules.worst(BlockedReason.NONE, BlockedReason.OUTPUT_FULL));
+        assertEquals(BlockedReason.OUTPUT_FULL, GrowthRules.worst(BlockedReason.OUTPUT_FULL, BlockedReason.NONE));
+        // Declaration order is severity order: the more fundamental blocker wins, either way round.
+        assertEquals(BlockedReason.GATE_CLOSED,
+                GrowthRules.worst(BlockedReason.NO_NUTRIENT, BlockedReason.GATE_CLOSED));
+        assertEquals(BlockedReason.GATE_CLOSED,
+                GrowthRules.worst(BlockedReason.GATE_CLOSED, BlockedReason.NO_NUTRIENT));
+        // A missing shared resource stalls every slot, so it outranks a jam that only stalls ripe ones.
+        assertEquals(BlockedReason.NO_POWER, GrowthRules.worst(BlockedReason.OUTPUT_FULL, BlockedReason.NO_POWER));
+    }
+
+    @Test
+    void theWireOrdinalsOfTheOriginalBlockersNeverMove() {
+        // BlockedReason travels as a ContainerData int, so new reasons may only ever be appended.
+        assertEquals(0, BlockedReason.NONE.ordinal());
+        assertEquals(10, BlockedReason.NO_NUTRIENT.ordinal());
+        assertEquals(11, BlockedReason.NOT_FORMED.ordinal());
+        assertEquals(12, BlockedReason.OUTPUT_FULL.ordinal());
+    }
+
+    private static Conditions valid(FragmentTier tier) {
         return new Conditions(ResolvedCatalog.Status.ACTIVE, tier, tier, true, true, true,
                 CropClimate.Result.OK, true, true);
     }

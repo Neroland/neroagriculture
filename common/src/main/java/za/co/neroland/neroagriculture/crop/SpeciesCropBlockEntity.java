@@ -1,6 +1,11 @@
 package za.co.neroland.neroagriculture.crop;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,9 +38,15 @@ public final class SpeciesCropBlockEntity extends BlockEntity {
     }
 
     public void setSpecies(Identifier species, int harvestCount) {
+        int bounded = Math.max(0, harvestCount);
+        boolean changed = !this.species.equals(species) || this.harvestCount != bounded;
         this.species = species;
-        this.harvestCount = Math.max(0, harvestCount);
+        this.harvestCount = bounded;
         setChanged();
+        // Species identity is client-visible (tint/model selection), so a real change must be broadcast.
+        if (changed && level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     public void recordHarvest() {
@@ -60,4 +71,8 @@ public final class SpeciesCropBlockEntity extends BlockEntity {
         }
         genetics = za.co.neroland.neroagriculture.genetics.GeneticsCodecs.load(input);
     }
+
+    // Client sync (chunk load + explicit updates) so client-side rendering sees the real species.
+    @Override public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries) { return saveCustomOnly(registries); }
 }

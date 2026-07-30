@@ -3,9 +3,6 @@ package za.co.neroland.neroagriculture.genetics;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,9 +18,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
-import za.co.neroland.neroagriculture.registry.ModDataComponents;
 
-/** Genetics Station block. Right-click with a seed to analyse (print) its traits; hoppers load the slots. */
+/** Genetics Station block. Right-click to open its splice/upgrade UI; hoppers load the slots. */
 public final class GeneticsStationBlock extends BaseEntityBlock {
     public static final MapCodec<GeneticsStationBlock> CODEC = simpleCodec(GeneticsStationBlock::new);
 
@@ -36,23 +32,22 @@ public final class GeneticsStationBlock extends BaseEntityBlock {
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GeneticsStationBlockEntity(pos, state); }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
-            InteractionHand hand, BlockHitResult hit) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        Genetics genetics = stack.get(ModDataComponents.GENETICS.get());
-        if (genetics == null) return InteractionResult.PASS;
-        player.sendSystemMessage(Component.literal("[Genetics] yield=" + genetics.yield() + " speed=" + genetics.speed()
-                + " hardiness=" + genetics.hardiness() + " oxygen=" + genetics.oxygenOutput()
-                + " potency=" + genetics.foodPotency() + " total=" + genetics.total() + "/15"));
-        return InteractionResult.CONSUME;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof GeneticsStationBlockEntity machine) {
+            player.openMenu(machine);
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof GeneticsStationBlockEntity machine) Containers.dropContents(level, pos, machine);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
     }
+
+    // Contents drop from GeneticsStationBlockEntity#preRemoveSideEffects (covers creative breaks and
+    // explosions too), so no playerDestroy override is needed here.
 
     @Nullable
     @Override

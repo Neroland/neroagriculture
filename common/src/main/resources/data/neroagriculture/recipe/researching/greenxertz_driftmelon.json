@@ -1,1 +1,1 @@
-{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:melon_slice", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/greenxertz_driftmelon", "family": "industrial"}
+{"type": "neroagriculture:seed_researching", "ingredient": "minecraft:melon_slice", "result": {"id": "neroagriculture:food_seed"}, "input_count": 1, "energy": 0, "ticks": 1, "material": "neroagriculture:food/greenxertz_driftmelon", "family": "forgite"}

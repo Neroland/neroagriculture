@@ -1,0 +1,111 @@
+package za.co.neroland.neroagriculture.menu;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import za.co.neroland.neroagriculture.registry.ModMenuTypes;
+
+/**
+ * Crop Tower menu: three seed slots + a fertiliser slot feed the virtual tower; six output slots collect
+ * fragments. Alongside height/slots/energy/nutrient it carries the tower's aggregate growth blocker.
+ */
+public final class CropTowerMenu extends AbstractContainerMenu {
+    /**
+     * Left edge of the machine column: the screen bolts a build-guide panel on to the LEFT of the
+     * original 176-wide layout, so every slot (and the screen's drawing) is offset by this much.
+     * Must match {@code client.CropTowerScreen}.
+     */
+    public static final int MACHINE_X = 158;
+    private static final int MACHINE_SLOTS = 10;
+    private static final int OUTPUT_START = 4;
+    public static final int DATA_COUNT = 8;
+    /** Blocked-reason data value used when no tower slot is planted yet. */
+    public static final int NO_CROP = -1;
+    private final Container machine;
+    private final ContainerData data;
+    private final BlockPos blockPos;
+
+    public CropTowerMenu(int id, Inventory inventory) {
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
+    }
+
+    public CropTowerMenu(int id, Inventory inventory, Container machine, ContainerData data, BlockPos blockPos) {
+        super(ModMenuTypes.CROP_TOWER_CONTROLLER.get(), id);
+        checkContainerSize(machine, MACHINE_SLOTS);
+        checkContainerDataCount(data, DATA_COUNT);
+        this.machine = machine;
+        this.data = data;
+        this.blockPos = blockPos;
+        machine.startOpen(inventory.player);
+        // three seed slots + a fertiliser slot (inputs)
+        addSlot(new Slot(machine, 0, MACHINE_X + 26, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(0, s); } });
+        addSlot(new Slot(machine, 1, MACHINE_X + 44, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(1, s); } });
+        addSlot(new Slot(machine, 2, MACHINE_X + 62, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(2, s); } });
+        addSlot(new Slot(machine, 3, MACHINE_X + 26, 44) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(3, s); } });
+        // six output slots (locked)
+        int[][] out = {{116, 20}, {134, 20}, {152, 20}, {116, 38}, {134, 38}, {152, 38}};
+        for (int i = 0; i < 6; i++) {
+            final int slotIndex = OUTPUT_START + i;
+            addSlot(new Slot(machine, slotIndex, MACHINE_X + out[i][0], out[i][1]) { @Override public boolean mayPlace(ItemStack s) { return false; } });
+        }
+        // Player inventory sits 26px lower than the vanilla 176x166 layout: the screen grew to 192 tall to
+        // give the gauges, the growth bar and the status line each their own uncramped row under the slots.
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, MACHINE_X + 8 + col * 18, 110 + row * 18));
+        }
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, MACHINE_X + 8 + col * 18, 168));
+        addDataSlots(data);
+    }
+
+    public BlockPos blockPos() { return blockPos; }
+    public int height() { return data.get(0); }
+    public int activeSlots() { return data.get(1); }
+    /** Permille fraction of the live energy capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
+    public int energy() { return data.get(2); }
+    /** Permille fraction of the live nutrient capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
+    public int nutrient() { return data.get(3); }
+
+    /** Aggregate growth blocker across the tower's planted slots; {@code null} when nothing is planted. */
+    @org.jetbrains.annotations.Nullable
+    public za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason blockedReason() {
+        var reasons = za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason.values();
+        int value = data.get(4);
+        return value >= 0 && value < reasons.length ? reasons[value] : null;
+    }
+
+    /**
+     * Average growth across the tower's planted (active) slots as a permille of max age,
+     * 0..{@link GaugeData#SCALE}, or {@link #NO_CROP} when nothing is planted.
+     */
+    public int growthAvg() { return data.get(5); }
+    /** How many planted slots are mature (ready to harvest). */
+    public int matureSlots() { return data.get(6); }
+    /** How many active slots currently hold a planted crop. */
+    public int plantedSlots() { return data.get(7); }
+
+    @Override public ItemStack quickMoveStack(Player player, int index) {
+        Slot slot = slots.get(index);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+        ItemStack current = slot.getItem();
+        ItemStack copy = current.copy();
+        if (index < MACHINE_SLOTS) {
+            if (!moveItemStackTo(current, MACHINE_SLOTS, slots.size(), true)) return ItemStack.EMPTY;
+        } else if (!moveItemStackTo(current, 0, OUTPUT_START, false)) {
+            return ItemStack.EMPTY;
+        }
+        if (current.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
+        else slot.setChanged();
+        return copy;
+    }
+
+    @Override public boolean stillValid(Player player) { return machine.stillValid(player); }
+    @Override public void removed(Player player) { super.removed(player); machine.stopOpen(player); }
+}

@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:forgite_fragment", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 1400, "ticks": 80, "family": "forgite" }

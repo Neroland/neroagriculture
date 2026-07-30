@@ -28,13 +28,13 @@ public final class CropClimate {
         return hardiness >= hostileRelaxThreshold ? Result.OK : Result.HOSTILE_ENVIRONMENT;
     }
 
-    /** Parse the configured controlled-environment threshold tier to an ordinal; defaults to Orbital. */
+    /** Parse the configured controlled-environment threshold tier to an ordinal; defaults to Orbite. */
     public static int thresholdOrdinal(String tierName) {
         try {
-            return za.co.neroland.neroagriculture.content.EssenceFamily
+            return za.co.neroland.neroagriculture.content.FragmentTier
                     .valueOf(tierName.toUpperCase(java.util.Locale.ROOT)).ordinal();
         } catch (RuntimeException e) {
-            return za.co.neroland.neroagriculture.content.EssenceFamily.ORBITAL.ordinal();
+            return za.co.neroland.neroagriculture.content.FragmentTier.ORBITE.ordinal();
         }
     }
 }

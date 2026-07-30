@@ -22,7 +22,7 @@ traits. All traits are capped (0–5 each, total 15).
 **Is biofuel better than a real generator?**
 No — it is a renewable baseload kept **below** an equivalent primary generator's ceiling by config, so it
 supplements power without replacing dedicated generation. See
-[Biofuel](Biofuel-and-Essence-Blocks.md).
+[Biofuel](Biofuel-and-Fragment-Blocks.md).
 
 **Does terraforming change my world blocks?**
 No. It only makes a bounded region habitable in Agriculture's environment model, and rolls back cleanly —

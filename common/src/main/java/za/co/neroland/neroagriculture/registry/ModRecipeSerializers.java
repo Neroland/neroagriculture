@@ -17,21 +17,24 @@ public final class ModRecipeSerializers {
             RegistrationProvider.get(Registries.RECIPE_SERIALIZER, NeroAgricultureCommon.MOD_ID);
 
     public static final RegistryEntry<RecipeType<FabricationRecipe>> EXTRACTION = type("material_extraction");
-    public static final RegistryEntry<RecipeType<FabricationRecipe>> INFUSING = type("essence_infusing");
+    public static final RegistryEntry<RecipeType<FabricationRecipe>> INFUSING = type("fragment_infusing");
     public static final RegistryEntry<RecipeType<FabricationRecipe>> SYNTHESIZING = type("seed_synthesizing");
     public static final RegistryEntry<RecipeType<FabricationRecipe>> RESEARCHING = type("seed_researching");
     public static final RegistryEntry<RecipeType<FabricationRecipe>> CONVERSION = type("material_conversion");
+    public static final RegistryEntry<RecipeType<FabricationRecipe>> FUSION = type("fragment_fusion");
 
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> EXTRACTION_SERIALIZER =
             serializer("material_extraction", EXTRACTION);
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> INFUSING_SERIALIZER =
-            serializer("essence_infusing", INFUSING);
+            serializer("fragment_infusing", INFUSING);
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> SYNTHESIZING_SERIALIZER =
             serializer("seed_synthesizing", SYNTHESIZING);
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> RESEARCHING_SERIALIZER =
             serializer("seed_researching", RESEARCHING);
     public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> CONVERSION_SERIALIZER =
             serializer("material_conversion", CONVERSION);
+    public static final RegistryEntry<RecipeSerializer<FabricationRecipe>> FUSION_SERIALIZER =
+            serializer("fragment_fusion", FUSION);
 
     private static RegistryEntry<RecipeType<FabricationRecipe>> type(String name) {
         return TYPES.register(name, key -> new RecipeType<FabricationRecipe>() {

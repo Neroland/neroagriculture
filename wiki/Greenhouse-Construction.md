@@ -9,12 +9,38 @@ for when sealing is required.
 
 1. Enclose an airtight room out of any solid blocks. **Greenhouse Frame** and **Greenhouse Glass** are the
    intended shell, but any full solid block counts as a wall — there must be no gaps to the outside.
-2. Place a **Greenhouse Controller** as part of the shell, touching the interior.
-3. Supply the controller with Nero Flux (NF) and, if crops are inside, Nutrient fluid.
+2. Fit a **Greenhouse Door** in a wall so you can walk in and out — as an airlock it never breaks the
+   seal (see below).
+3. Place a **Greenhouse Controller** as part of the shell, touching the interior.
+4. Supply the controller with Nero Flux (NF) and, if crops are inside, Nutrient fluid.
 
 The controller flood-fills the interior air pocket, bounded by the surrounding solid blocks and capped by
 the configured volume limit. Crops (and empty air) count as interior; grow beds and walls are boundary.
-The check runs only when the structure changes or on a slow safety interval — never every tick.
+The check runs on a slow safety interval (a few seconds by default) — never every tick.
+
+The Greenhouse Controller's screen carries this build guide **in-GUI**: a panel down its left-hand column
+walks through the shell, door, and power steps (with a cross-section sketch), so a greenhouse can be built
+without leaving the game.
+
+## The Greenhouse Door (airlock)
+
+The **Greenhouse Door** is a two-block-tall metal-and-glass door, opened and closed by hand like a wooden
+door (no redstone needed). It is the intended way in and out of a sealed greenhouse.
+
+**Airlock seal semantics:** both halves of the door count as valid sealing shell blocks **whether the door
+is open or closed**. The enclosure check treats the door itself as a wall in every state, so opening it to
+walk through never breaches the greenhouse, and revalidation will never flag an open door as a leak. (An
+open door still occupies its block — the interior fill stops at it either way.)
+
+**Crafting** — shaped, yields 3 doors (a glazed upper panel on a framed base):
+
+| | |
+| --- | --- |
+| Greenhouse Glass | Greenhouse Glass |
+| Greenhouse Glass | Greenhouse Glass |
+| Greenhouse Frame | Greenhouse Frame |
+
+Like any door, it drops itself when the lower half is broken, and it is part of the vanilla `doors` tags.
 
 ## Powering and upkeep
 

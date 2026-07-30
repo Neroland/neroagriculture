@@ -26,6 +26,7 @@ public final class CatalogResolver {
         Map<Identifier, ResolvedMaterial> all = new LinkedHashMap<>();
         Comparator<Candidate> order = Comparator.comparingInt((Candidate c) -> c.source().priority())
                 .thenComparing(Candidate::detail);
+        int shadowedIds = 0;
         for (Map.Entry<Identifier, List<Candidate>> entry : grouped.entrySet()) {
             List<Candidate> candidates = entry.getValue().stream().sorted(order).toList();
             Candidate winner = candidates.getFirst();
@@ -51,11 +52,15 @@ public final class CatalogResolver {
             }
             List<String> shadowed = candidates.stream().skip(1)
                     .map(candidate -> candidate.source().name().toLowerCase() + ":" + candidate.detail()).toList();
-            if (!shadowed.isEmpty()) {
-                errors.add(entry.getKey() + ": selected " + source.name().toLowerCase() + ":" + detail
-                        + "; shadowed " + String.join(", ", shadowed));
-            }
+            if (!shadowed.isEmpty()) shadowedIds++;
             all.put(entry.getKey(), new ResolvedMaterial(definition, source, detail, shadowed));
+        }
+        // One aggregate line instead of a WARN per id: on big packs nearly every builtin is shadowed by
+        // a datapack/config definition, which used to spam the log on every reload. The per-id detail
+        // survives on each ResolvedMaterial and is logged at debug level by MaterialCatalog#reload.
+        if (shadowedIds > 0) {
+            errors.add(shadowedIds + " material id(s) had lower-priority candidates shadowed by a"
+                    + " higher-priority source (per-id detail at debug level)");
         }
 
         int cap = Math.max(0, configuredCap);

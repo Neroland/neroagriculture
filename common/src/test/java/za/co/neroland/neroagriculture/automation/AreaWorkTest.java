@@ -12,17 +12,18 @@ import org.junit.jupiter.api.Test;
 
 class AreaWorkTest {
     @Test
-    void radiusClampsToThreeByThreeThroughNineByNine() {
-        assertEquals(1, AreaWork.radius(0), "no range upgrades = 3x3");
-        assertEquals(2, AreaWork.radius(1));
-        assertEquals(4, AreaWork.radius(3), "three range upgrades = 9x9");
-        assertEquals(4, AreaWork.radius(99), "clamped at 9x9");
-        assertEquals(1, AreaWork.radius(-5), "negative clamps to minimum");
+    void radiusClampsToSevenBySevenThroughThirteenByThirteen() {
+        assertEquals(3, AreaWork.radius(0), "no range upgrades = 7x7 (3 blocks each side)");
+        assertEquals(4, AreaWork.radius(1));
+        assertEquals(6, AreaWork.radius(3), "three range upgrades = 13x13");
+        assertEquals(6, AreaWork.radius(99), "clamped at 13x13");
+        assertEquals(3, AreaWork.radius(-5), "negative clamps to minimum");
     }
 
     @Test
     void columnCountsMatchTheSquare() {
         assertEquals(9, AreaWork.columns(1));
+        assertEquals(49, AreaWork.columns(3));
         assertEquals(81, AreaWork.columns(4));
     }
 

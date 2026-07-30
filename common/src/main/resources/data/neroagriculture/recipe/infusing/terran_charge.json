@@ -1,1 +1,0 @@
-{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:terran_essence", "result": { "id": "neroagriculture:charged_seed" }, "input_count": 8, "energy": 800, "ticks": 60, "family": "terran" }

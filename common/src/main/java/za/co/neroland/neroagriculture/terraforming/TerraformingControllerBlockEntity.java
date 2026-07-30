@@ -4,9 +4,15 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,8 +26,11 @@ import org.jetbrains.annotations.Nullable;
 import za.co.neroland.neroagriculture.api.AgricultureApi;
 import za.co.neroland.neroagriculture.automation.AutomationOwner;
 import za.co.neroland.neroagriculture.automation.AutomationPolicy;
+import za.co.neroland.neroagriculture.automation.ErasedOwners;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.fluid.ModFluids;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
+import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
@@ -30,6 +39,7 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 
 /**
  * Terraforming controller. A planted Terraforming Seed starts a rate-limited project that spends NF and
@@ -38,7 +48,8 @@ import za.co.neroland.nerolandcore.sideconfig.SideMode;
  * chunks, respects the claim/owner policy (fail-closed), and rolls back cleanly. Progress/completion/rollback
  * are published through the public {@link AgricultureApi} terraforming events.
  */
-public final class TerraformingControllerBlockEntity extends AbstractMachineBlockEntity implements AutomationOwner.Owned {
+public final class TerraformingControllerBlockEntity extends AbstractMachineBlockEntity
+        implements AutomationOwner.Owned, MenuProvider {
     private final FluidBuffer nutrient;
     private boolean seeded;
     private int progress;
@@ -51,6 +62,7 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
                 AgricultureConfig.MACHINE_ENERGY_RATE.get(), 0, stack -> null);
         this.nutrient = new FluidBuffer(AgricultureConfig.MACHINE_FLUID_CAPACITY.get(), this::setChanged);
         installSideConfig(SideConfig.builder().channel(Channel.ENERGY).channel(Channel.FLUID)
+                .defaultPreset(SidePreset.PROCESSOR)
                 .allow(Channel.ENERGY, SideMode.OUTPUT, false).allow(Channel.FLUID, SideMode.OUTPUT, false).build())
                 .withFluid(this::getFluid);
     }
@@ -58,11 +70,34 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
     public NeroFluidStorage getFluid() { return nutrient; }
     public TerraformingStage stage() { return stage; }
     public int progress() { return progress; }
+
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            int total = AgricultureConfig.TERRAFORM_TOTAL_PROGRESS.get();
+            return switch (index) {
+                case StatusMenu.MACHINE_ID -> StatusMenu.ID_TERRAFORMING;
+                // Permille fraction: ContainerData syncs shorts and the capacity can exceed 32,767.
+                case StatusMenu.ENERGY -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                case StatusMenu.V0 -> total <= 0 ? 100 : (int) (100L * progress / total);
+                case StatusMenu.V1 -> stage.ordinal();
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return StatusMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new StatusMenu(id, inventory, menuData, worldPosition, this);
+    }
     @Override public @Nullable UUID automationOwner() { return owner; }
     @Override public void clearAutomationOwner() { owner = null; setChanged(); }
 
     public static void tick(Level level, BlockPos pos, BlockState state, TerraformingControllerBlockEntity be) {
         AbstractMachineBlockEntity.tick(level, pos, state, be);
+        SideConfigMigration.tick(be);
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (!be.restored) {
             be.restored = true;
@@ -102,8 +137,11 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
     public boolean start(ServerLevel level, ServerPlayer player, ItemStack held) {
         if (seeded || !held.is(ModItems.TERRAFORMING_SEED.get())) return false;
         if (!AgricultureConfig.TERRAFORM_ENABLED.get()) return false;
-        this.owner = AutomationOwner.trackingEnabled() ? player.getUUID() : null;
-        if (!authorized(level)) return false;
+        // Authorise against the candidate owner but only RECORD the UUID once authorisation succeeds,
+        // so a denied attempt never persists the player's UUID on the block entity.
+        UUID candidate = AutomationOwner.trackingEnabled() ? player.getUUID() : null;
+        if (!AutomationPolicy.mayEdit(level, worldPosition, candidate)) return false;
+        this.owner = candidate;
         seeded = true;
         progress = 0;
         stage = TerraformingStage.SEEDED;
@@ -162,7 +200,13 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         AutomationOwner.untrack(this);
         super.setRemoved();
     }
-    @Override public void clearRemoved() { super.clearRemoved(); AutomationOwner.track(this); }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = ErasedOwners.filter(owner, serverLevel.getServer());
+        }
+    }
 
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
@@ -171,10 +215,12 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         output.putInt("Seeded", seeded ? 1 : 0);
         output.putInt("Progress", progress);
         AutomationOwner.save(output, owner);
+        SideConfigMigration.save(output);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(input.getStringOr("NutrientFluid", "minecraft:empty")));
         nutrient.setRaw(fluid == null ? Fluids.EMPTY : fluid, input.getIntOr("NutrientAmount", 0));
         seeded = input.getBooleanOr("Seeded", false);

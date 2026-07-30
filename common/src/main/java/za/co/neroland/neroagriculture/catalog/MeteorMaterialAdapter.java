@@ -9,7 +9,7 @@ import za.co.neroland.neroagriculture.catalog.MaterialDefinition.InputSelector;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.InputSelector.Kind;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.WorldRestriction;
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition.Yield;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.nerolandcore.meteor.MeteorMaterialEntry;
 
 /** Read-only adaptation of Core metadata; Core's registry is never mutated. */
@@ -19,11 +19,11 @@ public final class MeteorMaterialAdapter {
     public static List<Candidate> adapt(Collection<MeteorMaterialEntry> entries) {
         List<Candidate> result = new ArrayList<>();
         for (MeteorMaterialEntry entry : entries) {
-            EssenceFamily tier = switch (entry.tier()) {
-                case COMMON -> EssenceFamily.INDUSTRIAL;
-                case UNCOMMON -> EssenceFamily.ORBITAL;
-                case RARE -> EssenceFamily.COLONIAL;
-                case EXOTIC -> EssenceFamily.DEEPVOID;
+            FragmentTier tier = switch (entry.tier()) {
+                case COMMON -> FragmentTier.FORGITE;
+                case UNCOMMON -> FragmentTier.ORBITE;
+                case RARE -> FragmentTier.COLONITE;
+                case EXOTIC -> FragmentTier.VOIDITE;
             };
             MaterialDefinition definition = new MaterialDefinition(entry.id(), new InputSelector(Kind.ITEM, entry.item()),
                     entry.item(), tier, entry.minGate() == null ? MaterialDefinitionParser.defaultGate(tier) : entry.minGate(),

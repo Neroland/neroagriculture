@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import za.co.neroland.neroagriculture.catalog.MaterialDefinition;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 class YieldCurveTest {
     @Test
     void everyTierHonoursMinimumRampAndCapBoundaries() {
-        for (EssenceFamily tier : EssenceFamily.values()) {
+        for (FragmentTier tier : FragmentTier.values()) {
             int max = tier.ordinal() + 3;
             int ramp = 32 * (tier.ordinal() + 1);
             MaterialDefinition.Yield yield = new MaterialDefinition.Yield(1, max, ramp);
@@ -34,7 +34,7 @@ class YieldCurveTest {
 
     @Test
     void freshSeedNeverStartsAtMaximum() {
-        for (EssenceFamily tier : EssenceFamily.values()) {
+        for (FragmentTier tier : FragmentTier.values()) {
             int max = tier.ordinal() + 3;
             int ramp = 32 * (tier.ordinal() + 1);
             MaterialDefinition.Yield yield = new MaterialDefinition.Yield(1, max, ramp);

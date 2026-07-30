@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:material_extraction", "ingredient": "minecraft:echo_shard", "result": { "id": "neroagriculture:deepvoid_essence", "count": 2 }, "energy": 4000, "ticks": 200, "material": "minecraft:echo_shard", "family": "deepvoid" }
+{ "type": "neroagriculture:material_extraction", "ingredient": "minecraft:echo_shard", "result": { "id": "neroagriculture:voidite_fragment", "count": 2 }, "energy": 4000, "ticks": 200, "material": "minecraft:echo_shard", "family": "voidite" }

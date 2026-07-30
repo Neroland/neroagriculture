@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 
 /** Strict datapack parser with field-specific errors suitable for logs and admin diagnostics. */
 public final class MaterialDefinitionParser {
@@ -27,7 +27,7 @@ public final class MaterialDefinitionParser {
                     hasItem ? MaterialDefinition.InputSelector.Kind.ITEM : MaterialDefinition.InputSelector.Kind.TAG,
                     identifier(requiredString(selectorJson, hasItem ? "item" : "tag"), "input"));
             Identifier output = identifier(requiredString(json, "output"), "output");
-            EssenceFamily tier = tier(requiredString(json, "tier"));
+            FragmentTier tier = tier(requiredString(json, "tier"));
             Identifier gate = json.has("gate")
                     ? (json.get("gate").isJsonNull() ? null : identifier(json.get("gate").getAsString(), "gate"))
                     : defaultGate(tier);
@@ -49,18 +49,15 @@ public final class MaterialDefinitionParser {
     }
 
     @Nullable
-    public static Identifier defaultGate(EssenceFamily tier) {
-        return switch (tier) {
-            case TERRAN -> null;
-            case INDUSTRIAL -> Identifier.parse("nerolandcore:industrial_power");
-            case ORBITAL -> Identifier.parse("nerolandcore:reached_orbit");
-            case COLONIAL -> Identifier.parse("nerolandcore:first_colony");
-            case DEEPVOID -> Identifier.parse("nerolandcore:deep_space");
-        };
+    public static Identifier defaultGate(FragmentTier tier) {
+        // No hard gates by default (playtest decision 2026-07-16): every tier is open out of the box.
+        // Pack-makers can still gate materials explicitly via datapack/config ("gate": id), and the
+        // native gate ids in AgricultureGates remain registered + opened for packs that want them.
+        return null;
     }
 
-    private static EssenceFamily tier(String raw) {
-        try { return EssenceFamily.valueOf(raw.toUpperCase(java.util.Locale.ROOT)); }
+    private static FragmentTier tier(String raw) {
+        try { return FragmentTier.valueOf(raw.toUpperCase(java.util.Locale.ROOT)); }
         catch (IllegalArgumentException e) { throw new IllegalArgumentException("unknown tier '" + raw + "'"); }
     }
 
@@ -69,13 +66,15 @@ public final class MaterialDefinitionParser {
         catch (RuntimeException e) { throw new IllegalArgumentException(field + " is not a valid identifier: '" + raw + "'"); }
     }
 
+    /** JSON numbers are decimal RGB; strings go through the shared lenient parser (#/0x/hex/decimal). */
     private static int parseColor(@Nullable JsonElement element) {
         if (element == null || element.isJsonNull()) throw new IllegalArgumentException("missing color");
-        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) return element.getAsInt();
-        String raw = element.getAsString().trim();
-        if (raw.startsWith("#")) raw = raw.substring(1);
-        try { return Integer.parseInt(raw, 16); }
-        catch (NumberFormatException e) { throw new IllegalArgumentException("color must be RGB integer or #RRGGBB"); }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
+            int value = element.getAsInt();
+            if ((value & 0xFF000000) != 0) throw new IllegalArgumentException("color must be a 24-bit RGB value");
+            return value;
+        }
+        return MaterialColors.parseColor(element.getAsString());
     }
 
     private static JsonObject requiredObject(JsonObject json, String field) {

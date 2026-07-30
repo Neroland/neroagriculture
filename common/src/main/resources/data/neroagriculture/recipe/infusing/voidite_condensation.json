@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:colonite_fragment", "result": { "id": "neroagriculture:voidite_fragment" }, "input_count": 4, "energy": 4800, "ticks": 160, "family": "voidite" }

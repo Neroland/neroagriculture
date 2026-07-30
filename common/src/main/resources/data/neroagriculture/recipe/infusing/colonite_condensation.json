@@ -1,0 +1,1 @@
+{ "type": "neroagriculture:fragment_infusing", "ingredient": "neroagriculture:orbite_fragment", "result": { "id": "neroagriculture:colonite_fragment" }, "input_count": 4, "energy": 3200, "ticks": 120, "family": "colonite" }

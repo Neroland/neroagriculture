@@ -1,0 +1,8 @@
+{
+  "type": "neroagriculture:material_conversion",
+  "ingredient": "neroagriculture:resource_fragment",
+  "result": { "id": "neroagriculture:resource_fragment" },
+  "input_count": 1,
+  "energy": 1200,
+  "ticks": 80
+}

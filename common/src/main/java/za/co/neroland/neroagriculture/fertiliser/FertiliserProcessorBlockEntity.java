@@ -2,6 +2,11 @@ package za.co.neroland.neroagriculture.fertiliser;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
@@ -16,16 +21,18 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
 
 /** NF-powered processor: biomass + crop waste to base fertiliser, on Core machine/side-config surfaces. */
-public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer {
+public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
     public static final int BIOMASS = 0;
     public static final int WASTE = 1;
     public static final int OUTPUT = 2;
@@ -36,17 +43,44 @@ public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEn
     private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
     private int progress;
 
+    // Gauge slots ship as permille fractions: ContainerData syncs shorts, and the configured energy
+    // capacity can exceed 32,767 (see menu.GaugeData).
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(progress, PROCESS_TICKS);
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.SCALE;
+                case 2 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                default -> 0;
+            };
+        }
+        // Only the client's SimpleContainerData copy ever receives set(); the slots are scaled fractions.
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return za.co.neroland.neroagriculture.menu.ProcessorMenu.DATA_COUNT; }
+    };
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
+        return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
+                za.co.neroland.neroagriculture.registry.ModMenuTypes.PROCESSOR.get(), id, inventory, this,
+                menuData, worldPosition, 2);
+    }
+
     public FertiliserProcessorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FERTILISER_PROCESSOR.get(), pos, state, AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(),
                 AgricultureConfig.MACHINE_ENERGY_RATE.get(), 0, stack -> null);
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, SlotGroup.of("input", BIOMASS, WASTE), SlotGroup.of("output", OUTPUT))
-                .channel(Channel.ENERGY).allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
+                .channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
+                .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, FertiliserProcessorBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (level instanceof ServerLevel) machine.process();
     }
 
@@ -98,13 +132,22 @@ public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEn
     @Override public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return slot == OUTPUT; }
     @Override public void clearContent() { items.clear(); setChanged(); }
 
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
+    }
+
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
         output.putInt("Progress", progress);
+        SideConfigMigration.save(output);
     }
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         progress = Math.max(0, input.getIntOr("Progress", 0));
     }

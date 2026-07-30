@@ -13,7 +13,7 @@ import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
 import za.co.neroland.neroagriculture.catalog.CatalogResolver.Candidate;
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.crop.CropVariantState;
 
 class CatalogReloadSafetyTest {
@@ -21,19 +21,19 @@ class CatalogReloadSafetyTest {
     void addChangeRemoveAndReaddNeverReassignStoredId() {
         Identifier id = Identifier.parse("pack:osmium");
         CropVariantState stored = CropVariantState.fresh(id).harvested().harvested();
-        ResolvedCatalog added = catalog(definition(id, EssenceFamily.ORBITAL, 0x778899));
+        ResolvedCatalog added = catalog(definition(id, FragmentTier.ORBITE, 0x778899));
         assertTrue(added.lookup(stored.material()).permitsGrowth());
 
-        ResolvedCatalog changed = catalog(definition(id, EssenceFamily.COLONIAL, 0x998877));
+        ResolvedCatalog changed = catalog(definition(id, FragmentTier.COLONITE, 0x998877));
         assertEquals(id, stored.material());
         assertEquals(2, stored.harvestCount());
-        assertEquals(EssenceFamily.COLONIAL, changed.lookup(id).material().orElseThrow().definition().tier());
+        assertEquals(FragmentTier.COLONITE, changed.lookup(id).material().orElseThrow().definition().tier());
 
         ResolvedCatalog removed = CatalogResolver.resolve(List.of(), Set.of(), Map.of(), 512, List.of());
         assertFalse(removed.lookup(stored.material()).permitsGrowth());
         assertEquals(ResolvedCatalog.Status.UNKNOWN, removed.lookup(stored.material()).status());
 
-        ResolvedCatalog readded = catalog(definition(id, EssenceFamily.DEEPVOID, 0x554466));
+        ResolvedCatalog readded = catalog(definition(id, FragmentTier.VOIDITE, 0x554466));
         assertTrue(readded.lookup(stored.material()).permitsGrowth());
         assertEquals(id, stored.material());
     }
@@ -43,7 +43,7 @@ class CatalogReloadSafetyTest {
                 Set.of(), Map.of(), 512, List.of());
     }
 
-    private static MaterialDefinition definition(Identifier id, EssenceFamily tier, int color) {
+    private static MaterialDefinition definition(Identifier id, FragmentTier tier, int color) {
         return new MaterialDefinition(id, new MaterialDefinition.InputSelector(
                 MaterialDefinition.InputSelector.Kind.ITEM, Identifier.parse("minecraft:iron_ingot")),
                 Identifier.parse("minecraft:iron_ingot"), tier, MaterialDefinitionParser.defaultGate(tier),

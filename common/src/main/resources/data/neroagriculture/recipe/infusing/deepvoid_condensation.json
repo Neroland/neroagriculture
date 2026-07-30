@@ -1,1 +1,0 @@
-{ "type": "neroagriculture:essence_infusing", "ingredient": "neroagriculture:colonial_essence", "result": { "id": "neroagriculture:deepvoid_essence" }, "input_count": 4, "energy": 4800, "ticks": 160, "family": "deepvoid" }

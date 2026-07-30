@@ -5,11 +5,16 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.AgricultureUpgradeItem;
+import za.co.neroland.neroagriculture.machine.SideConfigMigration;
+import za.co.neroland.neroagriculture.menu.AreaMachineMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -28,11 +35,12 @@ import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
 import za.co.neroland.nerolandcore.sideconfig.Channel;
 import za.co.neroland.nerolandcore.sideconfig.SideConfig;
 import za.co.neroland.nerolandcore.sideconfig.SideMode;
+import za.co.neroland.nerolandcore.sideconfig.SidePreset;
 import za.co.neroland.nerolandcore.upgrade.UpgradeType;
 
 /** Bounded, interval-batched Planter/Harvester. One BE serves both modes, selected from its block. */
 public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
-        implements WorldlyContainer, AutomationOwner.Owned {
+        implements WorldlyContainer, AutomationOwner.Owned, MenuProvider {
     public enum Mode { PLANT, HARVEST, APPLY }
 
     public static final int SLOT_COUNT = 9;
@@ -51,7 +59,9 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("input", SLOTS),
                         za.co.neroland.nerolandcore.sideconfig.SlotGroup.of("output", SLOTS))
-                .channel(Channel.ENERGY).allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
+                .channel(Channel.ENERGY)
+                .defaultPreset(SidePreset.PROCESSOR)
+                .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
                 .withItems(() -> this);
         this.workTimer = 1 + AreaWork.phaseOffset(pos, AgricultureConfig.AUTOMATION_INTERVAL.get());
     }
@@ -63,6 +73,39 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         return Mode.PLANT;
     }
 
+    private boolean showArea;
+
+    // The energy slot ships as a permille fraction: ContainerData syncs shorts, and the configured
+    // energy capacity can exceed 32,767 (see menu.GaugeData).
+    private final ContainerData menuData = new ContainerData() {
+        @Override public int get(int index) {
+            return switch (index) {
+                case 0 -> mode().ordinal();
+                case 1 -> za.co.neroland.neroagriculture.menu.GaugeData.permille(
+                        getEnergy().getAmount(), getEnergy().getCapacity());
+                case 2 -> 2 * AreaWork.radius(upgrades.count(UpgradeType.RANGE)) + 1;
+                case 3 -> showArea ? 1 : 0;
+                default -> 0;
+            };
+        }
+        @Override public void set(int index, int value) { }
+        @Override public int getCount() { return 4; }
+    };
+
+    public void toggleShowArea() {
+        showArea = !showArea;
+        setChanged();
+    }
+
+    @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
+    @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            za.co.neroland.neroagriculture.network.AgricultureNetwork.sendToPlayer(serverPlayer,
+                    new za.co.neroland.neroagriculture.network.MachineMenuPositionPayload(id, worldPosition.asLong()));
+        }
+        return new AreaMachineMenu(id, inventory, this, menuData, worldPosition);
+    }
+
     @Override public @Nullable UUID automationOwner() { return owner; }
     @Override public void clearAutomationOwner() { owner = null; setChanged(); }
     public void setOwner(@Nullable UUID owner) {
@@ -72,10 +115,28 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
 
     public static void tick(Level level, BlockPos pos, BlockState state, AreaMachineBlockEntity machine) {
         AbstractMachineBlockEntity.tick(level, pos, state, machine);
+        SideConfigMigration.tick(machine);
         if (!(level instanceof ServerLevel serverLevel)) return;
+        if (machine.showArea && level.getGameTime() % 10 == 0) machine.emitAreaHologram(serverLevel);
         if (--machine.workTimer > 0) return;
         machine.workTimer = Math.max(1, AgricultureConfig.AUTOMATION_INTERVAL.get());
         machine.runPass(serverLevel);
+    }
+
+    /** "Hologram" outline of the working area: end-rod particles along the square perimeter. */
+    private void emitAreaHologram(ServerLevel level) {
+        int radius = AreaWork.radius(upgrades.count(UpgradeType.RANGE));
+        double y = worldPosition.getY() + 1.15;
+        for (int d = -radius; d <= radius; d++) {
+            spawnMarker(level, worldPosition.getX() + d + 0.5, y, worldPosition.getZ() - radius + 0.5);
+            spawnMarker(level, worldPosition.getX() + d + 0.5, y, worldPosition.getZ() + radius + 0.5);
+            spawnMarker(level, worldPosition.getX() - radius + 0.5, y, worldPosition.getZ() + d + 0.5);
+            spawnMarker(level, worldPosition.getX() + radius + 0.5, y, worldPosition.getZ() + d + 0.5);
+        }
+    }
+
+    private static void spawnMarker(ServerLevel level, double x, double y, double z) {
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, x, y, z, 1, 0, 0, 0, 0);
     }
 
     private void runPass(ServerLevel level) {
@@ -265,16 +326,33 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
         super.saveAdditional(output);
         ContainerHelper.saveAllItems(output, items);
         output.putInt("Cursor", cursor);
+        output.putBoolean("ShowArea", showArea);
         AutomationOwner.save(output, owner);
+        SideConfigMigration.save(output);
     }
 
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        SideConfigMigration.load(this, input);
         ContainerHelper.loadAllItems(input, items);
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
+        showArea = input.getBooleanOr("ShowArea", false);
         owner = AutomationOwner.load(input);
     }
 
     @Override public void setRemoved() { AutomationOwner.untrack(this); super.setRemoved(); }
-    @Override public void clearRemoved() { super.clearRemoved(); AutomationOwner.track(this); }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = ErasedOwners.filter(owner, serverLevel.getServer());
+        }
+    }
+
+    /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
+    }
 }

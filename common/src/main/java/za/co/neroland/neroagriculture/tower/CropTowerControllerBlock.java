@@ -3,10 +3,8 @@ package za.co.neroland.neroagriculture.tower;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -35,19 +33,19 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
-            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
-                    level.dimension().identifier(), level.getGameTime());
-            player.sendSystemMessage(Component.literal("[NeroAgriculture] crop tower " + tower.status() + " cycle=" + cycle));
+            player.openMenu(tower);
         }
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-            @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof CropTowerControllerBlockEntity tower) tower.dropTowerContents(level);
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
     }
+
+    // Contents (stored items + slot seeds) drop from CropTowerControllerBlockEntity#preRemoveSideEffects
+    // (covers creative breaks and explosions too), so no playerDestroy override is needed here.
 
     @Nullable
     @Override

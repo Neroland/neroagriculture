@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.resources.Identifier;
 
-import za.co.neroland.neroagriculture.content.EssenceFamily;
+import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.food.FoodDefinition.Kind;
 
 /**
@@ -19,47 +19,47 @@ public final class BuiltinFoods {
         List<FoodDefinition> out = new ArrayList<>();
 
         // Earth — nutrition baseline and an early night-vision food.
-        food(out, "earth_grain_loaf", EffectCategory.NONE, 0, 0, EssenceFamily.TERRAN, PlanetTheme.EARTH,
+        food(out, "earth_grain_loaf", EffectCategory.NONE, 0, 0, FragmentTier.TERRITE, PlanetTheme.EARTH,
                 6, 0.6F, 0, 0, 0xD9B44A);
-        food(out, "earth_sunfruit", EffectCategory.NIGHT_VISION, 0, 2400, EssenceFamily.TERRAN, PlanetTheme.EARTH,
+        food(out, "earth_sunfruit", EffectCategory.NIGHT_VISION, 0, 2400, FragmentTier.TERRITE, PlanetTheme.EARTH,
                 4, 0.4F, 0, 6000, 0xE8C34A);
 
         // Greenxertz — lush low-gravity world: low-gravity adaptation and oxygen efficiency.
-        food(out, "greenxertz_driftmelon", EffectCategory.LOW_GRAVITY_ADAPTATION, 0, 3600, EssenceFamily.INDUSTRIAL,
+        food(out, "greenxertz_driftmelon", EffectCategory.LOW_GRAVITY_ADAPTATION, 0, 3600, FragmentTier.FORGITE,
                 PlanetTheme.GREENXERTZ, 6, 0.6F, 1, 6000, 0x7FD68A);
-        food(out, "greenxertz_lungmoss", EffectCategory.OXYGEN_EFFICIENCY, 0, 3600, EssenceFamily.INDUSTRIAL,
+        food(out, "greenxertz_lungmoss", EffectCategory.OXYGEN_EFFICIENCY, 0, 3600, FragmentTier.FORGITE,
                 PlanetTheme.GREENXERTZ, 5, 0.5F, 1, 9600, 0x4FBF6E);
 
         // Cindara — volcanic world: fire resistance and mining haste.
-        food(out, "cindara_emberroot", EffectCategory.FIRE_RESISTANCE, 0, 3600, EssenceFamily.ORBITAL,
+        food(out, "cindara_emberroot", EffectCategory.FIRE_RESISTANCE, 0, 3600, FragmentTier.ORBITE,
                 PlanetTheme.CINDARA, 6, 0.7F, 0, 9600, 0xD5622A);
-        food(out, "cindara_magmagourd", EffectCategory.MINING_HASTE, 0, 2400, EssenceFamily.ORBITAL,
+        food(out, "cindara_magmagourd", EffectCategory.MINING_HASTE, 0, 2400, FragmentTier.ORBITE,
                 PlanetTheme.CINDARA, 7, 0.6F, 2, 6000, 0xE0853A);
 
         // Glacira — frozen dark world: freeze immunity and night vision.
-        food(out, "glacira_frostberry", EffectCategory.FREEZE_IMMUNITY, 0, 3600, EssenceFamily.ORBITAL,
+        food(out, "glacira_frostberry", EffectCategory.FREEZE_IMMUNITY, 0, 3600, FragmentTier.ORBITE,
                 PlanetTheme.GLACIRA, 4, 0.4F, 0, 9600, 0x8FC8E8);
-        food(out, "glacira_glowcap", EffectCategory.NIGHT_VISION, 0, 4800, EssenceFamily.COLONIAL,
+        food(out, "glacira_glowcap", EffectCategory.NIGHT_VISION, 0, 4800, FragmentTier.COLONITE,
                 PlanetTheme.GLACIRA, 5, 0.5F, 0, 9600, 0xB6E0F0);
 
         // Alien natural strains — found, never synthesized until a derived strain is researched.
-        alien(out, "voidchorus", true, EffectCategory.NONE, 0, 0, EssenceFamily.ORBITAL, PlanetTheme.EARTH,
+        alien(out, "voidchorus", true, EffectCategory.NONE, 0, 0, FragmentTier.ORBITE, PlanetTheme.EARTH,
                 6, 0.5F, 0, 0, 0x9B4FD1);
-        alien(out, "greenxertz_sporepod", true, EffectCategory.OXYGEN_EFFICIENCY, 0, 3600, EssenceFamily.COLONIAL,
+        alien(out, "greenxertz_sporepod", true, EffectCategory.OXYGEN_EFFICIENCY, 0, 3600, FragmentTier.COLONITE,
                 PlanetTheme.GREENXERTZ, 5, 0.5F, 1, 9600, 0x6ED0A0);
         // Alien derived strain — researched/bred, so the Synthesizer accepts it.
-        alien(out, "hybrid_gloomvine", false, EffectCategory.NIGHT_VISION, 0, 4800, EssenceFamily.COLONIAL,
+        alien(out, "hybrid_gloomvine", false, EffectCategory.NIGHT_VISION, 0, 4800, FragmentTier.COLONITE,
                 PlanetTheme.EARTH, 5, 0.5F, 0, 9600, 0x7A6FC0);
 
         // Oxygen flora — low-nutrition greenhouse life-support plants that contribute oxygen.
-        oxygenFlora(out, "earth_algae", EssenceFamily.TERRAN, PlanetTheme.EARTH, 1, 3, 0x3FA66A);
-        oxygenFlora(out, "greenxertz_oxyvine", EssenceFamily.INDUSTRIAL, PlanetTheme.GREENXERTZ, 2, 5, 0x5FE08A);
+        oxygenFlora(out, "earth_algae", FragmentTier.TERRITE, PlanetTheme.EARTH, 1, 3, 0x3FA66A);
+        oxygenFlora(out, "greenxertz_oxyvine", FragmentTier.FORGITE, PlanetTheme.GREENXERTZ, 2, 5, 0x5FE08A);
 
         return List.copyOf(out);
     }
 
     private static void food(List<FoodDefinition> out, String path, EffectCategory effect, int amplifier,
-            int durationTicks, EssenceFamily tier, PlanetTheme theme, int nutrition, float saturation,
+            int durationTicks, FragmentTier tier, PlanetTheme theme, int nutrition, float saturation,
             int potencyCap, int durationCap, int color) {
         Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "food/" + path);
         out.add(new FoodDefinition(id, Kind.FOOD, false, effect, amplifier, durationTicks, potencyCap, durationCap,
@@ -67,14 +67,14 @@ public final class BuiltinFoods {
     }
 
     private static void alien(List<FoodDefinition> out, String path, boolean natural, EffectCategory effect,
-            int amplifier, int durationTicks, EssenceFamily tier, PlanetTheme theme, int nutrition, float saturation,
+            int amplifier, int durationTicks, FragmentTier tier, PlanetTheme theme, int nutrition, float saturation,
             int potencyCap, int durationCap, int color) {
         Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "alien/" + path);
         out.add(new FoodDefinition(id, Kind.ALIEN, natural, effect, amplifier, durationTicks, potencyCap, durationCap,
                 nutrition, saturation, tier, theme, true, null, "alien.neroagriculture." + path, color, 0));
     }
 
-    private static void oxygenFlora(List<FoodDefinition> out, String path, EssenceFamily tier, PlanetTheme theme,
+    private static void oxygenFlora(List<FoodDefinition> out, String path, FragmentTier tier, PlanetTheme theme,
             int nutrition, int oxygenProduction, int color) {
         Identifier id = Identifier.fromNamespaceAndPath("neroagriculture", "food/" + path);
         out.add(new FoodDefinition(id, Kind.FOOD, false, EffectCategory.NONE, 0, 0, 0, 0, nutrition, 0.2F, tier,

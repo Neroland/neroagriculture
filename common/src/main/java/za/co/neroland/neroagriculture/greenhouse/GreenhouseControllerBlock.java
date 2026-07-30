@@ -3,7 +3,6 @@ package za.co.neroland.neroagriculture.greenhouse;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -34,17 +33,16 @@ public final class GreenhouseControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
             BlockHitResult hit) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof GreenhouseControllerBlockEntity controller) {
-            String leak = controller.leak() == null ? "none" : controller.leak().toShortString();
-            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
-                    level.dimension().identifier(), level.getGameTime());
-            player.sendSystemMessage(Component.literal("Greenhouse " + controller.state().name().toLowerCase()
-                    + " volume=" + controller.volume() + " crops=" + controller.activeCrops()
-                    + " oxygen=" + controller.oxygen() + " NF=" + controller.getEnergy().getAmount()
-                    + " nutrient=" + controller.getFluid().getAmount() + "mb leak=" + leak + " cycle=" + cycle));
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof GreenhouseControllerBlockEntity controller) {
+            player.openMenu(controller);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
     }
 
     @Nullable
