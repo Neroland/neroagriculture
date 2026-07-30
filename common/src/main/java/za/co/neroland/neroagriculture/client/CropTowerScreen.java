@@ -17,9 +17,10 @@ import za.co.neroland.neroagriculture.menu.GaugeData;
 
 /**
  * Texture-free screen for the Crop Tower Controller (drawn with {@code fill}/{@code text} like
- * {@link FoundationMachineScreen}): three seed slots plus a fertiliser slot on the left, six output
- * slots on the right, an energy gauge, a nutrient gauge, a readout of tower height and active slots, a
- * live blocker line, and a scrollable seed panel down the right-hand column.
+ * {@link FoundationMachineScreen}): a build-guide panel down the left-hand column, then the machine
+ * column — three seed slots plus a fertiliser slot, six output slots, an energy gauge, a nutrient gauge,
+ * the growth bar with the tower height/slots readout beside it, and a live blocker line, each on its own
+ * row — and a scrollable seed panel down the right-hand column.
  *
  * <p>The tower has no bed, so it has <em>no tier gate</em> — every resource seed it accepts is a seed it
  * will grow. The panel therefore lists the whole catalogue as growable and says where the gate actually
@@ -37,13 +38,25 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
 
-    /** Machine column keeps the original 176 layout; the panel column is bolted on to its right. */
+    // Build-guide diagram cells (a sketch, not pixel art): steel casing frames over an amber controller.
+    private static final int FRAME_CELL = 0xFF8C9AA4;
+    private static final int CONTROLLER_CELL = 0xFFE0B33A;
+
+    /**
+     * Three columns: the guide panel on the left, the original 176-wide machine layout in the middle
+     * (every slot and drawing x-offset shifted by {@link CropTowerMenu#MACHINE_X}), and the seed panel
+     * on the right.
+     */
+    private static final int MACHINE_X = CropTowerMenu.MACHINE_X;
     private static final int MACHINE_WIDTH = 176;
-    private static final int PANEL_X = MACHINE_WIDTH;
-    private static final int WIDTH = MACHINE_WIDTH + CompatibilityPanel.WIDTH + 8;
-    private static final int HEIGHT = 178;
+    private static final int GUIDE_X = 8;
+    private static final int PANEL_X = MACHINE_X + MACHINE_WIDTH;
+    private static final int WIDTH = PANEL_X + CompatibilityPanel.WIDTH + 8;
+    private static final int HEIGHT = 192;
 
     private final CompatibilityPanel panel = new CompatibilityPanel();
+    private final GuidePanel guide = new GuidePanel();
+    private final List<GuidePanel.Row> guideRows = guideRows();
 
     // Panel rows are rebuilt only when the synced catalog changes — never per frame (rows() sorts up
     // to 4096 entries, far too heavy for extractContents).
@@ -53,8 +66,8 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
 
     public CropTowerScreen(CropTowerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, WIDTH, HEIGHT);
-        titleLabelX = 8;
-        inventoryLabelX = 8;
+        titleLabelX = MACHINE_X + 8;
+        inventoryLabelX = MACHINE_X + 8;
     }
 
     @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
@@ -68,8 +81,11 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         g.fill(x, y, x + w, y + 17, HULL_HI);
         g.fill(x + 7, y + 15, x + w - 7, y + 16, ACCENT);
         g.fill(x + 7, y + 16, x + w - 7, y + 17, DIVIDER);
-        g.fill(x + 7, y + 83, x + MACHINE_WIDTH - 7, y + 84, DIVIDER);
-        g.fill(x + MACHINE_WIDTH - 4, y + 20, x + MACHINE_WIDTH - 3, y + HEIGHT - 8, DIVIDER);
+        // horizontal rule between the machine rows and the player inventory
+        g.fill(x + MACHINE_X + 7, y + 95, x + MACHINE_X + MACHINE_WIDTH - 7, y + 96, DIVIDER);
+        // vertical rules boxing the machine column: guide panel left, seed panel right
+        g.fill(x + MACHINE_X + 3, y + 20, x + MACHINE_X + 4, y + HEIGHT - 8, DIVIDER);
+        g.fill(x + MACHINE_X + MACHINE_WIDTH - 4, y + 20, x + MACHINE_X + MACHINE_WIDTH - 3, y + HEIGHT - 8, DIVIDER);
 
         for (Slot slot : menu.slots) {
             if (slot.x < 0 || slot.y < 0) continue;
@@ -80,41 +96,67 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         }
 
         // feed arrow toward the output cluster
-        g.fill(x + 86, y + 27, x + 114, y + 28, DIVIDER);
-        g.fill(x + 112, y + 25, x + 114, y + 30, ACCENT);
+        g.fill(x + MACHINE_X + 86, y + 27, x + MACHINE_X + 114, y + 28, DIVIDER);
+        g.fill(x + MACHINE_X + 112, y + 25, x + MACHINE_X + 114, y + 30, ACCENT);
 
         // labelled energy + nutrient gauges, side by side under the slots (synced as capacity fractions)
-        Gauges.bar(g, font, x + 8, y + 59, x + 84, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
-        Gauges.bar(g, font, x + 88, y + 59, x + 168, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        Gauges.bar(g, font, x + MACHINE_X + 8, y + 59, x + MACHINE_X + 84, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
+        Gauges.bar(g, font, x + MACHINE_X + 88, y + 59, x + MACHINE_X + 168, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
 
         // Average growth across the planted slots as a mini labelled bar (fill = average age, label =
-        // ripe count), tucked between the seed wells and the tower readout; hidden while nothing is
-        // planted so an empty tower stays uncluttered. Synced as a permille of max age (see GaugeData).
+        // ripe count), always drawn on its own row: an empty tower shows the bare bar with the em-dash
+        // label, mirroring the grow bed's idiom. Synced as a permille of max age (see GaugeData).
         int growthAvg = menu.growthAvg();
-        if (growthAvg >= 0) {
-            String ripe = Component.translatable("screen.neroagriculture.tower.ripe",
-                    menu.matureSlots(), menu.plantedSlots()).getString();
-            Gauges.bar(g, font, x + 48, y + 38, x + 112, ripe, growthAvg, GaugeData.SCALE, Gauges.PROGRESS);
-        }
+        String growthLabel = (growthAvg < 0
+                ? Component.translatable("screen.neroagriculture.growth.none")
+                : Component.translatable("screen.neroagriculture.tower.ripe", menu.matureSlots(), menu.plantedSlots()))
+                .getString();
+        Gauges.bar(g, font, x + MACHINE_X + 8, y + 71, x + MACHINE_X + 84, growthLabel,
+                Math.max(0, growthAvg), GaugeData.SCALE, Gauges.PROGRESS);
 
-        // Compact status beside the fertiliser slot, left of the output cluster (x115+).
+        // Tower readout beside the growth bar, aligned with its label text.
         Component tower = menu.height() <= 0
                 ? Component.translatable("screen.neroagriculture.tower.unformed")
                 : Component.literal("H" + menu.height() + " · " + menu.activeSlots() + " slots");
-        g.text(font, tower, x + 48, y + 50, MUTED, false);
+        g.text(font, tower, x + MACHINE_X + 88, y + 72, MUTED, false);
 
-        // Aggregate blocker for the tower's planted slots; nothing planted reads as idle.
+        // Aggregate blocker for the tower's planted slots on its own full-width row; nothing planted
+        // reads as idle.
         GrowthRules.BlockedReason reason = menu.blockedReason();
         Component status = reason == null
                 ? Component.translatable("screen.neroagriculture.tower.idle")
                 : Component.translatable("machine.neroagriculture.status." + reason.name().toLowerCase(Locale.ROOT));
         int statusColor = reason == null ? MUTED
                 : reason == GrowthRules.BlockedReason.NONE ? ACCENT : WARN;
-        g.text(font, status, x + 8, y + 72, statusColor, false);
+        g.text(font, status, x + MACHINE_X + 8, y + 83, statusColor, false);
 
+        guide.draw(g, font, x + GUIDE_X, y + 20, x + GUIDE_X + GuidePanel.WIDTH, y + HEIGHT - 8,
+                Component.translatable("screen.neroagriculture.guide.tower.title"), guideRows);
         drawPanel(g, x, y);
 
         super.extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    /**
+     * Build-guide content, stated once: what the controller's revalidation actually does — a contiguous
+     * run of Crop Tower Frames directly above the controller, formed automatically on the slow recheck
+     * interval, fed through any face via side configuration. The 3/12/4 numbers are the config defaults
+     * ({@code crop_tower.min_height}/{@code max_height}/{@code slots_per_layer}) and the lines say so.
+     */
+    private static List<GuidePanel.Row> guideRows() {
+        return List.of(
+                GuidePanel.Row.text(Component.translatable("screen.neroagriculture.guide.tower.step1")),
+                GuidePanel.Row.text(Component.translatable("screen.neroagriculture.guide.tower.step2")),
+                GuidePanel.Row.text(Component.translatable("screen.neroagriculture.guide.tower.step3")),
+                GuidePanel.Row.text(Component.translatable("screen.neroagriculture.guide.tower.step4")),
+                GuidePanel.Row.text(Component.translatable("screen.neroagriculture.guide.tower.step5")),
+                GuidePanel.Row.gap(),
+                GuidePanel.Row.accent(Component.translatable("screen.neroagriculture.guide.tower.capacity")),
+                GuidePanel.Row.gap(),
+                GuidePanel.Row.cells(Component.translatable("screen.neroagriculture.guide.tower.frame"), FRAME_CELL),
+                GuidePanel.Row.cells(null, FRAME_CELL),
+                GuidePanel.Row.cells(null, FRAME_CELL),
+                GuidePanel.Row.cells(Component.translatable("screen.neroagriculture.guide.tower.controller"), CONTROLLER_CELL));
     }
 
     /**
@@ -140,7 +182,8 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
     }
 
     @Override public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        return panel.scrolled(mouseX, mouseY, scrollY) || super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return guide.scrolled(mouseX, mouseY, scrollY) || panel.scrolled(mouseX, mouseY, scrollY)
+                || super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {

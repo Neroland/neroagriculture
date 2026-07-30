@@ -18,6 +18,12 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
  * fragments. Alongside height/slots/energy/nutrient it carries the tower's aggregate growth blocker.
  */
 public final class CropTowerMenu extends AbstractContainerMenu {
+    /**
+     * Left edge of the machine column: the screen bolts a build-guide panel on to the LEFT of the
+     * original 176-wide layout, so every slot (and the screen's drawing) is offset by this much.
+     * Must match {@code client.CropTowerScreen}.
+     */
+    public static final int MACHINE_X = 158;
     private static final int MACHINE_SLOTS = 10;
     private static final int OUTPUT_START = 4;
     public static final int DATA_COUNT = 8;
@@ -40,22 +46,22 @@ public final class CropTowerMenu extends AbstractContainerMenu {
         this.blockPos = blockPos;
         machine.startOpen(inventory.player);
         // three seed slots + a fertiliser slot (inputs)
-        addSlot(new Slot(machine, 0, 26, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(0, s); } });
-        addSlot(new Slot(machine, 1, 44, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(1, s); } });
-        addSlot(new Slot(machine, 2, 62, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(2, s); } });
-        addSlot(new Slot(machine, 3, 26, 44) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(3, s); } });
+        addSlot(new Slot(machine, 0, MACHINE_X + 26, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(0, s); } });
+        addSlot(new Slot(machine, 1, MACHINE_X + 44, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(1, s); } });
+        addSlot(new Slot(machine, 2, MACHINE_X + 62, 20) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(2, s); } });
+        addSlot(new Slot(machine, 3, MACHINE_X + 26, 44) { @Override public boolean mayPlace(ItemStack s) { return machine.canPlaceItem(3, s); } });
         // six output slots (locked)
         int[][] out = {{116, 20}, {134, 20}, {152, 20}, {116, 38}, {134, 38}, {152, 38}};
         for (int i = 0; i < 6; i++) {
             final int slotIndex = OUTPUT_START + i;
-            addSlot(new Slot(machine, slotIndex, out[i][0], out[i][1]) { @Override public boolean mayPlace(ItemStack s) { return false; } });
+            addSlot(new Slot(machine, slotIndex, MACHINE_X + out[i][0], out[i][1]) { @Override public boolean mayPlace(ItemStack s) { return false; } });
         }
-        // Player inventory sits 12px lower than the vanilla 176x166 layout: the screen grew to 178 tall to
-        // make room for the status line under the gauges.
+        // Player inventory sits 26px lower than the vanilla 176x166 layout: the screen grew to 192 tall to
+        // give the gauges, the growth bar and the status line each their own uncramped row under the slots.
         for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 96 + row * 18));
+            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, MACHINE_X + 8 + col * 18, 110 + row * 18));
         }
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 154));
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, MACHINE_X + 8 + col * 18, 168));
         addDataSlots(data);
     }
 

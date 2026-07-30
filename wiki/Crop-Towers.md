@@ -9,8 +9,12 @@ tower can never out-produce or duplicate compared with an equivalent farm.
 Place a **Crop Tower Controller**, then stack **Crop Tower Frame** blocks directly above it. The tower's
 **tier is its height**: it forms once the casing run reaches the minimum height and its capacity is
 `height x slots-per-layer`, up to a configured maximum (a taller stack simply caps out). The controller
-caches the formed structure and only rechecks it when a block changes or on a slow safety interval — it
-never scans the whole structure every tick.
+caches the formed structure and only rechecks it on a slow safety interval (a few seconds by default) — it
+never scans the whole structure every tick, and a freshly stacked tower forms by itself within moments.
+
+The controller's screen carries this build guide **in-GUI**: a panel down its left-hand column walks
+through the stacking steps (with a frame/controller sketch), so the tower can be built without leaving
+the game.
 
 ## Running a tower
 
@@ -45,8 +49,8 @@ hardier crops removes the surcharge.
 Alongside the slots, gauges and the `height / active slots` readout the controller shows:
 
 - A **growth bar** summarising the planted slots: the fill is the **average growth** across every planted
-  slot and the label counts how many are ready to harvest (e.g. "Ripe 3/12"). It appears once at least one
-  slot is planted and disappears again when the tower is empty.
+  slot and the label counts how many are ready to harvest (e.g. "Ripe 3/12"). An empty tower shows the
+  bare bar with a "Growth —" label, the same idiom as a bare grow bed.
 - A **status line** with the tower's current blocker — progression gate closed, out of NF, out of
   nutrient, or a disabled/unknown material. Nothing planted reads as idle.
 - A scrollable **seed panel** listing every material in the server's catalog. Unlike a grow bed the tower

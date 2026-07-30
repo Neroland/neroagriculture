@@ -16,7 +16,11 @@ for when sealing is required.
 
 The controller flood-fills the interior air pocket, bounded by the surrounding solid blocks and capped by
 the configured volume limit. Crops (and empty air) count as interior; grow beds and walls are boundary.
-The check runs only when the structure changes or on a slow safety interval — never every tick.
+The check runs on a slow safety interval (a few seconds by default) — never every tick.
+
+The Greenhouse Controller's screen carries this build guide **in-GUI**: a panel down its left-hand column
+walks through the shell, door, and power steps (with a cross-section sketch), so a greenhouse can be built
+without leaving the game.
 
 ## The Greenhouse Door (airlock)
 

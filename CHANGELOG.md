@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added
 
+- **In-GUI build guides**: the Crop Tower Controller and Greenhouse Controller screens gained a
+  left-hand guide panel (scrollable, with a small block-layer sketch) walking through how to build
+  the structure — tower: controller + 3–12 stacked frames, power/nutrient, seeds; greenhouse:
+  sealed shell, no gaps, Greenhouse Door airlock, powered controller, volume/upkeep notes.
+
+#### Fixed (UI)
+
+- **Crop Tower screen layout**: the tower readout no longer collides with the output slots; the
+  screen grew taller with dedicated rows for gauges, growth bar (now always visible, "Growth —"
+  when empty), tower readout, and status line; the seed panel's truncated heading lines were
+  shortened to fit ("All tiers grow" / "Gates at growth").
+
+#### Added (gameplay)
+
 - **Growth progress readouts**: Grow Bed screens show a live growth bar with percentage for the
   planted crop; Crop Tower screens show average growth plus a "Ripe n/m" mature-slot counter
   (aggregate — towers are config-sized). Synced as permille gauge data alongside the existing
