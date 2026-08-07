@@ -11,8 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 The **resource-seed economy** release. The mod is reframed around a standalone fragment ladder with
 NeroAgriculture-native progression: the word "essence" is gone, every machine reports through a real
-screen, and a full code + design audit
-(`neroland-mc-ecosystem/audits/2026-07-28-neroagriculture-audit.md`) was remediated in the same
+screen, and a full code + design audit was remediated in the same
 cycle. Builds green across all six loader×MC cells (Fabric/Forge/NeoForge × 26.1.2/26.2).
 
 ### Added

@@ -88,11 +88,12 @@ def beacon(name):
     write(name, {"parent": "minecraft:block/block", "textures": tex(t, s, b), "elements": els})
 
 
-MACHINES = ["essence_extractor", "essence_infuser", "seed_synthesizer", "seed_research_bench",
+# Block ids must match ModBlocks / the blockstate JSONs — stale ids emit orphan models.
+MACHINES = ["fragment_extractor", "fragment_infuser", "seed_synthesizer", "seed_research_bench",
             "planter", "harvester", "fertiliser_applicator", "fertiliser_processor",
             "genetics_station", "greenhouse_controller", "oxygen_plant", "biofuel_converter",
             "crop_tower_controller", "terraforming_controller"]
-BEDS = ["terran_grow_bed", "industrial_grow_bed", "orbital_grow_bed", "colonial_grow_bed", "deepvoid_grow_bed"]
+BEDS = ["territe_grow_bed", "forgite_grow_bed", "orbite_grow_bed", "colonite_grow_bed", "voidite_grow_bed"]
 
 for m in MACHINES:
     machine(m)

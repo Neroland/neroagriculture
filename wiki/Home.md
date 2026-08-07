@@ -1,7 +1,7 @@
 # NeroAgriculture Wiki
 
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
-[Neroland ecosystem](../../neroland-mc-ecosystem/README.md). Built on **Neroland Core**.
+Neroland ecosystem. Built on **Neroland Core**.
 
 > **Status:** resource-seed economy rework. NeroAgriculture is fully playable with **Neroland Core
 > alone**; every other Nero mod adds optional links that are dormant-safe when absent.
@@ -67,8 +67,6 @@ path. See [Engineered foods](Engineered-Foods.md), [Food effects](Food-Effects.m
 ## See also
 
 - [Build & contributor context](../AGENTS.md)
-- [Ecosystem overview](../../neroland-mc-ecosystem/README.md)
-- [This mod's planning docs](../../neroland-mc-ecosystem/neroagriculture/)
 
 ## Stage history
 

@@ -1,9 +1,12 @@
 # NeroAgriculture
 
-> Part of the [Neroland](../neroland-mc-ecosystem) sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
+> Part of the Neroland sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** Stage 5 fabrication and research — version `0.0.1-alpha.1`. The Extractor, Infuser,
-Synthesizer, Research Bench, and datapack-driven material conversion chain are functional.
+**Status:** `0.1.0-beta.1` (tag `v0.1.0-beta.1`, 2026-07-30) — the **resource-seed economy**
+release. Progression runs on the standalone Cosmic-ascent fragment ladder — Territe → Forgite →
+Orbite → Colonite → Voidite — with the Fragment Extractor, Fragment Infuser, Seed Synthesizer and
+Seed Research Bench driving the datapack-driven resource-fragment conversion chain, plus grow beds,
+greenhouses, crop towers, genetics, automation and terraforming.
 
 ## Build targets
 
@@ -35,9 +38,14 @@ sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. Se
           :fabric:26.1.2:build :fabric:26.2:build   # all six
 ```
 
+## Telemetry and privacy
+
+NeroAgriculture ships **opt-out** anonymous crash reporting via Sentry (EU-region servers) so bugs in
+the mod can be found and fixed. Reports carry a stack trace plus version strings (mod / Minecraft /
+loader / OS / Java) and the list of loaded mod ids — never names, UUIDs, IPs or world data. Opt out
+by setting `telemetryEnabled = false` in `config/neroagriculture.properties`.
+
+Full disclosure, including what player data the mod stores and how erasure works:
+[`PRIVACY.md`](PRIVACY.md).
+
 See [`AGENTS.md`](AGENTS.md) / [`CLAUDE.md`](CLAUDE.md) for agent and contributor context.
-
-## Planning docs
-
-Design, feature and dependency docs for this mod live in the umbrella repo under
-[`../neroland-mc-ecosystem/neroagriculture`](../neroland-mc-ecosystem/neroagriculture).

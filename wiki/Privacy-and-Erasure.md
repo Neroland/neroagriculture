@@ -1,7 +1,7 @@
 # Privacy and Data Erasure
 
 NeroAgriculture is built to be POPIA- and GDPR-friendly: it stores the minimum player data, never a name,
-and everything it does keep can be exported and erased through Neroland Core.
+and everything it does keep can be erased through Neroland Core.
 
 ## What player data is stored
 
@@ -40,9 +40,20 @@ transparency rules:
 - **Bounded:** per-session de-duplication and a hard cap of 10 events per session; nothing is stored on
   disk locally.
 
-## Export and erasure
+## Erasure
 
-- **Milestones/research** export and erase through Core's shared `data.PlayerDataErasure` hook — a single
+Erasure is requested through Neroland Core: `/neroland data eraseme` for your own data, or
+`/neroland data erase <uuid>` for an operator-initiated request. Core's inactivity retention sweep
+triggers the same path.
+
+> **No export command.** Neither NeroAgriculture nor Core ships an in-game data-export command, and
+> Core's `data.PlayerDataErasure` hook covers erasure only. Core does expose a programmatic
+> `MaterialMilestones.exportPlayer(server, uuid)` for milestone rows, but nothing calls it at runtime,
+> and machine ownership has no export path at all. To exercise a right of access, contact
+> **[info@neroland.co.za](mailto:info@neroland.co.za)** — the only player-linked values are the owner
+> UUID on machines and Core's progression store, both readable from the world save by an operator.
+
+- **Milestones/research** erase through Core's shared `data.PlayerDataErasure` hook — a single
   erasure request purges a player across every Nero mod that registers with it.
 - **Machine ownership** registers its own eraser with the same hook: an erasure request clears the owner
   UUID from every loaded owned machine (the machine simply becomes unowned). Breaking a machine also drops
