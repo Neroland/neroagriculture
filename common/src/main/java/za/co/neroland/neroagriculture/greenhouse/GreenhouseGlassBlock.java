@@ -6,6 +6,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
+
 /**
  * Greenhouse glazing. A translucent, non-occluding pane that hides the shared faces between adjacent
  * greenhouse glass (like vanilla glass) so a glazed wall reads as one clean surface instead of a grid of
@@ -13,13 +15,12 @@ import net.minecraft.world.level.block.state.BlockState;
  * fixing the "transparent model on a solid block" render artefact.
  */
 public final class GreenhouseGlassBlock extends Block {
-    public static final MapCodec<GreenhouseGlassBlock> CODEC = simpleCodec(GreenhouseGlassBlock::new);
+    public static final MapCodec<GreenhouseGlassBlock> CODEC = BlockCodecs.simple(GreenhouseGlassBlock::new);
 
     public GreenhouseGlassBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
     protected MapCodec<? extends Block> codec() {
         return CODEC;
     }

@@ -19,17 +19,18 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Planter/Harvester block; the mode is read from which registered block this is. */
 public final class AreaMachineBlock extends BaseEntityBlock {
-    public static final MapCodec<AreaMachineBlock> CODEC = simpleCodec(AreaMachineBlock::new);
+    public static final MapCodec<AreaMachineBlock> CODEC = BlockCodecs.simple(AreaMachineBlock::new);
 
     public AreaMachineBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<AreaMachineBlock> codec() { return CODEC; }
+    protected MapCodec<AreaMachineBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new AreaMachineBlockEntity(pos, state); }
 

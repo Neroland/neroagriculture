@@ -13,17 +13,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** NF bioreactor block (registered as the OXYGEN_PLANT id); item/fluid I/O via hoppers/pipes and side config. */
 public final class BioreactorBlock extends BaseEntityBlock {
-    public static final MapCodec<BioreactorBlock> CODEC = simpleCodec(BioreactorBlock::new);
+    public static final MapCodec<BioreactorBlock> CODEC = BlockCodecs.simple(BioreactorBlock::new);
 
     public BioreactorBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<BioreactorBlock> codec() { return CODEC; }
+    protected MapCodec<BioreactorBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BioreactorBlockEntity(pos, state); }
 

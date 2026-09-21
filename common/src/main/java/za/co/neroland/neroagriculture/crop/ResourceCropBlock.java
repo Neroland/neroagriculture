@@ -27,6 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.balance.TierBalance;
 import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
@@ -39,7 +40,7 @@ import za.co.neroland.nerolandcore.progression.ProgressionGates;
 
 /** Generic crop shell. Deliberately has no block-entity ticker; Stage 4 growth stays random/scheduled. */
 public final class ResourceCropBlock extends BaseEntityBlock {
-    public static final MapCodec<ResourceCropBlock> CODEC = simpleCodec(ResourceCropBlock::new);
+    public static final MapCodec<ResourceCropBlock> CODEC = BlockCodecs.simple(ResourceCropBlock::new);
     public static final IntegerProperty AGE = BlockStateProperties.AGE_7;
     public static final int MAX_AGE = 7;
 
@@ -48,7 +49,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(AGE, 0));
     }
-    @Override protected MapCodec<ResourceCropBlock> codec() { return CODEC; }
+    protected MapCodec<ResourceCropBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new ResourceCropBlockEntity(pos, state); }
 
@@ -255,8 +256,13 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         }
     }
 
+    //? if >=26.3 {
+    /*@Override public void playerDestroy(net.minecraft.server.level.ServerLevel level, net.minecraft.server.level.ServerPlayer player, BlockPos pos, BlockState state,
+            @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
+    *///?} else {
     @Override public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
             @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
+    //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof ResourceCropBlockEntity crop) {
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());

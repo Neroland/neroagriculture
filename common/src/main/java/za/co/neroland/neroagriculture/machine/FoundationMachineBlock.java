@@ -15,17 +15,17 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Common Stage 2 machine shell; later stages layer recipes and menus onto the stable ids. */
 public final class FoundationMachineBlock extends BaseEntityBlock {
-    public static final MapCodec<FoundationMachineBlock> CODEC = simpleCodec(FoundationMachineBlock::new);
+    public static final MapCodec<FoundationMachineBlock> CODEC = BlockCodecs.simple(FoundationMachineBlock::new);
 
     public FoundationMachineBlock(Properties properties) {
         super(properties);
     }
 
-    @Override
     protected MapCodec<FoundationMachineBlock> codec() {
         return CODEC;
     }

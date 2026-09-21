@@ -16,17 +16,18 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Controller for the sealed greenhouse multiblock. Right-click prints its status without opening a menu. */
 public final class GreenhouseControllerBlock extends BaseEntityBlock {
-    public static final MapCodec<GreenhouseControllerBlock> CODEC = simpleCodec(GreenhouseControllerBlock::new);
+    public static final MapCodec<GreenhouseControllerBlock> CODEC = BlockCodecs.simple(GreenhouseControllerBlock::new);
 
     public GreenhouseControllerBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<GreenhouseControllerBlock> codec() { return CODEC; }
+    protected MapCodec<GreenhouseControllerBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GreenhouseControllerBlockEntity(pos, state); }
 

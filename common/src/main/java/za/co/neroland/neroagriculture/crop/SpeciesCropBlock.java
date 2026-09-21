@@ -27,6 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.SpeciesVariant;
@@ -40,7 +41,7 @@ import za.co.neroland.neroagriculture.registry.ModItems;
 public final class SpeciesCropBlock extends BaseEntityBlock {
     public static final MapCodec<SpeciesCropBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             FoodDefinition.Kind.CODEC.fieldOf("kind").forGetter(SpeciesCropBlock::kind),
-            propertiesCodec()).apply(instance, SpeciesCropBlock::new));
+            BlockCodecs.properties()).apply(instance, SpeciesCropBlock::new));
     public static final IntegerProperty AGE = BlockStateProperties.AGE_7;
     public static final int MAX_AGE = 7;
     private final FoodDefinition.Kind kind;
@@ -53,7 +54,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
     }
 
     public FoodDefinition.Kind kind() { return kind; }
-    @Override protected MapCodec<SpeciesCropBlock> codec() { return CODEC; }
+    protected MapCodec<SpeciesCropBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new SpeciesCropBlockEntity(pos, state); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(AGE); }
@@ -114,8 +115,13 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
+    //? if >=26.3 {
+    /*@Override public void playerDestroy(net.minecraft.server.level.ServerLevel level, net.minecraft.server.level.ServerPlayer player, BlockPos pos, BlockState state,
+            @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
+    *///?} else {
     @Override public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
             @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
+    //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof SpeciesCropBlockEntity crop) {
             ItemStack seed = new ItemStack(kind == FoodDefinition.Kind.ALIEN

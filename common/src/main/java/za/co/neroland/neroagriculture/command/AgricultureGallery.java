@@ -447,7 +447,11 @@ public final class AgricultureGallery {
         stand.setCustomNameVisible(true);
         stand.setInvisible(true);
         stand.setNoGravity(true);
+        //? if >=26.3 {
+        /*stand.setPermanentlyInvulnerable(true);
+        *///?} else {
         stand.setInvulnerable(true);
+        //?}
         level.addFreshEntity(stand);
     }
 }

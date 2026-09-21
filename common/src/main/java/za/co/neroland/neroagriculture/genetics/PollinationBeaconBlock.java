@@ -16,17 +16,18 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Optional pollination booster block; right-click for status. */
 public final class PollinationBeaconBlock extends BaseEntityBlock {
-    public static final MapCodec<PollinationBeaconBlock> CODEC = simpleCodec(PollinationBeaconBlock::new);
+    public static final MapCodec<PollinationBeaconBlock> CODEC = BlockCodecs.simple(PollinationBeaconBlock::new);
 
     public PollinationBeaconBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<PollinationBeaconBlock> codec() { return CODEC; }
+    protected MapCodec<PollinationBeaconBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new PollinationBeaconBlockEntity(pos, state); }
 

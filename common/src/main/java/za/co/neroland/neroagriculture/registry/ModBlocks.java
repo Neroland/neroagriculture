@@ -33,12 +33,20 @@ public final class ModBlocks {
     public static final RegistryEntry<ResourceCropBlock> RESOURCE_CROP = BLOCKS.register("resource_crop",
             key -> new ResourceCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
                     .strength(0.5F).sound(SoundType.CROP).noOcclusion().noCollision().randomTicks().noLootTable()
+                    //? if >=26.3 {
+                    /*.pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE)));
+                    *///?} else {
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+                    //?}
     // Base crop planted from the Prospora Seed; not in ALL, so no block item (placed via the seed).
     public static final RegistryEntry<ProsporaCropBlock> PROSPORA_CROP = BLOCKS.register("prospora_crop",
             key -> new ProsporaCropBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
                     .instabreak().sound(SoundType.CROP).noOcclusion().noCollision().randomTicks()
+                    //? if >=26.3 {
+                    /*.pushReaction(net.minecraft.world.level.material.PushReaction.POPPED)));
+                    *///?} else {
                     .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+                    //?}
     public static final RegistryEntry<SpeciesCropBlock> ENGINEERED_FOOD_CROP =
             speciesCrop("engineered_food_crop", za.co.neroland.neroagriculture.food.FoodDefinition.Kind.FOOD, MapColor.PLANT);
     public static final RegistryEntry<SpeciesCropBlock> ALIEN_CROP =
@@ -53,7 +61,11 @@ public final class ModBlocks {
             BLOCKS.register("greenhouse_door", key -> new za.co.neroland.neroagriculture.greenhouse.GreenhouseDoorBlock(
                     BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.METAL).strength(3.0F, 6.0F)
                             .sound(SoundType.METAL).noOcclusion()
+                            //? if >=26.3 {
+                            /*.pushReaction(net.minecraft.world.level.material.PushReaction.POPPED)));
+                            *///?} else {
                             .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)));
+                            //?}
     public static final RegistryEntry<Block> CROP_TOWER_FRAME = plain("crop_tower_frame", MapColor.METAL);
     public static final RegistryEntry<Block> TERRITE_FRAGMENT_BLOCK = plain("territe_fragment_block", MapColor.GRASS);
     public static final RegistryEntry<Block> FORGITE_FRAGMENT_BLOCK = plain("forgite_fragment_block", MapColor.METAL);
@@ -139,7 +151,11 @@ public final class ModBlocks {
             za.co.neroland.neroagriculture.food.FoodDefinition.Kind kind, MapColor color) {
         return BLOCKS.register(name, key -> new SpeciesCropBlock(kind, BlockBehaviour.Properties.of().setId(key)
                 .mapColor(color).strength(0.5F).sound(SoundType.CROP).noOcclusion().noCollision().randomTicks()
+                //? if >=26.3 {
+                /*.noLootTable().pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE)));
+                *///?} else {
                 .noLootTable().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+                //?}
     }
 
     private static RegistryEntry<GrowBedBlock> bed(String name,

@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.CropBlock;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModItems;
 
 /**
@@ -15,13 +16,13 @@ import za.co.neroland.neroagriculture.registry.ModItems;
  * tier-1 ore extraction, so this is a convenience rather than a gate.
  */
 public final class ProsporaCropBlock extends CropBlock {
-    public static final MapCodec<ProsporaCropBlock> CODEC = simpleCodec(ProsporaCropBlock::new);
+    public static final MapCodec<ProsporaCropBlock> CODEC = BlockCodecs.simple(ProsporaCropBlock::new);
 
     public ProsporaCropBlock(Properties properties) {
         super(properties);
     }
 
-    @Override public MapCodec<? extends CropBlock> codec() { return CODEC; }
+    public MapCodec<? extends CropBlock> codec() { return CODEC; }
 
     @Override protected ItemLike getBaseSeedId() { return ModItems.PROSPORA_SEED.get(); }
 }

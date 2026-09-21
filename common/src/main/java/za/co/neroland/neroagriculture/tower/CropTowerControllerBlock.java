@@ -16,17 +16,18 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Crop tower controller; right-click for status. Contents (stored items + slot seeds) drop on break. */
 public final class CropTowerControllerBlock extends BaseEntityBlock {
-    public static final MapCodec<CropTowerControllerBlock> CODEC = simpleCodec(CropTowerControllerBlock::new);
+    public static final MapCodec<CropTowerControllerBlock> CODEC = BlockCodecs.simple(CropTowerControllerBlock::new);
 
     public CropTowerControllerBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<CropTowerControllerBlock> codec() { return CODEC; }
+    protected MapCodec<CropTowerControllerBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new CropTowerControllerBlockEntity(pos, state); }
 

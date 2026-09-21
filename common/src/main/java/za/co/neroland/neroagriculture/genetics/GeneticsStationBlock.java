@@ -17,17 +17,18 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Genetics Station block. Right-click to open its splice/upgrade UI; hoppers load the slots. */
 public final class GeneticsStationBlock extends BaseEntityBlock {
-    public static final MapCodec<GeneticsStationBlock> CODEC = simpleCodec(GeneticsStationBlock::new);
+    public static final MapCodec<GeneticsStationBlock> CODEC = BlockCodecs.simple(GeneticsStationBlock::new);
 
     public GeneticsStationBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<GeneticsStationBlock> codec() { return CODEC; }
+    protected MapCodec<GeneticsStationBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GeneticsStationBlockEntity(pos, state); }
 

@@ -392,7 +392,11 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                         ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
                 seed.set(ModDataComponents.SPECIES_VARIANT.get(),
                         za.co.neroland.neroagriculture.content.SpeciesVariant.of(definition.id()));
+                //? if >=26.3 {
+                /*if (!player.getInventory().add(seed)) player.drop(seed, false, net.minecraft.util.Prediction.SERVER_ONLY);
+                *///?} else {
                 if (!player.getInventory().add(seed)) player.drop(seed, false);
+                //?}
             });
         }
         blockedReason = MachineBlockedReason.COMPLETE;

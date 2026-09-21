@@ -13,17 +13,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** NF-powered fertiliser processor block; item I/O through hoppers/pipes and Core side config. */
 public final class FertiliserProcessorBlock extends BaseEntityBlock {
-    public static final MapCodec<FertiliserProcessorBlock> CODEC = simpleCodec(FertiliserProcessorBlock::new);
+    public static final MapCodec<FertiliserProcessorBlock> CODEC = BlockCodecs.simple(FertiliserProcessorBlock::new);
 
     public FertiliserProcessorBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<FertiliserProcessorBlock> codec() { return CODEC; }
+    protected MapCodec<FertiliserProcessorBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new FertiliserProcessorBlockEntity(pos, state); }
 

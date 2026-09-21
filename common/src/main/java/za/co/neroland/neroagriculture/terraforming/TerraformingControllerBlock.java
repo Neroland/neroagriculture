@@ -21,18 +21,19 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
 
 /** Terraforming controller: use a Terraforming Seed to start; sneak-right-click (owner/op) to roll back. */
 public final class TerraformingControllerBlock extends BaseEntityBlock {
-    public static final MapCodec<TerraformingControllerBlock> CODEC = simpleCodec(TerraformingControllerBlock::new);
+    public static final MapCodec<TerraformingControllerBlock> CODEC = BlockCodecs.simple(TerraformingControllerBlock::new);
 
     public TerraformingControllerBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<TerraformingControllerBlock> codec() { return CODEC; }
+    protected MapCodec<TerraformingControllerBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TerraformingControllerBlockEntity(pos, state); }
 

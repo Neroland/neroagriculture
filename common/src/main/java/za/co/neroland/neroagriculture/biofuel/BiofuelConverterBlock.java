@@ -13,17 +13,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 
+import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** NF Biofuel Converter block; item/fluid/energy I/O via hoppers/pipes and Core side config. */
 public final class BiofuelConverterBlock extends BaseEntityBlock {
-    public static final MapCodec<BiofuelConverterBlock> CODEC = simpleCodec(BiofuelConverterBlock::new);
+    public static final MapCodec<BiofuelConverterBlock> CODEC = BlockCodecs.simple(BiofuelConverterBlock::new);
 
     public BiofuelConverterBlock(Properties properties) {
         super(properties);
     }
 
-    @Override protected MapCodec<BiofuelConverterBlock> codec() { return CODEC; }
+    protected MapCodec<BiofuelConverterBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BiofuelConverterBlockEntity(pos, state); }
 
