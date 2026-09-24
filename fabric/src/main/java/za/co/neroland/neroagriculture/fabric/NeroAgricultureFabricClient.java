@@ -27,6 +27,11 @@ public final class NeroAgricultureFabricClient implements ClientModInitializer {
         // a session on server B (or on a server without this mod, which sends no fresh snapshot).
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register(
                 (handler, client) -> za.co.neroland.neroagriculture.lifecycle.ClientStateReset.disconnected());
+        // Keep the client's copy of the server's synced fabrication recipes for recipe viewers
+        // (compat.jei / compat.emi); 26.x clients hold no full recipe list of their own.
+        net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent.EVENT.register(
+                (client, synchronizedRecipes) ->
+                        za.co.neroland.neroagriculture.compat.viewer.ViewerRecipes.accept(synchronizedRecipes.recipes()));
         // One canonical menu->screen table in common; adapted onto vanilla MenuScreens.register here.
         ScreenBindings.registerAll(new ScreenBindings.Registrar() {
             @Override

@@ -2,6 +2,7 @@ package za.co.neroland.neroagriculture.lifecycle;
 
 import za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog;
 import za.co.neroland.neroagriculture.catalog.ClientSpeciesCatalog;
+import za.co.neroland.neroagriculture.compat.viewer.ViewerRecipes;
 import za.co.neroland.neroagriculture.network.ClientMachineMenuPositions;
 
 /**
@@ -19,5 +20,6 @@ public final class ClientStateReset {
         ClientMaterialCatalog.clear();
         ClientSpeciesCatalog.clear();
         ClientMachineMenuPositions.clear();
+        ViewerRecipes.clear();
     }
 }

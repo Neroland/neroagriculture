@@ -3,7 +3,8 @@
 NeroAgriculture hard-depends on **Neroland Core alone**. Every other integration is optional and dormant
 until the other mod is present — the mod runs fully standalone with nothing registered. External mods
 interoperate only through Core capabilities, `c:` common tags, and the provider seams in
-`CompatContracts` — no third-party classes appear anywhere in `common/`.
+`CompatContracts` — no third-party classes appear anywhere in `common/` except the compile-only
+recipe-viewer plugins under `compat/jei` and `compat/emi`, which load only when that viewer is installed.
 
 ## Integration routes
 
@@ -23,6 +24,7 @@ interoperate only through Core capabilities, `c:` common tags, and the provider 
 | NeroQuests | `AgricultureApi.ObjectiveProvider`, terraforming/pollination events | Contract-ready |
 | NeroCreatures | `AgricultureApi.DroneAssistanceProvider` | Contract-ready |
 | NeroEvents | `CycleApi.Provider`, terraforming events | Contract-ready |
+| JEI / EMI | Native recipe-viewer plugins for the six fabrication types; see [Recipe viewers](Recipe-Viewers.md) | Live (EMI via the community 26.x port) |
 
 ## For integrators
 

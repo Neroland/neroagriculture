@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0-beta.1] - 2026-09-24
+
+JEI and EMI recipe pages for the fabrication machines.
+
+### Added
+
+- **JEI and EMI pages for all six fabrication recipe types:** Material Extraction, Fragment Infusing,
+  Fragment Fusion, Seed Synthesizing, Material Conversion and Seed Research, with the Fragment
+  Extractor, Fragment Infuser, Seed Synthesizer and Seed Research Bench as workstations. Each page shows
+  what the machine actually takes and gives, including the slots the recipe file does not list (a
+  synthesizer's Tier Fragments and Prospora Seed, an infuser's Blank Seed, an extractor's Resource
+  Fragment), plus the energy and time before upgrades. Resource Fragments and Seeds carry their
+  material, so they read as "Iron Fragment", "Steel Seed" and so on. EMI support targets the community
+  EMI Unofficial Port (Unstable), the only EMI build for Minecraft 26.x, on NeoForge and Fabric. With JEI
+  and EMI both installed, the pages show once. Both viewers stay optional. See the wiki's Recipe viewers
+  page.
+- **Recipe sync for the fabrication recipes** on NeoForge and Fabric. 26.x clients no longer receive the
+  full recipe list, so the server now sends the six fabrication recipe types to clients for the recipe
+  viewers. Recipe definitions only; no player data.
+
 ## [0.2.1-beta.1] - 2026-09-24
 
 ### Fixed

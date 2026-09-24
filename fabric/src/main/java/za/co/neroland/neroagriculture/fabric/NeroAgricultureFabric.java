@@ -5,12 +5,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
 import za.co.neroland.neroagriculture.compat.CompatContracts;
 import za.co.neroland.neroagriculture.lifecycle.ServerStateReset;
+import za.co.neroland.neroagriculture.registry.ModRecipeSerializers;
 import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 
 /** Fabric entry point for NeroAgriculture. */
@@ -39,5 +41,20 @@ public final class NeroAgricultureFabric implements ModInitializer {
         });
         // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerStateReset.serverStopped());
+        registerRecipeSync();
+    }
+
+    /**
+     * Recipe sync is opt-in on Fabric (26.x clients hold no full recipe list). Without this the client never
+     * receives the fabrication recipes and recipe viewers (compat.jei / compat.emi) would show empty pages.
+     * Recipe definitions only; no player data crosses the wire.
+     */
+    private static void registerRecipeSync() {
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.EXTRACTION_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.INFUSING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.SYNTHESIZING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.RESEARCHING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.CONVERSION_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.FUSION_SERIALIZER.get());
     }
 }

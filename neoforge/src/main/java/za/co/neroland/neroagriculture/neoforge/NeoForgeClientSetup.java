@@ -26,6 +26,11 @@ public final class NeoForgeClientSetup {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) ->
                         za.co.neroland.neroagriculture.lifecycle.ClientStateReset.disconnected());
+        // Keep the client's copy of the server's synced fabrication recipes for recipe viewers
+        // (compat.jei / compat.emi); 26.x clients hold no full recipe list of their own.
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.client.event.RecipesReceivedEvent event) ->
+                        za.co.neroland.neroagriculture.compat.viewer.ViewerRecipes.accept(event.getRecipeMap()));
     }
 
     /** Give every NeroAgriculture fluid its still/flow sprites (26.x fluid models, per-fluid registration). */

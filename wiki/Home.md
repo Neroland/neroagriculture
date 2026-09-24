@@ -48,6 +48,7 @@ See [Resource-seed economy](Resource-Seed-Economy.md) for the full walkthrough.
 - [Seasonal and stellar cycles](Seasonal-Cycles.md)
 - [Terraforming](Terraforming.md)
 - [Compatibility](Compatibility.md)
+- [Recipe viewers (JEI & EMI)](Recipe-Viewers.md)
 - [Art and visuals](Art-and-Visuals.md)
 - [Configuration](Configuration.md)
 - [Administration](Administration.md)

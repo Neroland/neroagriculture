@@ -165,5 +165,21 @@
   "screen.neroagriculture.guide.greenhouse.volume": "Volume cap: 4,096 blocks (config)",
   "screen.neroagriculture.guide.greenhouse.breach": "A breach or power loss drops control until fixed",
   "screen.neroagriculture.guide.greenhouse.door": "Door",
-  "screen.neroagriculture.guide.greenhouse.controller": "Controller"
+  "screen.neroagriculture.guide.greenhouse.controller": "Controller",
+  "gui.neroagriculture.viewer.material_extraction": "Material Extraction",
+  "gui.neroagriculture.viewer.fragment_infusing": "Fragment Infusing",
+  "gui.neroagriculture.viewer.fragment_fusion": "Fragment Fusion",
+  "gui.neroagriculture.viewer.seed_synthesizing": "Seed Synthesizing",
+  "gui.neroagriculture.viewer.material_conversion": "Material Conversion",
+  "gui.neroagriculture.viewer.seed_researching": "Seed Research",
+  "gui.neroagriculture.viewer.energy": "%s FE",
+  "gui.neroagriculture.viewer.time": "%s s",
+  "gui.neroagriculture.viewer.research_unlock": "Unlocks this seed for synthesis; gives no item",
+  "gui.neroagriculture.viewer.research_instant": "Instant, on use",
+  "emi.category.neroagriculture.material_extraction": "Material Extraction",
+  "emi.category.neroagriculture.fragment_infusing": "Fragment Infusing",
+  "emi.category.neroagriculture.fragment_fusion": "Fragment Fusion",
+  "emi.category.neroagriculture.seed_synthesizing": "Seed Synthesizing",
+  "emi.category.neroagriculture.material_conversion": "Material Conversion",
+  "emi.category.neroagriculture.seed_researching": "Seed Research"
 }

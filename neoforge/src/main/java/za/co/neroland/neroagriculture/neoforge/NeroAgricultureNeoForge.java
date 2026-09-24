@@ -18,6 +18,7 @@ import za.co.neroland.neroagriculture.catalog.CatalogSync;
 import za.co.neroland.neroagriculture.command.AgricultureCommands;
 import za.co.neroland.neroagriculture.compat.CompatContracts;
 import za.co.neroland.neroagriculture.lifecycle.ServerStateReset;
+import za.co.neroland.neroagriculture.registry.ModRecipeSerializers;
 import za.co.neroland.neroagriculture.telemetry.NeroAgricultureTelemetry;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 
@@ -41,6 +42,16 @@ public final class NeroAgricultureNeoForge {
             if (event.getPlayer() == null) CatalogSync.reloadAndSync(event.getPlayerList().getServer());
             else CatalogSync.syncTo(event.getPlayer());
         });
+        // Recipe sync is opt-in on NeoForge (26.x clients hold no full recipe list): send the fabrication
+        // recipes so recipe viewers (compat.jei / compat.emi) can list them. Recipe definitions only; no
+        // player data crosses the wire.
+        NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> event.sendRecipes(
+                ModRecipeSerializers.EXTRACTION.get(),
+                ModRecipeSerializers.INFUSING.get(),
+                ModRecipeSerializers.SYNTHESIZING.get(),
+                ModRecipeSerializers.RESEARCHING.get(),
+                ModRecipeSerializers.CONVERSION.get(),
+                ModRecipeSerializers.FUSION.get()));
         // Optional Nerospace planet-visit adapter (join backfill + live dimension-change tracking).
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerJoined(player);
