@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1-beta.1] - 2026-09-24
+
+### Fixed
+
+- **Fabric: the game no longer crashes while loading.** The client registered the Resource Crop's tint
+  against Minecraft's block colours during client start-up, before those colours exist, so Fabric
+  clients stopped with a `NullPointerException` from `Minecraft.getBlockColors()`. The tint is now
+  registered through Fabric API's `BlockColorRegistry`, which holds it until the colours are ready. Crops
+  keep the same tint. NeoForge and Forge were not affected.
+
 ## [0.2.0-beta.1] - 2026-09-20
 
 Minecraft **26.3** support. No gameplay, id, tag or config change.
