@@ -2,6 +2,7 @@ package za.co.neroland.neroagriculture.fabric;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -34,9 +35,11 @@ public final class NeroAgricultureFabricClient implements ClientModInitializer {
                 MenuScreens.register(type, factory::create);
             }
         });
-        // Register the crop tint against vanilla BlockColors directly (no Fabric-API rendering module
-        // needed): the same CropTintSource the Forge/NeoForge events use.
-        net.minecraft.client.Minecraft.getInstance().getBlockColors().register(
+        // Register the crop tint through Fabric API's BlockColorRegistry: the same CropTintSource the
+        // Forge/NeoForge events use. Minecraft.getBlockColors() is still null when client entrypoints
+        // run (vanilla builds BlockColors later in the Minecraft constructor), so a direct call NPEs at
+        // startup; the registry queues the source and applies it once BlockColors exists.
+        BlockColorRegistry.register(
                 java.util.List.of(new za.co.neroland.neroagriculture.client.CropTintSource()),
                 za.co.neroland.neroagriculture.registry.ModBlocks.RESOURCE_CROP.get());
         registerFluidModels();
