@@ -358,6 +358,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material());
         if (outputCapacityFor(probe) < amount) return; // output jammed: keep the slot mature, consume nothing
         insertAmount(probe, amount);
+        TowerOutputChannel.recordHarvest(level, amount);
         if (fertilised) items.get(FERTILISER).shrink(1);
         slot.harvested();
     }

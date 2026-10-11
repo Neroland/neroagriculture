@@ -22,5 +22,6 @@ public final class ServerStateReset {
         MaterialCatalog.reset();
         za.co.neroland.neroagriculture.command.AgricultureGallery.clearRecords();
         za.co.neroland.neroagriculture.compat.nerospace.NerospaceVisitBridge.reset();
+        za.co.neroland.neroagriculture.tower.TowerOutputChannel.clearAll();
     }
 }

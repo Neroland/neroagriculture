@@ -57,6 +57,9 @@ public final class CompatContracts {
     // --- Colonies / Economy / Quests consumers ----------------------------
     public static void registerDietProvider(AgricultureApi.DietProvider provider) { AgricultureApi.DIET.add(provider); }
     public static void registerObjectiveProvider(AgricultureApi.ObjectiveProvider provider) { AgricultureApi.OBJECTIVES.add(provider); }
+    /** @deprecated See {@link AgricultureApi.PremiumGoodsProvider}: price NeroAgriculture goods by item tag instead. */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public static void registerPremiumGoodsProvider(AgricultureApi.PremiumGoodsProvider provider) { AgricultureApi.PREMIUM_GOODS.add(provider); }
     public static void registerCultivationProvider(AgricultureApi.CultivationProvider provider) { AgricultureApi.CULTIVATION.add(provider); }
     public static void registerTerraformingListener(AgricultureApi.TerraformingListener listener) { AgricultureApi.TERRAFORMING.add(listener); }

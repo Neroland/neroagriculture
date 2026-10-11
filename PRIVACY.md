@@ -66,7 +66,8 @@ keyed by **UUID only** (never a username or display name):
   researched is tracked through Neroland Core's shared progression store, not by this mod directly.
 
 Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle
-phases — is world data with no player attribution.
+phases, and the per-dimension crop-tower output count behind the `neroagriculture:tower_output`
+threshold event (kept in memory only) — is world data with no player attribution.
 
 Ownership data is registered with Neroland Core's shared data-erasure hook
 (`data.PlayerDataErasure`), so a single erase request purges a player's NeroAgriculture data

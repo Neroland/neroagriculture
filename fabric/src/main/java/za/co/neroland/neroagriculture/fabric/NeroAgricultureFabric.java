@@ -36,6 +36,8 @@ public final class NeroAgricultureFabric implements ModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
                 CompatContracts.playerDisconnected(handler.player));
         ServerTickEvents.END_SERVER_TICK.register(CompatContracts::serverTick);
+        // Ages the crop-tower output window so neroagriculture:tower_output falls back on time.
+        ServerTickEvents.END_SERVER_TICK.register(za.co.neroland.neroagriculture.tower.TowerOutputChannel::serverTick);
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
             if (success) CatalogSync.reloadAndSync(server);
         });

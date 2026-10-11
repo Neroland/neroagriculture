@@ -20,7 +20,8 @@ recipe-viewer plugins under `compat/jei` and `compat/emi`, which load only when 
 | Ad Astra | Dimension environment via `DimensionEnvironments` datapack + `EnvironmentApi` | Dormant until Ad Astra ports to 26.1+ |
 | NeroLogistics | Moves component-backed items via generic `WorldlyContainer`/side config | Contract-ready |
 | NeroColonies | `AgricultureApi.DietProvider` (varied-diet metadata) | Contract-ready |
-| NeroEconomy | `AgricultureApi.PremiumGoodsProvider` | Contract-ready |
+| NeroEconomy | Item tags `#neroagriculture:fragments`, `#neroagriculture:fertilisers`, `#neroagriculture:biofuels` (plus the `c:` tags) for tag-keyed commodity data; no code link. `AgricultureApi.PremiumGoodsProvider` is deprecated | Data-only |
+| Any Core listener (NeroQuests `custom_event`, NeroEvents) | Core `ThresholdEvents` channel `neroagriculture:tower_output`; see [Crop Towers](Crop-Towers.md#output-threshold-event) | Live |
 | NeroQuests | `AgricultureApi.ObjectiveProvider`, terraforming/pollination events | Contract-ready |
 | NeroCreatures | `AgricultureApi.DroneAssistanceProvider` | Contract-ready |
 | NeroEvents | `CycleApi.Provider`, terraforming events | Contract-ready |

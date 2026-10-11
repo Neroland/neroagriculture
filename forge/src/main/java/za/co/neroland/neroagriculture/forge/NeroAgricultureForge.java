@@ -47,5 +47,8 @@ public final class NeroAgricultureForge {
         });
         // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
         ServerStoppedEvent.BUS.addListener(event -> ServerStateReset.serverStopped());
+        // Ages the crop-tower output window so neroagriculture:tower_output falls back on time.
+        net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(event ->
+                za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.server()));
     }
 }

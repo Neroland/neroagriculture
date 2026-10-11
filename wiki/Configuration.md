@@ -52,6 +52,8 @@ Values are grouped by system; the most useful keys are listed below. Lists use c
 - `crop_tower.min_height`, `crop_tower.max_height`, `crop_tower.slots_per_layer`, `crop_tower.slots_per_pass`.
 - `crop_tower.hostile_environment_nf_multiplier` — NF surcharge for tower layers whose environment would
   fail the crop's climate check (default 4; towers keep growing, they just pay more).
+- `crop_tower.output_event_threshold` — items the crop towers of one dimension may harvest in the last
+  in-game hour before the `neroagriculture:tower_output` threshold event fires (default 512; 0 disables).
 - `terraforming.enabled`, `terraforming.region_radius`, `terraforming.total_progress`,
   `terraforming.progress_per_tick`.
 

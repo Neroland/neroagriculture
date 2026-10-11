@@ -65,6 +65,22 @@ and restart. Breaking the controller returns every stored item plus a seed for e
 genetics and history), so nothing is lost when you take a tower down. Right-click the controller for its
 status (formed/height/slots/planted/NF/nutrient).
 
+## Output threshold event
+
+Crop towers report their combined output on Neroland Core's threshold-event bus, channel
+`neroagriculture:tower_output`, so quests and world events can react to farm output:
+
+- **scope**: the dimension id, for example `minecraft:overworld`. Never a player.
+- **value**: items harvested by every crop tower in that dimension during the last in-game hour.
+- **threshold**: `crop_tower.output_event_threshold` (default 512; 0 turns the event off).
+- **rising**: `true` once when the hourly total reaches the threshold, `false` once when it drops back
+  below it.
+
+An "hour" here is one **in-game hour**: 1,000 game ticks, about 50 real seconds at 20 TPS. It follows the
+server's game time, not the time of day, so sleeping or `/time set` never skips part of it. The window is
+rolling (ten 100-tick steps). It is kept in memory only, so after a restart every dimension starts at zero
+and nothing is announced until output builds up again.
+
 ## Performance
 
 Work is bounded per pass and phase-offset, contents are cached, and crops are virtual slots rather than

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0-beta.1] - 2026-10-11
+
+Item tags for tag-keyed pricing, and a crop-tower output threshold event. Neroland Core only: no new
+dependency (NeroEconomy is not needed for any of this).
+
+### Added
+
+- **Item tags** for data packs and economy mods to key on, so a tag-keyed commodity follows every new
+  item with no code: `#neroagriculture:fragments` (the five tier fragments; the component-keyed
+  `resource_fragment` stays out because its identity is in item components),
+  `#neroagriculture:fertilisers` (fertiliser, speed and yield fertiliser) and `#neroagriculture:biofuels`
+  (biofuel canister and bucket). The fragments and biofuels already sit in `c:fragments` and `c:biofuels`.
+- **Threshold event `neroagriculture:tower_output`** on Neroland Core's `ThresholdEvents` bus. Scope = the
+  dimension id (never a player); value = items harvested by every crop tower in that dimension in the
+  last in-game hour (1,000 game ticks of server game time, a rolling window in ten 100-tick steps);
+  threshold = new config `crop_tower.output_event_threshold` (default 512, 0 = off); `rising` is `true`
+  once when the total reaches the threshold and `false` once when it drops back below. In-memory only, so
+  a restart announces nothing. Usable by NeroQuests' `custom_event` and NeroEvents.
+
+### Deprecated
+
+- `AgricultureApi.PremiumGoodsProvider`, `AgricultureApi.PremiumGood`, `AgricultureApi.PREMIUM_GOODS` and
+  `CompatContracts.registerPremiumGoodsProvider`. They were never implemented or read, priced in energy
+  rather than credits, and keyed on a player. Price NeroAgriculture goods through the item tags above
+  instead. Kept so existing callers still compile.
+
 ## [0.3.0-beta.1] - 2026-09-24
 
 JEI and EMI recipe pages for the fabrication machines.

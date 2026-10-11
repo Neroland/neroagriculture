@@ -57,6 +57,11 @@ public final class AgricultureConfig {
             "crop_tower.hostile_environment_nf_multiplier", 4, 1, 64, true,
             "NF cost multiplier a tower layer pays when its environment would fail the crop's climate "
             + "check (towers keep growing in hostile environments, at this surcharge)");
+    public static final ConfigValue<Integer> TOWER_OUTPUT_THRESHOLD = SCHEMA.intRange(
+            "crop_tower.output_event_threshold", 512, 0, 1_000_000_000, true,
+            "items crop towers in one dimension may harvest in the last in-game hour (1,000 game ticks) before "
+            + "the neroagriculture:tower_output threshold event fires (rising when reached, falling when back "
+            + "below); 0 disables the event");
     public static final ConfigValue<Boolean> FUSION_ENABLED = SCHEMA.bool("fusion.enabled", true, true,
             "Enable fragment-fusion (alloy) recipes that combine two resources into an alloy seed");
     public static final ConfigValue<String> FUSION_MAX_TIER = SCHEMA.string("fusion.max_tier", "voidite", true,

@@ -10,6 +10,14 @@ import net.minecraft.server.level.ServerPlayer;
 public final class AgricultureApi {
     public record DietOutput(Identifier food, int nutrition, float saturation, Identifier profile) { }
     public record Objective(Identifier id, Identifier subject, int target) { }
+    /**
+     * @deprecated Part of the unused {@link PremiumGoodsProvider} seam. {@code unitPriceNf} is energy, not
+     * credits. Pricing belongs in data: key commodities on the item tags {@code #neroagriculture:fragments},
+     * {@code #neroagriculture:fertilisers} and {@code #neroagriculture:biofuels} (and the {@code c:} tags
+     * the items also carry) instead. Kept only so existing callers still compile; nothing reads it, and it
+     * may be removed in a future major version.
+     */
+    @Deprecated
     public record PremiumGood(Identifier item, long unitPriceNf, Identifier quality) { }
     public record CultivationContext(Identifier crop, Identifier dimension, float growth, float yield) { }
     public record CultivationModifier(float growthMultiplier, float yieldMultiplier) { }
@@ -19,6 +27,14 @@ public final class AgricultureApi {
 
     @FunctionalInterface public interface DietProvider { List<DietOutput> outputs(ServerPlayer player); }
     @FunctionalInterface public interface ObjectiveProvider { List<Objective> objectives(ServerPlayer player); }
+    /**
+     * @deprecated Never implemented and never read. A provider keyed by {@link ServerPlayer} would hand
+     * player state to a pricing mod for no reason. Pricing belongs in data: key commodities on the item tags {@code #neroagriculture:fragments},
+     * {@code #neroagriculture:fertilisers} and {@code #neroagriculture:biofuels} (and the {@code c:} tags
+     * the items also carry) instead. Kept only so existing callers still compile; nothing reads it, and it
+     * may be removed in a future major version.
+     */
+    @Deprecated
     @FunctionalInterface public interface PremiumGoodsProvider { List<PremiumGood> goods(ServerPlayer player); }
     @FunctionalInterface public interface CultivationProvider { CultivationModifier modify(CultivationContext context); }
     @FunctionalInterface public interface DroneAssistanceProvider { boolean assist(DroneRequest request); }
@@ -27,6 +43,8 @@ public final class AgricultureApi {
 
     public static final List<DietProvider> DIET = new CopyOnWriteArrayList<>();
     public static final List<ObjectiveProvider> OBJECTIVES = new CopyOnWriteArrayList<>();
+    /** @deprecated See {@link PremiumGoodsProvider}: nothing reads this list. Use the item tags instead. */
+    @Deprecated
     public static final List<PremiumGoodsProvider> PREMIUM_GOODS = new CopyOnWriteArrayList<>();
     public static final List<CultivationProvider> CULTIVATION = new CopyOnWriteArrayList<>();
     public static final List<DroneAssistanceProvider> DRONES = new CopyOnWriteArrayList<>();
