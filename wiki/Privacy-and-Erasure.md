@@ -26,7 +26,8 @@ world/environment data is never linked to a player.
 
 ## Anonymous crash reporting (opt-out)
 
-Like the rest of the Neroland family, NeroAgriculture includes **opt-out** crash/error reporting via
+Like the rest of the Neroland family, NeroAgriculture includes crash/error reporting, **on by default
+and opt-out**, via
 Sentry (EU-region servers) so bugs can be fixed. It is disclosed here for the POPIA/GDPR and CurseForge
 transparency rules:
 

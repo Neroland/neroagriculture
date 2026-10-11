@@ -40,7 +40,7 @@ sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. Se
 
 ## Telemetry and privacy
 
-NeroAgriculture ships **opt-out** anonymous crash reporting via Sentry (EU-region servers) so bugs in
+NeroAgriculture ships anonymous crash reporting, **on by default** and **opt-out**, via Sentry (EU-region servers) so bugs in
 the mod can be found and fixed. Reports carry a stack trace plus version strings (mod / Minecraft /
 loader / OS / Java) and the list of loaded mod ids — never names, UUIDs, IPs or world data. Opt out
 by setting `telemetryEnabled = false` in `config/neroagriculture.properties`.

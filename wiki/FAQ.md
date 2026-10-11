@@ -33,7 +33,8 @@ No. It hard-depends only on Neroland Core. Every other integration is optional a
 [Compatibility](Compatibility.md).
 
 **What player data does it store?**
-Only opt-out machine-owner UUIDs and Core-tracked milestones — no names, no telemetry. See
-[Privacy and Erasure](Privacy-and-Erasure.md).
+Only opt-out machine-owner UUIDs and Core-tracked milestones — no names. Anonymous crash reporting is
+separate, carries no player data, and is on by default and opt-out (`telemetryEnabled = false` in
+`config/neroagriculture.properties`). See [Privacy and Erasure](Privacy-and-Erasure.md).
 
 See also: [Home](Home.md).

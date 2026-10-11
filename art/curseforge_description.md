@@ -36,7 +36,9 @@ Built on **Neroland Core**, so its power/upgrade framework, progression gates, c
 
 ## Privacy (POPIA / GDPR)
 
-NeroAgriculture stores **no personal data**. Crop, genetics and terraforming state is world/gameplay data tied to the save, never to a player's identity. Any optional crash telemetry is anonymous and opt-out, carrying **version strings only** — never names, UUIDs, IPs or world data.
+NeroAgriculture stores **no personal data**. Crop, genetics and terraforming state is world/gameplay data tied to the save, never to a player's identity.
+
+> **Telemetry notice:** NeroAgriculture sends anonymous error reports (stack trace, mod/game versions and the loaded-mod id list — never IPs, usernames, UUIDs, or world data) to the developers via Sentry (EU servers) so crashes can be fixed. On by default — opt out any time by setting `telemetryEnabled = false` in `config/neroagriculture.properties`. Full details: [PRIVACY.md](https://github.com/Neroland/neroagriculture/blob/main/PRIVACY.md).
 
 ## Why it fits the ecosystem
 

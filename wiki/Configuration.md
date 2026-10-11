@@ -33,6 +33,9 @@ Values are grouped by system; the most useful keys are listed below. Lists use c
 - `privacy.erasure_retention_days` — how long erasure tombstones are kept so owners saved in unloaded
   chunks are still purged when those chunks load (default 90 days).
 - `fertiliser.max_dose`, `fertiliser.duration_ticks` — fertiliser cap and lifetime.
+- `telemetryEnabled` — anonymous crash reporting, **on by default** and **opt-out**. Client-local (never
+  synced from the server); set `telemetryEnabled = false` in `config/neroagriculture.properties` to switch
+  it off (takes effect on restart). See [Privacy](Privacy-and-Erasure.md).
 
 ## Greenhouse, oxygen and bioreactor
 
