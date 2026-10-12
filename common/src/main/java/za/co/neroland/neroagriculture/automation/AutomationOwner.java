@@ -37,7 +37,9 @@ public final class AutomationOwner {
     public static void register() {
         PlayerDataErasure.register((server, uuid) -> {
             // Tombstone first so machines saved in unloaded chunks drop the owner when they load.
-            ErasedOwners.get(server).markErased(uuid);
+            // eraseFor (not markErased) also pushes the tombstone to the saved-data recovery backup in
+            // the same request, so the copy that survives a corrupt primary file carries it too.
+            ErasedOwners.eraseFor(server, uuid);
             for (Owned owned : TRACKED) {
                 if (uuid.equals(owned.automationOwner())) owned.clearAutomationOwner();
             }
@@ -66,6 +68,38 @@ public final class AutomationOwner {
 
     public static void track(Owned owned) { TRACKED.add(owned); }
     public static void untrack(Owned owned) { TRACKED.remove(owned); }
+
+    /**
+     * A snapshot of every currently tracked owned machine, for the rare caller that starts from a place
+     * rather than from a player — the link module's greenhouse event has a set of interior positions and
+     * needs the owners of the beds standing in them, which is the one direction {@link #ownedBy} cannot
+     * answer. It is <b>not</b> an authorisation seam: anything derived from it must still be scoped to a
+     * specific owner before it leaves the mod.
+     */
+    public static java.util.List<Owned> allTracked() {
+        return new java.util.ArrayList<>(TRACKED);
+    }
+
+    /**
+     * Every currently loaded machine {@code player} owns — the single visibility rule the link module's
+     * read and write surfaces both route through, so there is one method to read to know what a
+     * companion client can reach, and one to change if it ever needs to be narrower.
+     *
+     * <p>Two deliberate limits. It is <b>loaded machines only</b>: {@link #TRACKED} holds block entities
+     * whose chunks are loaded, and widening it would mean force-loading somebody's base to answer a
+     * phone. And it never widens for permission level — an operator's powers belong to a live command
+     * source, not to a UUID arriving over a bridge.
+     *
+     * @param player the requesting player; {@code null} yields an empty list
+     */
+    public static java.util.List<Owned> ownedBy(@Nullable UUID player) {
+        if (player == null) return java.util.List.of();
+        java.util.List<Owned> out = new java.util.ArrayList<>();
+        for (Owned owned : TRACKED) {
+            if (player.equals(owned.automationOwner())) out.add(owned);
+        }
+        return out;
+    }
 
     public static void save(ValueOutput output, @Nullable UUID owner) {
         if (owner != null && trackingEnabled()) output.putString("Owner", owner.toString());

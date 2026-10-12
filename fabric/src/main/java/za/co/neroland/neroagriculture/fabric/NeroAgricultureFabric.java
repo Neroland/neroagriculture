@@ -41,7 +41,9 @@ public final class NeroAgricultureFabric implements ModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
             if (success) CatalogSync.reloadAndSync(server);
         });
-        // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
+        // Record the running server (the NeroLink module resolves the world from it) and clear the common
+        // server-scoped static caches so nothing leaks into the next (single-player) world.
+        ServerLifecycleEvents.SERVER_STARTED.register(ServerStateReset::serverStarted);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerStateReset.serverStopped());
         registerRecipeSync();
     }

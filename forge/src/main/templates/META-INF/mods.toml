@@ -29,6 +29,15 @@ versionRange = "${nerolandcore_version_range}"
 ordering = "AFTER"
 side = "BOTH"
 
+# Nerospace is OPTIONAL. When present it must load first, so its public api is available the first time
+# the environment bridge queries it; when absent the bridge stays dormant and the local model is used.
+[[dependencies.${mod_id}]]
+modId = "nerospace"
+mandatory = false
+versionRange = "${nerospace_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true

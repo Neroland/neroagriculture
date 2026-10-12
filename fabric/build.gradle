@@ -13,6 +13,7 @@ def fabricApi = project.findProperty("fabric_api_version_${mc}")
 def jeiVersion = project.findProperty("jei_version_${mc}")
 def emiFile = project.findProperty("emi_file_fabric_${mc}")
 def nerolandcoreVersion = project.findProperty('nerolandcore_version')
+def nerospaceVersion = project.findProperty('nerospace_version')
 
 // This node's projectDir is <loader>/versions/<v>; the authoritative loader source +
 // resources live in the BRANCH root (fabric/). Resolve branch-root paths via the parent.
@@ -67,6 +68,11 @@ dependencies {
     // Required shared foundation. Core is a separate mod, not bundled into NeroAgriculture.
     implementation "za.co.neroland.nerolandcore:nerolandcore-fabric-${mc}:${nerolandcoreVersion}"
 
+    // Nerospace — OPTIONAL sibling. compileOnly: we compile against its public api package but never
+    // ship or require it, and compat/nerospace/NerospaceEnvironmentBridge keeps every Nerospace type
+    // behind a lazily loaded holder so the mod runs unchanged when Nerospace is absent.
+    compileOnly "za.co.neroland.nerospace:nerospace-fabric-${mc}:${nerospaceVersion}"
+
     // Sentry SDK (telemetry/NeroAgricultureTelemetry): compile against it + embed it as a jar-in-jar so the
     // shipped Fabric jar carries it. Counterpart to the NeoForge JarJar bundling.
     implementation 'io.sentry:sentry:8.45.0'
@@ -108,6 +114,7 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         fabric_loader_version: rootProject.fabric_loader_version,
         minecraft_version    : mc,
         nerolandcore_version  : nerolandcoreVersion,
+        nerospace_version     : nerospaceVersion,
     ]
     inputs.properties(props)
     expand(props)

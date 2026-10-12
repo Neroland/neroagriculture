@@ -11,6 +11,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
@@ -59,7 +60,10 @@ public final class NeroAgricultureNeoForge {
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerChangedDimensionEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerChangedDimension(player);
         });
-        // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
+        // Record the running server (the NeroLink module resolves the world from it) and clear the common
+        // server-scoped static caches so nothing leaks into the next (single-player) world.
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) ->
+                ServerStateReset.serverStarted(event.getServer()));
         NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> ServerStateReset.serverStopped());
         // Ages the crop-tower output window so neroagriculture:tower_output falls back on time.
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) ->

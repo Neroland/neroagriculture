@@ -31,7 +31,17 @@ Values are grouped by system; the most useful keys are listed below. Lists use c
 - `automation.track_owner` — record placer UUIDs for claim checks and owner-bound progression (opt-out;
   see [Privacy](Privacy-and-Erasure.md)).
 - `privacy.erasure_retention_days` — how long erasure tombstones are kept so owners saved in unloaded
-  chunks are still purged when those chunks load (default 90 days).
+  chunks are still purged when those chunks load (default 90 days). The window applies to the tombstone
+  file's crash-recovery backup too.
+- `link.module_enabled` — expose your own farm to companion clients through Neroland Core's NeroLink
+  registry (default on; see [Link module](Link-Module.md)). `false` registers nothing at all.
+- `compat.nerospace_visits` — grant `material_discovered` for planet-bound materials when a player
+  enters the planet's dimension, and backfill earlier Nerospace visits once per join (see
+  [Nerospace integration](Nerospace-Integration.md)).
+- `compat.nerospace_environment` — let Nerospace answer the open-air growing environment on its own
+  planets, and publish greenhouse oxygen back into its atmosphere (default on; see
+  [Nerospace integration](Nerospace-Integration.md)). `false`, or Nerospace absent, uses this mod's own
+  dimension environment table and local life support everywhere.
 - `fertiliser.max_dose`, `fertiliser.duration_ticks` — fertiliser cap and lifetime.
 - `telemetryEnabled` — anonymous crash reporting, **on by default** and **opt-out**. Client-local (never
   synced from the server); set `telemetryEnabled = false` in `config/neroagriculture.properties` to switch

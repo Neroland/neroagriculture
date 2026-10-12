@@ -127,6 +127,7 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         stage = TerraformingStage.of(seeded, progress, total);
         if (stage != previous) {
             fireEvent(level, (float) progress / total);
+            publishLink(level, previous);
             if (stage.complete()) {
                 TerraformingRegions.complete(level, worldPosition, AgricultureConfig.TERRAFORM_RADIUS.get());
             }
@@ -148,6 +149,7 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         stage = TerraformingStage.SEEDED;
         if (!player.getAbilities().instabuild) held.shrink(1);
         fireEvent(level, 0.0F);
+        publishLink(level, TerraformingStage.DORMANT);
         setChanged();
         return true;
     }
@@ -157,13 +159,26 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         if (!seeded) return false;
         // Owner-only via interaction; breaking the controller also rolls back, so admins can always undo.
         if (owner != null && !owner.equals(player.getUUID())) return false;
+        TerraformingStage previous = stage;
         seeded = false;
         progress = 0;
         stage = TerraformingStage.DORMANT;
         TerraformingRegions.rollback(level, worldPosition);
         fireEvent(level, 0.0F);
+        publishLink(level, previous);
         setChanged();
         return true;
+    }
+
+    /**
+     * Publishes this project's stage transition on the NeroLink {@code terraforming} topic. Owner-scoped
+     * and a no-op when the controller has no recorded owner (tracking opted out, or the owner erased),
+     * because there is then nobody the event belongs to.
+     */
+    private void publishLink(ServerLevel level, TerraformingStage previous) {
+        if (previous == stage) return;
+        za.co.neroland.neroagriculture.link.AgricultureLinkEvents.terraformingStageChanged(
+                level, worldPosition, owner, previous, stage, progress);
     }
 
     private boolean authorized(ServerLevel level) {

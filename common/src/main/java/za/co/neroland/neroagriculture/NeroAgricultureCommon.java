@@ -35,7 +35,15 @@ public final class NeroAgricultureCommon {
         AgricultureNetwork.init();
         za.co.neroland.neroagriculture.food.FoodProviders.register();
         za.co.neroland.neroagriculture.automation.AutomationOwner.register();
+        za.co.neroland.neroagriculture.compat.nerospace.NerospaceVisitBridge.register();
         za.co.neroland.neroagriculture.terraforming.TerraformingRegions.register();
+        // Registered AFTER TerraformingRegions on purpose: EnvironmentApi returns the first provider that
+        // answers, so our own completed-terraforming override keeps priority over Nerospace's reading of
+        // the same spot. Both agree in the normal case; ours wins while a project is still local-only.
+        za.co.neroland.neroagriculture.compat.nerospace.NerospaceEnvironmentBridge.register();
+        // Registered LAST: a companion client must never be told about something before the mod itself
+        // has finished setting it up. Self-guarding — a failure here cannot take the mod down.
+        za.co.neroland.neroagriculture.link.AgricultureLinkModule.init();
         LOGGER.info("[NeroAgriculture] common init");
     }
 }
