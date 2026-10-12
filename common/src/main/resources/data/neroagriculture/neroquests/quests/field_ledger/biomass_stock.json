@@ -1,0 +1,24 @@
+{
+  "title": "quest.neroagriculture.field_ledger.biomass_stock.title",
+  "description": "quest.neroagriculture.field_ledger.biomass_stock.desc",
+  "icon": "neroagriculture:biomass",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neroagriculture:biomass",
+      "count": 8
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 30
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 20
+    }
+  ],
+  "scope": "player"
+}

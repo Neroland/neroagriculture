@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TRT",
+    "IBI",
+    "TRT"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "R": "minecraft:redstone",
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "neroagriculture:fragment_infuser",
+    "count": 1
+  }
+}

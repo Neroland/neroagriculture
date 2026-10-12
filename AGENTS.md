@@ -1,6 +1,6 @@
 # Project context for AI coding agents — neroagriculture
 
-> This and `CLAUDE.md` are kept identical; update both together.
+> `CLAUDE.md` and `AGENTS.md` are kept identical; update both together.
 
 ## The mod
 
@@ -9,7 +9,7 @@
   shared content under `common/` and wire it through each loader entry point.
 - Mod id: **`neroagriculture`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neroagriculture`. Author: **Neroland**.
-- Version: **0.4.0-beta.1**.
+- Version: **0.5.0-beta.1**.
 - Targets **MC 26.1.2, 26.2 AND 26.3** on **NeoForge, MinecraftForge/Forge, and Fabric** → the **"9 cells"**.
   **Java 25.** Mappings = official Mojang names (26.x ships de-obfuscated; no Parchment).
 

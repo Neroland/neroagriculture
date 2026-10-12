@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FGF",
+    "IBI",
+    "IRI"
+  ],
+  "key": {
+    "F": "neroagriculture:forgite_fragment",
+    "G": "minecraft:glass",
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:brewing_stand",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:genetics_station",
+    "count": 1
+  }
+}

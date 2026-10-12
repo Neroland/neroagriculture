@@ -17,6 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.nerolandcore.registry.BlockCodecs;
+import za.co.neroland.neroagriculture.progression.AgricultureMilestones;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 
 /** Crop tower controller; right-click for status. Contents (stored items + slot seeds) drop on break. */
@@ -34,6 +35,10 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
+            // Opening a formed tower is the personal milestone; recorded on interaction, no owner stored. Gates nothing.
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer && tower.formed()) {
+                AgricultureMilestones.record(serverPlayer, AgricultureMilestones.TOWER_GROWER);
+            }
             player.openMenu(tower);
         }
         return InteractionResult.SUCCESS;

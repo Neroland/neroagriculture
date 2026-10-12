@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0-beta.1] - 2026-10-11
+
+Survival crafting recipes for every machine, controller, grow bed and farm block, a NeroQuests quest
+pack, four personal milestone gates and a terraforming channel. Requires Neroland Core 1.15.0; still no
+other dependency (NeroQuests stays optional).
+
+### Added
+
+- **Survival crafting recipes** for the whole block line, which until now was creative-only: the
+  Fragment Extractor (iron, copper, a furnace, a piston and redstone — vanilla only, so Territe
+  extraction is reachable from a fresh world) and the Territe Grow Bed (iron, a composter, dirt); the
+  Fragment Infuser, Seed Synthesizer, Seed Research Bench, Planter, Harvester, Fertiliser Applicator,
+  Fertiliser Processor, Greenhouse Frame (x8), Greenhouse Glass (x8), Greenhouse Controller, Crop Tower
+  Frame (x4), Crop Tower Controller, Speed Module and Efficiency Module, all costing Territe Fragments
+  plus vanilla parts; the Genetics Station, Pollination Beacon, Oxygen Plant and Biofuel Converter at
+  Forgite; the Terraforming Controller and Terraforming Seed at Orbite; each higher grow bed from the
+  bed below it plus four fragments of its tier; and a Blank Seed from wheat seeds, paper and a Territe
+  Fragment. Recipes carry no progression gate: the fragment ladder itself paces them. See the wiki's
+  Crafting Recipes page.
+- **NeroQuests quest pack** — chapter `neroagriculture:field_ledger` "Field Ledger", 15 quests — that
+  appears in the quest book when NeroQuests is installed; inert otherwise, no dependency. Five
+  vanilla-ingredient crafts (fertilisers, biomass, crop waste) lead to the `ledger_opened` capstone,
+  four gate quests follow the tier ladder (Refinement to Ascension), four record personal milestones
+  (`first_reaping`, `seed_scholar`, `under_glass`, `vertical_farm`) and one server-wide world-log quest
+  (`green_world`) completes when a terraforming project in any dimension reaches Complete.
+- **Record gates** `neroagriculture:first_research`, `first_harvest`, `greenhouse_keeper` and
+  `tower_grower`: player-scope Neroland Core gates the mod opens once for a player when they complete a
+  Seed Research Bench research, harvest a mature NeroAgriculture crop by hand, open a running
+  Greenhouse Controller or open a formed Crop Tower Controller. They have no prerequisites and gate
+  nothing; the tier gates (`refinement` to `ascension`) are unchanged and keep their prerequisites. The
+  greenhouse and tower milestones are recorded on interaction, so neither controller stores an owner.
+- **Threshold event `neroagriculture:terraform_stage`** on Neroland Core's `ThresholdEvents` bus,
+  fired on every terraforming stage change. Scope = the dimension id (never the position, the project
+  id or a player); value and threshold = the stage (Seeded 1, Growing 2, Stabilising 3, Complete 4);
+  `rising` is `false` only for a rollback to Dormant (0). The in-process `AgricultureApi` terraforming
+  event is unchanged.
+
+### Changed
+
+- **Requires Neroland Core 1.15.0** (was 1.13.0): the `ThresholdEvents.fire(sourceModId, crossing)`
+  overload. `neroagriculture:tower_output` crossings now name `neroagriculture` as their source too.
+- The four tier quests in the quest pack are visible from the start (they were hidden behind their own
+  gate while the ladder had no survival recipes).
+
 ## [0.4.0-beta.1] - 2026-10-11
 
 Item tags for tag-keyed pricing, and a crop-tower output threshold event. Neroland Core only: no new

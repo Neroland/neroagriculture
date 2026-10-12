@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:wheat_seeds",
+    "minecraft:paper",
+    "neroagriculture:territe_fragment"
+  ],
+  "result": {
+    "id": "neroagriculture:blank_seed",
+    "count": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "quest.neroagriculture.field_ledger.refinement.title",
+  "description": "quest.neroagriculture.field_ledger.refinement.desc",
+  "icon": "minecraft:amethyst_shard",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:refinement"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 80
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 60
+    }
+  ],
+  "scope": "player"
+}

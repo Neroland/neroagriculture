@@ -89,10 +89,10 @@ public final class TowerOutputChannel {
         }
         if (!window.above && total >= threshold) {
             window.above = true;
-            ThresholdEvents.fire(new ThresholdEvents.ThresholdCrossing(CHANNEL, dimension.toString(), total, threshold, true));
+            ThresholdEvents.fire("neroagriculture", new ThresholdEvents.ThresholdCrossing(CHANNEL, dimension.toString(), total, threshold, true));
         } else if (window.above && total < threshold) {
             window.above = false;
-            ThresholdEvents.fire(new ThresholdEvents.ThresholdCrossing(CHANNEL, dimension.toString(), total, threshold, false));
+            ThresholdEvents.fire("neroagriculture", new ThresholdEvents.ThresholdCrossing(CHANNEL, dimension.toString(), total, threshold, false));
         }
     }
 

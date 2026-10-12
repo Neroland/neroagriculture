@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TFT",
+    "IHI",
+    "IRI"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "F": "neroagriculture:crop_tower_frame",
+    "I": "minecraft:iron_ingot",
+    "H": "minecraft:hopper",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:crop_tower_controller",
+    "count": 1
+  }
+}

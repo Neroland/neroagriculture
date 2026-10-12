@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TGT",
+    "ICI",
+    "IRI"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "G": "neroagriculture:greenhouse_glass",
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:comparator",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:greenhouse_controller",
+    "count": 1
+  }
+}

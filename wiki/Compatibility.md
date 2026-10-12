@@ -21,8 +21,8 @@ recipe-viewer plugins under `compat/jei` and `compat/emi`, which load only when 
 | NeroLogistics | Moves component-backed items via generic `WorldlyContainer`/side config | Contract-ready |
 | NeroColonies | `AgricultureApi.DietProvider` (varied-diet metadata) | Contract-ready |
 | NeroEconomy | Item tags `#neroagriculture:fragments`, `#neroagriculture:fertilisers`, `#neroagriculture:biofuels` (plus the `c:` tags) for tag-keyed commodity data; no code link. `AgricultureApi.PremiumGoodsProvider` is deprecated | Data-only |
-| Any Core listener (NeroQuests `custom_event`, NeroEvents) | Core `ThresholdEvents` channel `neroagriculture:tower_output`; see [Crop Towers](Crop-Towers.md#output-threshold-event) | Live |
-| NeroQuests | `AgricultureApi.ObjectiveProvider`, terraforming/pollination events | Contract-ready |
+| Any Core listener (NeroQuests `custom_event`, NeroEvents) | Core `ThresholdEvents` channels `neroagriculture:tower_output` (see [Crop Towers](Crop-Towers.md#output-threshold-event)) and `neroagriculture:terraform_stage` (see [Terraforming](Terraforming.md#stage-threshold-event)); record gates `neroagriculture:first_research`, `first_harvest`, `greenhouse_keeper`, `tower_grower` | Live |
+| NeroQuests | Bundled quest pack, chapter `neroagriculture:field_ledger` (data only, dormant without NeroQuests); see [NeroQuests integration](NeroQuests-Integration.md). `AgricultureApi.ObjectiveProvider` and the terraforming/pollination events remain available | Live (data) |
 | NeroCreatures | `AgricultureApi.DroneAssistanceProvider` | Contract-ready |
 | NeroEvents | `CycleApi.Provider`, terraforming events | Contract-ready |
 | JEI / EMI | Native recipe-viewer plugins for the six fabrication types; see [Recipe viewers](Recipe-Viewers.md) | Live (EMI via the community 26.x port) |

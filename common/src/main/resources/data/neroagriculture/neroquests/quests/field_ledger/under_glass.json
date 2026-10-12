@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.under_glass.title",
+  "description": "quest.neroagriculture.field_ledger.under_glass.desc",
+  "icon": "neroagriculture:greenhouse_controller",
+  "prerequisites": [
+    "neroagriculture:field_ledger/first_reaping"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:greenhouse_keeper"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 80
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 60
+    }
+  ],
+  "scope": "player"
+}

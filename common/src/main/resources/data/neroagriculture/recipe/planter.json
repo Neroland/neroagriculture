@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "IDI",
+    "TRT"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:wheat_seeds",
+    "D": "minecraft:dispenser",
+    "T": "neroagriculture:territe_fragment",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:planter",
+    "count": 1
+  }
+}

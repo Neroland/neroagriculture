@@ -64,6 +64,11 @@ keyed by **UUID only** (never a username or display name):
   case no owner is stored at all. The UUID is server-only and never sent to clients.
 - **Material milestones / research** — which materials and seeds a player has discovered or
   researched is tracked through Neroland Core's shared progression store, not by this mod directly.
+- **Milestone gates** — the mod opens four player-scope Neroland Core progression gates
+  (`neroagriculture:first_research`, `first_harvest`, `greenhouse_keeper`, `tower_grower`) the first
+  time a player reaches that milestone. Only the gate id is recorded, in Core's progression store
+  (UUID-keyed, covered by Core's privacy disclosure and erased by Core's erasure hook); nothing is
+  logged or broadcast, and the gates grant no access.
 
 Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle
 phases, and the per-dimension crop-tower output count behind the `neroagriculture:tower_output`

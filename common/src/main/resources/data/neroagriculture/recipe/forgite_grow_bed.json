@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    "FBF",
+    " F "
+  ],
+  "key": {
+    "F": "neroagriculture:forgite_fragment",
+    "B": "neroagriculture:territe_grow_bed"
+  },
+  "result": {
+    "id": "neroagriculture:forgite_grow_bed",
+    "count": 1
+  }
+}

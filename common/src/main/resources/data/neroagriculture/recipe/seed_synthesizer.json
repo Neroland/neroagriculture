@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TST",
+    "ICI",
+    "IRI"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "S": "minecraft:wheat_seeds",
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:crafting_table",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:seed_synthesizer",
+    "count": 1
+  }
+}

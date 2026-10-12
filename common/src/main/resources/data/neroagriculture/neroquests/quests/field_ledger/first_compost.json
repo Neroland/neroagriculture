@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.first_compost.title",
+  "description": "quest.neroagriculture.field_ledger.first_compost.desc",
+  "icon": "neroagriculture:fertiliser",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neroagriculture:fertiliser",
+      "count": 4
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 20
+    },
+    {
+      "type": "neroquests:item",
+      "item": "minecraft:bone_meal",
+      "count": 8
+    }
+  ],
+  "scope": "player"
+}

@@ -1,0 +1,24 @@
+{
+  "title": "quest.neroagriculture.field_ledger.nothing_wasted.title",
+  "description": "quest.neroagriculture.field_ledger.nothing_wasted.desc",
+  "icon": "neroagriculture:crop_waste",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neroagriculture:crop_waste",
+      "count": 4
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 20
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 15
+    }
+  ],
+  "scope": "player"
+}

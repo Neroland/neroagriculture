@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " V ",
+    "VBV",
+    " V "
+  ],
+  "key": {
+    "V": "neroagriculture:voidite_fragment",
+    "B": "neroagriculture:colonite_grow_bed"
+  },
+  "result": {
+    "id": "neroagriculture:voidite_grow_bed",
+    "count": 1
+  }
+}

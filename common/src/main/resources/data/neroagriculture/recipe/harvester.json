@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IHI",
+    "IDI",
+    "TRT"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "H": "minecraft:iron_hoe",
+    "D": "minecraft:dispenser",
+    "T": "neroagriculture:territe_fragment",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:harvester",
+    "count": 1
+  }
+}

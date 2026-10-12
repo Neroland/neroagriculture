@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.seed_scholar.title",
+  "description": "quest.neroagriculture.field_ledger.seed_scholar.desc",
+  "icon": "neroagriculture:seed_research_bench",
+  "prerequisites": [
+    "neroagriculture:field_ledger/ledger_opened"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:first_research"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 50
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 40
+    }
+  ],
+  "scope": "player"
+}

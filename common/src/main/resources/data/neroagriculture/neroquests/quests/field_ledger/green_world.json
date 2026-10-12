@@ -1,0 +1,26 @@
+{
+  "title": "quest.neroagriculture.field_ledger.green_world.title",
+  "description": "quest.neroagriculture.field_ledger.green_world.desc",
+  "icon": "neroagriculture:terraforming_controller",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neroagriculture:terraform_stage",
+      "direction": "rising",
+      "min_value": 4,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 150
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 120
+    }
+  ],
+  "scope": "server"
+}

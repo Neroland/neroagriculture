@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FHF",
+    "IGI",
+    "IRI"
+  ],
+  "key": {
+    "F": "neroagriculture:forgite_fragment",
+    "H": "minecraft:honeycomb",
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glowstone_dust",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:pollination_beacon",
+    "count": 1
+  }
+}

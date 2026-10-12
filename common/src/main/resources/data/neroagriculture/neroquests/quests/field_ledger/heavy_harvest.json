@@ -1,0 +1,26 @@
+{
+  "title": "quest.neroagriculture.field_ledger.heavy_harvest.title",
+  "description": "quest.neroagriculture.field_ledger.heavy_harvest.desc",
+  "icon": "neroagriculture:yield_fertiliser",
+  "prerequisites": [
+    "neroagriculture:field_ledger/first_compost"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neroagriculture:yield_fertiliser",
+      "count": 2
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 30
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 20
+    }
+  ],
+  "scope": "player"
+}

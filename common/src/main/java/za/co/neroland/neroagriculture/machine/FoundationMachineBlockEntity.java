@@ -400,6 +400,9 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             });
         }
         blockedReason = MachineBlockedReason.COMPLETE;
+        // Personal record for quest packs and other Core listeners; gates nothing (see AgricultureMilestones).
+        za.co.neroland.neroagriculture.progression.AgricultureMilestones.record(player,
+                za.co.neroland.neroagriculture.progression.AgricultureMilestones.FIRST_RESEARCH);
         setChanged();
         return true;
     }

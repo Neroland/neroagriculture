@@ -33,6 +33,7 @@ import za.co.neroland.neroagriculture.catalog.MaterialCatalog;
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
 import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.MaterialVariant;
+import za.co.neroland.neroagriculture.progression.AgricultureMilestones;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -130,6 +131,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, state.setValue(AGE, 0), 3);
         giveFragment(serverPlayer, pos, definition.id(), definition.tier(), amount);
+        AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
         // Self-sustaining farms: a configurable chance to also return a planted seed on harvest.
         if (AgricultureConfig.SEED_RETURN_PERCENT.get() > 0
                 && level.getRandom().nextInt(100) < AgricultureConfig.SEED_RETURN_PERCENT.get()) {
@@ -264,6 +266,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
     //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
+        if (player instanceof ServerPlayer serverPlayer && state.getValue(AGE) >= MAX_AGE) {
+            AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+        }
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof ResourceCropBlockEntity crop) {
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
             // Server-side only (guarded above), so getServer() is available; the stored family is the

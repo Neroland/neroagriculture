@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.synthesis.title",
+  "description": "quest.neroagriculture.field_ledger.synthesis.desc",
+  "icon": "minecraft:glowstone_dust",
+  "prerequisites": [
+    "neroagriculture:field_ledger/refinement"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:synthesis"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 120
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 100
+    }
+  ],
+  "scope": "player"
+}

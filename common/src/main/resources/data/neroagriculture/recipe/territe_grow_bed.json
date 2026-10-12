@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "DDD",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:composter",
+    "D": "#minecraft:dirt"
+  },
+  "result": {
+    "id": "neroagriculture:territe_grow_bed",
+    "count": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CBC",
+    " C "
+  ],
+  "key": {
+    "C": "neroagriculture:colonite_fragment",
+    "B": "neroagriculture:orbite_grow_bed"
+  },
+  "result": {
+    "id": "neroagriculture:colonite_grow_bed",
+    "count": 1
+  }
+}

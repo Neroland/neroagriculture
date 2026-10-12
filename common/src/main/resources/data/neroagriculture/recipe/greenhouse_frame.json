@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ITI",
+    "T T",
+    "ITI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "T": "neroagriculture:territe_fragment"
+  },
+  "result": {
+    "id": "neroagriculture:greenhouse_frame",
+    "count": 8
+  }
+}

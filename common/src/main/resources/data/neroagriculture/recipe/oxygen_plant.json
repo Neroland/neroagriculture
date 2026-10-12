@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FKF",
+    "IGI",
+    "IRI"
+  ],
+  "key": {
+    "F": "neroagriculture:forgite_fragment",
+    "K": "minecraft:kelp",
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:oxygen_plant",
+    "count": 1
+  }
+}

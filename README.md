@@ -27,7 +27,7 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 
 ## Building
 
-Neroland Core `1.8.0` is a required dependency. Local builds prefer artifacts published by the
+Neroland Core `1.15.0` is a required dependency. Local builds prefer artifacts published by the
 sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. See
 [`USING-CORE.md`](USING-CORE.md) for setup and authentication details.
 
@@ -37,6 +37,16 @@ sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. Se
           :forge:26.1.2:build :forge:26.2:build :forge:26.3:build \
           :fabric:26.1.2:build :fabric:26.2:build :fabric:26.3:build   # all nine
 ```
+
+## Optional integrations
+
+NeroAgriculture needs only Neroland Core. Other Neroland mods are optional and dormant when absent:
+it ships a **NeroQuests quest pack** (chapter "Field Ledger", 15 quests) that appears in the quest
+book when NeroQuests is installed, publishes Core threshold events (`neroagriculture:tower_output`,
+`neroagriculture:terraform_stage`) and record gates that any Core listener can read, and exposes
+provider seams for the rest of the ecosystem. None of this adds a dependency; see the wiki's
+[Compatibility](wiki/Compatibility.md) and [NeroQuests integration](wiki/NeroQuests-Integration.md)
+pages.
 
 ## Telemetry and privacy
 

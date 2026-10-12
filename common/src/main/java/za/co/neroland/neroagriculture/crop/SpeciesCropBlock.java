@@ -33,6 +33,7 @@ import za.co.neroland.neroagriculture.content.FragmentTier;
 import za.co.neroland.neroagriculture.content.SpeciesVariant;
 import za.co.neroland.neroagriculture.food.FoodCatalog;
 import za.co.neroland.neroagriculture.food.FoodDefinition;
+import za.co.neroland.neroagriculture.progression.AgricultureMilestones;
 import za.co.neroland.neroagriculture.registry.ModBlocks;
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 import za.co.neroland.neroagriculture.registry.ModItems;
@@ -112,6 +113,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
         if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
         if (!serverPlayer.getInventory().add(produce)) popResource(level, pos, produce);
+        AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
         return InteractionResult.SUCCESS;
     }
 
@@ -123,6 +125,9 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
             @Nullable BlockEntity blockEntity, ItemStack destroyedWith) {
     //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
+        if (player instanceof ServerPlayer serverPlayer && state.getValue(AGE) >= MAX_AGE) {
+            AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+        }
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof SpeciesCropBlockEntity crop) {
             ItemStack seed = new ItemStack(kind == FoodDefinition.Kind.ALIEN
                     ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());

@@ -33,6 +33,7 @@ import za.co.neroland.neroagriculture.machine.SideConfigMigration;
 import za.co.neroland.neroagriculture.menu.StatusMenu;
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.neroagriculture.registry.ModItems;
+import za.co.neroland.nerolandcore.event.ThresholdEvents;
 import za.co.neroland.nerolandcore.fluid.FluidBuffer;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
 import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
@@ -182,10 +183,24 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         return false;
     }
 
+    /** Neroland Core {@link ThresholdEvents} channel mirrored on every stage change; see {@link #fireEvent}. */
+    public static final Identifier STAGE_CHANNEL = Identifier.fromNamespaceAndPath("neroagriculture", "terraform_stage");
+
+    /**
+     * Publish a stage change. The mod's own {@link AgricultureApi} event carries the project id and
+     * position for in-process consumers; the Core crossing on {@link #STAGE_CHANNEL} carries only the
+     * <em>dimension id</em> as its scope (never the position, the project id or a player) so it is
+     * safe for world-log listeners such as NeroQuests' {@code custom_event}. Value and threshold are
+     * the {@link TerraformingStage} ordinal (SEEDED 1 .. COMPLETE 4); {@code rising} is false only for
+     * a rollback to DORMANT (0).
+     */
     private void fireEvent(ServerLevel level, float fraction) {
         AgricultureApi.fireTerraforming(new AgricultureApi.TerraformingEvent(
                 Identifier.fromNamespaceAndPath("neroagriculture", "project/" + Long.toHexString(worldPosition.asLong())),
                 level.dimension().identifier(), worldPosition.asLong(), Math.max(0.0F, Math.min(1.0F, fraction))));
+        int ordinal = stage.ordinal();
+        ThresholdEvents.fire("neroagriculture", new ThresholdEvents.ThresholdCrossing(STAGE_CHANNEL,
+                level.dimension().identifier().toString(), ordinal, ordinal, stage != TerraformingStage.DORMANT));
     }
 
     public String status() {

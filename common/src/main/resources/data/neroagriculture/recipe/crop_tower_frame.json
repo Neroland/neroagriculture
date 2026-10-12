@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I I",
+    "ITI",
+    "I I"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "T": "neroagriculture:territe_fragment"
+  },
+  "result": {
+    "id": "neroagriculture:crop_tower_frame",
+    "count": 4
+  }
+}

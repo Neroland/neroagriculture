@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IFI",
+    "IDI",
+    "TRT"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "F": "neroagriculture:fertiliser",
+    "D": "minecraft:dispenser",
+    "T": "neroagriculture:territe_fragment",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:fertiliser_applicator",
+    "count": 1
+  }
+}

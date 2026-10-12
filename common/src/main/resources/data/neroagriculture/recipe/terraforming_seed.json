@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "BPB",
+    " O "
+  ],
+  "key": {
+    "O": "neroagriculture:orbite_fragment",
+    "B": "minecraft:bone_meal",
+    "P": "neroagriculture:prospora_seed"
+  },
+  "result": {
+    "id": "neroagriculture:terraforming_seed",
+    "count": 1
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "title": "quest.neroagriculture.field_ledger.ledger_opened.title",
+  "description": "quest.neroagriculture.field_ledger.ledger_opened.desc",
+  "icon": "minecraft:writable_book",
+  "prerequisites": [
+    "neroagriculture:field_ledger/first_compost",
+    "neroagriculture:field_ledger/quick_growth",
+    "neroagriculture:field_ledger/heavy_harvest",
+    "neroagriculture:field_ledger/biomass_stock",
+    "neroagriculture:field_ledger/nothing_wasted"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:quest_complete",
+      "quest": "neroagriculture:field_ledger/first_compost"
+    },
+    {
+      "type": "neroquests:quest_complete",
+      "quest": "neroagriculture:field_ledger/quick_growth"
+    },
+    {
+      "type": "neroquests:quest_complete",
+      "quest": "neroagriculture:field_ledger/heavy_harvest"
+    },
+    {
+      "type": "neroquests:quest_complete",
+      "quest": "neroagriculture:field_ledger/biomass_stock"
+    },
+    {
+      "type": "neroquests:quest_complete",
+      "quest": "neroagriculture:field_ledger/nothing_wasted"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 60
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 50
+    }
+  ],
+  "scope": "player"
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "OBO",
+    " O "
+  ],
+  "key": {
+    "O": "neroagriculture:orbite_fragment",
+    "B": "neroagriculture:forgite_grow_bed"
+  },
+  "result": {
+    "id": "neroagriculture:orbite_grow_bed",
+    "count": 1
+  }
+}

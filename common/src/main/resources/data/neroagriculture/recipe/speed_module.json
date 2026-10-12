@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TRT",
+    "RCR",
+    "TRT"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "R": "minecraft:redstone",
+    "C": "minecraft:clock"
+  },
+  "result": {
+    "id": "neroagriculture:speed_module",
+    "count": 1
+  }
+}

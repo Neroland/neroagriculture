@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FMF",
+    "ICI",
+    "IRI"
+  ],
+  "key": {
+    "F": "neroagriculture:forgite_fragment",
+    "M": "neroagriculture:biomass",
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:cauldron",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:biofuel_converter",
+    "count": 1
+  }
+}

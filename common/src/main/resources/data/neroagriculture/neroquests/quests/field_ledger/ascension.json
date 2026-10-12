@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.ascension.title",
+  "description": "quest.neroagriculture.field_ledger.ascension.desc",
+  "icon": "minecraft:nether_star",
+  "prerequisites": [
+    "neroagriculture:field_ledger/transmutation"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:ascension"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 300
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 300
+    }
+  ],
+  "scope": "player"
+}

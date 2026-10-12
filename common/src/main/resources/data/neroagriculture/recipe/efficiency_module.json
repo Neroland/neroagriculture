@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TLT",
+    "LCL",
+    "TLT"
+  ],
+  "key": {
+    "T": "neroagriculture:territe_fragment",
+    "L": "minecraft:lapis_lazuli",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "neroagriculture:efficiency_module",
+    "count": 1
+  }
+}

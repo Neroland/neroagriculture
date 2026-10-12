@@ -29,7 +29,23 @@ project back. Because terraforming only toggles an environment override, rollbac
   `terraforming.*`.
 - Projects respect the claim/ownership policy: with a claims mod present, only authorised players can start
   or advance a project, and the check **fails closed** when authorisation cannot be determined.
-- Progress, completion and rollback are published as public terraforming events for Quests/Colonies/Events.
+- Progress, completion and rollback are published as public terraforming events for Quests/Colonies/Events,
+  and every stage change is mirrored on Neroland Core's event bus (below).
+
+## Stage threshold event
+
+Each time a project changes stage the controller fires a crossing on Neroland Core's `ThresholdEvents` bus
+on channel **`neroagriculture:terraform_stage`**, so quest and event mods can react without any link to
+this mod:
+
+- **scope**: the dimension id, for example `minecraft:overworld`. Never the controller position, the
+  project id or a player (POPIA/GDPR).
+- **value** and **threshold**: the stage number — Seeded 1, Growing 2, Stabilising 3, Complete 4.
+- **rising**: `true` for every forward step; `false` only when a project is rolled back to Dormant (0).
+
+A NeroQuests server-scope quest can therefore wait for `min_value: 4` on this channel to mark the first
+completed terraform in a world. The in-process `AgricultureApi` terraforming event, which does carry the
+project's position for mods that need it, is unchanged.
 
 ## Griefing warning
 

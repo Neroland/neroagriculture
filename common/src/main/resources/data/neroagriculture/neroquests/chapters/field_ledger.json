@@ -1,0 +1,82 @@
+{
+  "title": "chapter.neroagriculture.field_ledger.title",
+  "icon": "neroagriculture:fertiliser",
+  "allow_server_scope": true,
+  "quests": [
+    {
+      "quest": "neroagriculture:field_ledger/first_compost",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/quick_growth",
+      "x": 2,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/heavy_harvest",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "quest": "neroagriculture:field_ledger/biomass_stock",
+      "x": 0,
+      "y": 4
+    },
+    {
+      "quest": "neroagriculture:field_ledger/nothing_wasted",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "quest": "neroagriculture:field_ledger/ledger_opened",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "quest": "neroagriculture:field_ledger/refinement",
+      "x": 6,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/synthesis",
+      "x": 8,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/transmutation",
+      "x": 10,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/ascension",
+      "x": 12,
+      "y": 0
+    },
+    {
+      "quest": "neroagriculture:field_ledger/first_reaping",
+      "x": 0,
+      "y": 2
+    },
+    {
+      "quest": "neroagriculture:field_ledger/seed_scholar",
+      "x": 6,
+      "y": 2
+    },
+    {
+      "quest": "neroagriculture:field_ledger/under_glass",
+      "x": 6,
+      "y": 4
+    },
+    {
+      "quest": "neroagriculture:field_ledger/vertical_farm",
+      "x": 8,
+      "y": 4
+    },
+    {
+      "quest": "neroagriculture:field_ledger/green_world",
+      "x": 12,
+      "y": 4
+    }
+  ]
+}

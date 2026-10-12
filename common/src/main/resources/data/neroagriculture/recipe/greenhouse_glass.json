@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GTG",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "T": "neroagriculture:territe_fragment"
+  },
+  "result": {
+    "id": "neroagriculture:greenhouse_glass",
+    "count": 8
+  }
+}

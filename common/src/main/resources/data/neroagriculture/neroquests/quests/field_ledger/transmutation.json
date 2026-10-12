@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroagriculture.field_ledger.transmutation.title",
+  "description": "quest.neroagriculture.field_ledger.transmutation.desc",
+  "icon": "minecraft:echo_shard",
+  "prerequisites": [
+    "neroagriculture:field_ledger/synthesis"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroagriculture:transmutation"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 200
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 200
+    }
+  ],
+  "scope": "player"
+}

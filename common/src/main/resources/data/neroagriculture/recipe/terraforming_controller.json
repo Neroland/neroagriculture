@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OGO",
+    "ICI",
+    "IRI"
+  ],
+  "key": {
+    "O": "neroagriculture:orbite_fragment",
+    "G": "minecraft:glowstone",
+    "I": "minecraft:iron_ingot",
+    "C": "neroagriculture:greenhouse_controller",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "neroagriculture:terraforming_controller",
+    "count": 1
+  }
+}
