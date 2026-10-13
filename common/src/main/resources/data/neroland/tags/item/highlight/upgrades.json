@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "neroagriculture:efficiency_module",
+      "required": false
+    },
+    "neroagriculture:speed_module"
+  ]
+}

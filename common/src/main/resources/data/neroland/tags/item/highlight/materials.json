@@ -1,0 +1,41 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "neroagriculture:alien_crop",
+      "required": false
+    },
+    "neroagriculture:alien_produce",
+    "neroagriculture:alien_seed",
+    "neroagriculture:biofuel_bucket",
+    "neroagriculture:biofuel_canister",
+    "neroagriculture:biomass",
+    "neroagriculture:blank_seed",
+    "neroagriculture:charged_seed",
+    "neroagriculture:crop_waste",
+    "neroagriculture:engineered_food",
+    "neroagriculture:engineered_food_crop",
+    "neroagriculture:fertiliser",
+    "neroagriculture:speed_fertiliser",
+    "neroagriculture:yield_fertiliser",
+    "neroagriculture:food_seed",
+    "neroagriculture:prospora_seed",
+    "neroagriculture:resource_crop",
+    "neroagriculture:resource_fragment",
+    "neroagriculture:resource_seed",
+    "neroagriculture:terraforming_seed",
+    "neroagriculture:nutrient_bucket",
+    "neroagriculture:nutrient_canister",
+    "neroagriculture:fragment_decor",
+    "neroagriculture:colonite_fragment",
+    "neroagriculture:colonite_fragment_block",
+    "neroagriculture:forgite_fragment",
+    "neroagriculture:forgite_fragment_block",
+    "neroagriculture:orbite_fragment",
+    "neroagriculture:orbite_fragment_block",
+    "neroagriculture:territe_fragment",
+    "neroagriculture:territe_fragment_block",
+    "neroagriculture:voidite_fragment",
+    "neroagriculture:voidite_fragment_block"
+  ]
+}
