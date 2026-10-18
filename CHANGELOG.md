@@ -63,6 +63,15 @@ item, recipe or tag id changes, and no gameplay balance change.
 
 ### Fixed
 
+- **Machines, grow beds, controllers and fragment blocks drop again when mined with a pickaxe.**
+  The mod shipped no `minecraft:mineable/pickaxe` block tag, so every block that needs the correct
+  tool (grow beds, all machines and controllers) dropped nothing when broken, and the frames, glass,
+  door and fragment blocks mined slowly. They are now all tagged as pickaxe-mineable (any pickaxe
+  tier). Crops and fluids are unchanged.
+- **Block and loot drops work as intended on Minecraft 26.3** (NeoForge, Fabric and Forge). Minecraft
+  26.3 changed the loot-table file format and silently ignores the old one, so conditions and drop
+  modifiers (explosion survival, door/slab block-state checks, drop counts, random chances) were skipped.
+  The 26.3 builds now ship every loot table in the new format. 26.1.2 and 26.2 were not affected.
 - **The erasure tombstone store no longer crashes the server on a corrupt file.**
   `ErasedOwners.get` read `data/erased_owners.dat` straight through `computeIfAbsent`, and it is
   consulted on *every owned block-entity load* — so an unreadable file threw once per chunk load,
