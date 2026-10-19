@@ -7,6 +7,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 
 import net.minecraft.server.level.ServerPlayer;
@@ -45,7 +46,9 @@ public final class NeroAgricultureForge {
         PlayerEvent.PlayerChangedDimensionEvent.BUS.addListener(event -> {
             if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerChangedDimension(player);
         });
-        // Clear the common server-scoped static caches so nothing leaks into the next (single-player) world.
+        // Record the running server (the NeroLink module resolves the world from it) and clear the common
+        // server-scoped static caches so nothing leaks into the next (single-player) world.
+        ServerStartedEvent.BUS.addListener(event -> ServerStateReset.serverStarted(event.getServer()));
         ServerStoppedEvent.BUS.addListener(event -> ServerStateReset.serverStopped());
         // Ages the crop-tower output window so neroagriculture:tower_output falls back on time.
         net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(event ->

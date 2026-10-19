@@ -7,6 +7,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Companion-client support, a two-way Nerospace environment bridge and two POPIA/GDPR fixes. No block,
+item, recipe or tag id changes, and no gameplay balance change.
+
+### Added
+
+**Nerospace environment and oxygen bridge**
+
+- On Nerospace planets, Nerospace now answers the open-air growing environment directly — atmosphere,
+  hazard and terraforming stage — instead of NeroAgriculture guessing from its own dimension table. The
+  practical effect is that a **terraformed** planet supports open-sky farming while a dead one still
+  needs a sealed greenhouse.
+- A formed, powered greenhouse publishes its oxygen production back into Nerospace's atmosphere model
+  as a bounded, expiring contribution around the controller. Breaching, unpowering or breaking the
+  greenhouse retracts it at once.
+- Nerospace stays silent for the overworld, the nether, the end and every other mod's dimension, so
+  datapack environments are never overridden. A completed local terraforming project still wins over
+  Nerospace's reading of the same spot.
+- New config key `compat.nerospace_environment` (default `true`, server-authoritative).
+- Nerospace is consumed as an **optional compile-only** dependency (`nerospace_version`, new, pinned
+  to `1.1.0` — the first Nerospace release published for all nine loader x MC cells; the API surface
+  used has been stable since `1.0.3`). It is listed as optional in all three manifests, is neither
+  shipped nor required, and every Nerospace type sits behind a holder class the JVM only loads once
+  the mod is confirmed present — so the mod runs unchanged with Nerospace absent. Nothing reflects.
+- **Not wired, deliberately:** `CycleApi` (Nerospace exposes no public space-weather query) and the
+  terraforming overlay hand-off (Nerospace's overlay API is claim-gated and needs an acting player, so
+  forwarding our block-entity events would be a silent no-op on every server).
+- **Privacy:** nothing player-identifying crosses this seam in either direction. The environment query
+  carries no actor, and the oxygen source id is derived from the greenhouse controller's block
+  position, never from its owner.
+
+**NeroLink module** (`za.co.neroland.neroagriculture.link`, module id `neroagriculture`, schema `1`)
+
+- NeroAgriculture now registers with Neroland Core's link registry, so a companion client can show you
+  your own farm. Four read sections — `crops` (your grow beds, what is planted and what is blocking
+  it), `machines` (fabrication, area and terraforming machines with progress), `greenhouse` (the
+  greenhouses enclosing your beds: seal state, volume, oxygen, leak) and `fragments` (per-tier progress
+  up the Cosmic-ascent ladder, discovered materials and gate state).
+- Two owner-scoped live topics — `greenhouse` (a greenhouse you farm in changed seal state) and
+  `terraforming` (one of your projects reached a new stage) — plus one rate-limited alert when a
+  greenhouse you farm in stops being sealed. No broadcast topics: a farm is not a public place.
+- **One action, `acknowledge_alert`, and nothing else.** Every other candidate write creates items,
+  consumes items or changes the world, which is the class of action that should require being in the
+  world. No link action can plant, harvest, fertilise or alter crops.
+- **No `towers` section.** The Crop Tower Controller records no owner and its in-world gate check falls
+  back to `getNearestPlayer`, which is not a permission model — a player idling near somebody else's
+  tower would have been handed its contents. The section is omitted rather than approximated, and
+  becomes available (additively) once the controller records a placing player. `greenhouse` passes the
+  same test only because it is scoped indirectly: a greenhouse is reported to you when it encloses a
+  grow bed *you* own, so the authorisation comes from the bed.
+- New config key `link.module_enabled` (default `true`); `false` registers nothing at all. A failure
+  registering the module is logged and swallowed — farming is unaffected.
+- New wiki page [Link module](wiki/Link-Module.md), and the new surface is disclosed in
+  [`PRIVACY.md`](PRIVACY.md) and [Privacy and erasure](wiki/Privacy-and-Erasure.md).
+
+### Fixed
+
+- **Machines, grow beds, controllers and fragment blocks drop again when mined with a pickaxe.**
+  The mod shipped no `minecraft:mineable/pickaxe` block tag, so every block that needs the correct
+  tool (grow beds, all machines and controllers) dropped nothing when broken, and the frames, glass,
+  door and fragment blocks mined slowly. They are now all tagged as pickaxe-mineable (any pickaxe
+  tier). Crops and fluids are unchanged.
+- **Block and loot drops work as intended on Minecraft 26.3** (NeoForge, Fabric and Forge). Minecraft
+  26.3 changed the loot-table file format and silently ignores the old one, so conditions and drop
+  modifiers (explosion survival, door/slab block-state checks, drop counts, random chances) were skipped.
+  The 26.3 builds now ship every loot table in the new format. 26.1.2 and 26.2 were not affected.
+- **The erasure tombstone store no longer crashes the server on a corrupt file.**
+  `ErasedOwners.get` read `data/erased_owners.dat` straight through `computeIfAbsent`, and it is
+  consulted on *every owned block-entity load* — so an unreadable file threw once per chunk load,
+  forever, **and** stopped erased owners being dropped from saved NBT. That made it an erasure failure,
+  not only a stability bug. Every fetch now routes through Neroland Core's shared
+  `za.co.neroland.nerolandcore.data.SavedDataRecovery` (Core 1.15.0, the version already required),
+  with the primary → last-known-good backup → fresh-store ladder used across the ecosystem, reporting
+  the failure as handled telemetry instead of crashing.
+- **Erasure and retention now reach the recovery backup.** The backup is a second copy of the same
+  UUIDs, so a new tombstone is forced into it in the same request that records the erasure, and an
+  expired tombstone is forced out of it in the same pass that prunes it — the
+  `privacy.erasure_retention_days` window applies to both copies.
+- **The Nerospace planet-visit adapter's session map is registered for erasure.** The in-memory
+  last-seen-dimension entry was session-scoped and therefore low risk, but an erasure request now
+  clears it immediately rather than waiting for the player to disconnect.
+
+### Changed
+
+- **The Nerospace visit-history backfill now calls Nerospace's public API directly.** On join,
+  historical planet visits are read from `NerospaceVisits.visitedPlanets` (Nerospace 1.0.3+) through
+  the same optional compile-only dependency as the environment bridge, replacing the reflective
+  `compat/nerospace/NerospaceVisitHistory` probe that guessed at method names. Behaviour is unchanged
+  — visits made before NeroAgriculture was installed are still backfilled once per join, and live
+  tracking still compares dimension ids — and any failure still degrades silently to live tracking.
+  The `compat.nerospace_visits` description now names Nerospace 1.0.3+ instead of `1.0.0-beta.8`.
+
 ## [0.5.0-beta.1] - 2026-10-11
 
 Survival crafting recipes for every machine, controller, grow bed and farm block, a NeroQuests quest

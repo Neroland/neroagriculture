@@ -24,5 +24,8 @@
     "java": ">=25",
     "fabric-api": "*",
     "nerolandcore": ">=${nerolandcore_version}"
+  },
+  "suggests": {
+    "nerospace": ">=${nerospace_version}"
   }
 }

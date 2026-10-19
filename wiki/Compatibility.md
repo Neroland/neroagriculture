@@ -11,7 +11,8 @@ recipe-viewer plugins under `compat/jei` and `compat/emi`, which load only when 
 | Mod | Route | Status |
 | --- | --- | --- |
 | Neroland Core | Hard dependency (registration, machines, NF energy, upgrades, side config, gates, fluids) | Live |
-| Nerospace | `EnvironmentApi` (planet atmosphere), `OxygenApi`, `CycleApi` (space weather), terraforming overlay | Contract-ready; live wiring pending Nerospace 26.x |
+| Nerospace | `EnvironmentApi` (planet atmosphere) + `OxygenApi` (greenhouse oxygen), via its public API as an optional compile-only dependency; planet visits via dimension identity plus a join-time backfill from its `NerospaceVisits` API | Live — see [Nerospace integration](Nerospace-Integration.md) |
+| Nerospace | `CycleApi` (space weather), terraforming overlay hand-off | Not wired — Nerospace exposes no public cycle query, and its overlay API needs a server-installed claim policy and an acting player |
 | Nerotech / NeroPower | `AgricultureApi.BIOFUEL` consumer seam + `c:` biofuel fluid/item tags | Contract-ready; live when a consumer registers |
 | Energized Power | Core Forge-Energy bridge + `c:` material/biofuel tags | Live (targets 26.1+/26.2) |
 | Create | Generic item/fluid I/O via Core side config + `c:` tags (no Create classes) | Dormant until Create ports to 26.1+ |

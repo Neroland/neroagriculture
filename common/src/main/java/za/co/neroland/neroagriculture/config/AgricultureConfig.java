@@ -75,8 +75,16 @@ public final class AgricultureConfig {
             + "hard gates), auto (only when the opener mod is loaded), or on (always)");
     public static final ConfigValue<Boolean> NEROSPACE_VISITS = SCHEMA.bool("compat.nerospace_visits", true,
             true, "Grant material_discovered for planet-bound materials from Nerospace planet visits — "
-            + "live dimension entry plus, with Nerospace 1.0.0-beta.8+, historical visit backfill on join; "
+            + "live dimension entry plus, with Nerospace 1.0.3+, historical visit backfill on join; "
             + "off leaves planet-bound research locked to visits that are never recorded");
+    public static final ConfigValue<Boolean> NEROSPACE_ENVIRONMENT = SCHEMA.bool("compat.nerospace_environment",
+            true, true, "Let Nerospace answer the open-air growing environment on its own planets, and "
+            + "publish greenhouse oxygen back into its atmosphere model; off (or with Nerospace absent) "
+            + "falls back to this mod's own dimension environment table and local life support");
+    public static final ConfigValue<Boolean> LINK_MODULE_ENABLED = SCHEMA.bool("link.module_enabled", true,
+            true, "Expose NeroAgriculture data to companion clients through Neroland Core's NeroLink "
+            + "registry (own farms only — see wiki/Link-Module.md); off registers nothing at all, and "
+            + "no snapshot, action or event leaves the mod");
     public static final ConfigValue<Boolean> CYCLES_ENABLED = SCHEMA.bool("cycles.enabled", true, true,
             "Enable seasonal/stellar-cycle growth and yield modifiers");
     public static final ConfigValue<Boolean> TERRAFORM_ENABLED = SCHEMA.bool("terraforming.enabled", true, true,

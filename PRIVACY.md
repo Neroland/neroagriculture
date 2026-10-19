@@ -72,14 +72,47 @@ keyed by **UUID only** (never a username or display name):
 
 Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle
 phases, and the per-dimension crop-tower output count behind the `neroagriculture:tower_output`
-threshold event (kept in memory only) — is world data with no player attribution.
+threshold event (kept in memory only) — is world data with no player attribution. One per-player
+value is held in memory only: each online player's last-seen dimension, used to notice a planet
+visit. It is never written to disk or logged, and is dropped on disconnect, on server stop, and on an
+erasure request. When Nerospace is installed, the mod also reads the joining player's own Nerospace
+planet-visit list once per join to credit planet-bound research; nothing from it is stored by
+NeroAgriculture beyond the resulting Core milestone.
 
 Ownership data is registered with Neroland Core's shared data-erasure hook
 (`data.PlayerDataErasure`), so a single erase request purges a player's NeroAgriculture data
 alongside every other Neroland mod. Erasure also writes a UUID tombstone so machines in chunks that
 were unloaded at the time drop their owner when those chunks next load; tombstones are pruned after
-`privacy.erasure_retention_days` (default 90 days). See
-[`wiki/Privacy-and-Erasure.md`](wiki/Privacy-and-Erasure.md) for the operational detail.
+`privacy.erasure_retention_days` (default 90 days).
+
+That tombstone file is read on every owned-machine load, so it is loaded through a crash-recovery
+guard: an unreadable copy falls back to a last-known-good backup and then to a fresh, empty store,
+rather than crashing the server repeatedly *and* leaving the erasure request unfinished. The backup
+holds the same UUIDs, so it is kept in step deliberately — a new tombstone reaches it in the same
+request that creates it, and an expired one leaves it in the same pass that prunes it, under the same
+retention window. See [`wiki/Privacy-and-Erasure.md`](wiki/Privacy-and-Erasure.md) for the
+operational detail.
+
+## Companion clients (the NeroLink module)
+
+NeroAgriculture registers a **link module** with Neroland Core so that a companion client can display
+your own farm. It is enabled by default and switched off with `link.module_enabled = false` in
+`config/neroagriculture.properties`.
+
+The module **stores no new data**. It is a read view over live block-entity state and Core's existing
+milestone store, and every section is scoped to the requesting player's own UUID before anything
+leaves the mod — the machines that UUID owns, and nothing else. It reports your grow beds and
+machines with their positions and state, the greenhouses enclosing your beds (crop counts only, never
+whose crops), and your per-tier fragment-ladder progress. It exposes exactly one write action:
+marking your own alert read. No link action can plant, harvest, fertilise or alter crops.
+
+Because every read starts from the owner UUID recorded on a block entity, an erased player owns
+nothing and every section answers empty for them — erasure needs no separate wiring here.
+
+NeroAgriculture ships no server and no network code for this: it publishes into Core's registry, and
+the separate **NeroLink** bridge mod (with its own disclosure) is what serves it to a device. Without
+that bridge installed, nothing reads the registry. Full detail:
+[`wiki/Link-Module.md`](wiki/Link-Module.md).
 
 ## Legal basis and your rights (GDPR / POPIA)
 

@@ -46,6 +46,24 @@ public final class GreenhouseIndex {
         CONTROLLER_TO_INTERIOR.clear();
     }
 
+    /**
+     * The controller of the greenhouse whose interior contains {@code pos}, or {@code null} when the
+     * position is not inside any published interior.
+     *
+     * <p>Unlike {@link #sealedAt} this reports the containing greenhouse whatever state it is in — the
+     * link module uses it to answer "which greenhouse is my crop in?", and a breached one is exactly the
+     * case its owner most wants to hear about. It performs no loaded check and never touches the world,
+     * so it cannot force-load a chunk; callers that need the controller's live state must make their own
+     * {@code isLoaded} check first, as {@link #sealedAt} does.
+     */
+    @org.jetbrains.annotations.Nullable
+    public static BlockPos controllerAt(ServerLevel level, BlockPos pos) {
+        Map<Long, Long> forward = INTERIOR_TO_CONTROLLER.get(level.dimension().identifier());
+        if (forward == null) return null;
+        Long controllerKey = forward.get(pos.asLong());
+        return controllerKey == null ? null : BlockPos.of(controllerKey);
+    }
+
     /** True when the position sits inside a formed, powered greenhouse whose controller is loaded. */
     public static boolean sealedAt(ServerLevel level, BlockPos pos) {
         Map<Long, Long> forward = INTERIOR_TO_CONTROLLER.get(level.dimension().identifier());

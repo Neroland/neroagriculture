@@ -16,6 +16,13 @@ Only two kinds, both keyed by **UUID only** (never a username or display name):
 - **Material milestones / research** — which materials and seeds a player has discovered or researched is
   tracked through Core's shared progression store, not by this mod directly.
 
+Plus one **transient, in-memory** value: each online player's last-seen dimension, used by the Nerospace
+planet-visit adapter on Fabric to notice that they changed world. It is never written to disk, never
+logged, dropped when the player disconnects and when the server stops, and cleared immediately by an
+erasure request. When Nerospace is installed, the same adapter also reads the joining player's own
+Nerospace planet-visit list once per join to credit planet-bound research; nothing from it is kept
+beyond the resulting Core milestone.
+
 Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle phases — is
 **world data with no player attribution**.
 
@@ -23,6 +30,30 @@ Everything else — the material catalog, greenhouse and tower state, terraforme
 
 No usernames or display names, no chat, no location history, and no play-time analytics. Aggregate
 world/environment data is never linked to a player.
+
+## Companion clients (the NeroLink module)
+
+NeroAgriculture registers a **link module** with Neroland Core so a companion client can show you your
+own farm. This is a data-processing surface, so it is worth stating exactly what it exposes:
+
+- **It stores nothing new.** The module is a read view over live block-entity state and Core's existing
+  milestone store. It adds no table, no log and no per-player record of its own.
+- **Own machines only.** Every section is scoped to the requesting player's UUID before anything leaves
+  the mod — the machines that UUID owns, and nothing else. It does not widen for operators, and it never
+  falls back to "the nearest player", which is why crop towers (which have no owner field) are omitted
+  from it entirely.
+- **What leaves the mod:** your grow beds and machines with their positions and state, the greenhouses
+  enclosing your beds, and your per-tier fragment-ladder progress. A shared greenhouse reports how many
+  crops are inside, never whose.
+- **What a client may change:** one thing — marking your own alert read. No link action can plant,
+  harvest, fertilise or alter crops, yours or anyone's.
+- **Erasure is automatic.** Every read starts from the owner UUID on a block entity, so an erased player
+  owns nothing and every section answers empty for them; no extra eraser is needed.
+- **Opt out** with `link.module_enabled = false`, which registers nothing at all.
+
+The bridge that actually serves this to a device is the separate **NeroLink** mod, with its own
+disclosure; without it installed nothing reads Core's registry. Full detail:
+[NeroLink module](Link-Module.md).
 
 ## Anonymous crash reporting (opt-out)
 
@@ -63,10 +94,22 @@ triggers the same path.
   machines whose chunks were unloaded at erasure time drop the owner the moment they load. Tombstones are
   pruned after a retention window (`privacy.erasure_retention_days`, default 90 days) and the UUIDs in
   them are never logged.
+- **Session state:** the planet-visit adapter's in-memory last-seen-dimension entry is dropped in the
+  same request, so an erasure leaves no trace of the player in memory either.
+- **Crash-safe tombstones.** The tombstone file is read on every owned-machine load, so a corrupt or
+  unreadable copy used to be a double failure: a repeating server crash *and* a silently failed erasure,
+  because the tombstones that drop owners out of saved chunks were unreachable. It now loads through a
+  recovery guard that falls back to a last-known-good backup and then to a fresh (empty) store, so the
+  worst case is a degraded server rather than one that will not stay up.
+  <br>That backup is a second copy of the same UUIDs, so it is kept in step deliberately: a new tombstone
+  is written to it in the same request that creates it, and an expired tombstone is removed from it in
+  the same pass that prunes it. The retention window applies to both copies.
 
 ## For administrators
 
-Set `automation.track_owner = false` to disable ownership recording entirely. Player-data erasure is
+Set `automation.track_owner = false` to disable ownership recording entirely. Set
+`link.module_enabled = false` to stop exposing anything to companion clients. Player-data erasure is
 performed through Core's mechanism; NeroAgriculture participates automatically once Core processes a request.
 
-See also: [Administration](Administration.md), [Configuration](Configuration.md).
+See also: [Administration](Administration.md), [Configuration](Configuration.md),
+[NeroLink module](Link-Module.md).

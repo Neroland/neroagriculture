@@ -26,12 +26,14 @@ import za.co.neroland.nerolandcore.progression.MaterialObservation;
  *
  * <h2>Mechanism (decision record)</h2>
  * <ul>
- *   <li><b>Not Core's link API:</b> Nerospace registers no {@code za.co.neroland.nerolandcore.link}
- *       module (verified against the Nerospace source), so there is nothing in the link registry to
- *       query for visits.</li>
- *   <li><b>Not a compile-time import:</b> Nerospace is not on NeroAgriculture's compile classpath (no
- *       {@code nerospace} pin in {@code gradle.properties}) and sibling interop must stay optional, so
- *       {@code common/} cannot reference {@code za.co.neroland.nerospace} types.</li>
+ *   <li><b>Not Core's link API:</b> Nerospace's {@code za.co.neroland.nerolandcore.link} module serves
+ *       rockets, stations, planets, life support and the Star Guide — there is no visit section, and in
+ *       any case that registry exists to answer companion clients about a player's own data, not to be
+ *       a mod-to-mod query channel.</li>
+ *   <li><b>Compile-time API, never a hard dependency:</b> Nerospace is a {@code compileOnly} dependency
+ *       ({@code nerospace_version} in {@code gradle.properties}) and sibling interop must stay optional,
+ *       so the only Nerospace types this class names live in the nested {@link History} holder, which
+ *       the JVM links on first use and which is only reached once Nerospace is known to be loaded.</li>
  *   <li><b>Live visits — loader events plus vanilla dimension identity:</b> a Nerospace planet is,
  *       at data level, just the dimension id its materials are restricted to (e.g.
  *       {@code nerospace:cindara}). Player join and dimension-change events — wired by each loader
@@ -39,26 +41,32 @@ import za.co.neroland.nerolandcore.progression.MaterialObservation;
  *       {@code player.level().dimension().identifier()} against the catalog's restrictions. Zero
  *       Nerospace code involved, so it works with every Nerospace version and costs one string
  *       comparison when Nerospace is absent.</li>
- *   <li><b>Historical visits — reflection over the documented {@code nerospace.api} facade:</b>
- *       visits made before NeroAgriculture was added are backfilled once per join via
- *       {@link NerospaceVisitHistory}, which reflectively queries the semver-stable
- *       {@code za.co.neroland.nerospace.api.NerospaceVisits} surface negotiated for the
- *       Nerospace {@code >= 1.0.0-beta.8} API floor (BETA-0.1.0-PLAN Stage 1). Reflection is probed
- *       once, version-checked against the floor, and fails silently to "no history" on any absence or
- *       mismatch — live tracking keeps working regardless.</li>
+ *   <li><b>Historical visits — Nerospace's public {@code NerospaceVisits} API:</b> visits made before
+ *       NeroAgriculture was installed are backfilled once per join from
+ *       {@code za.co.neroland.nerospace.api.NerospaceVisits#visitedPlanets(MinecraftServer, UUID)}
+ *       (Nerospace 1.0.3+), called directly through the {@link History} holder. This replaces an
+ *       earlier reflective probe that guessed at method names; any failure degrades silently to live
+ *       tracking only.</li>
  * </ul>
  *
  * <h2>Caching and cost</h2>
- * The cross-mod (reflective) query runs exactly once per player join; every later grant in the session
- * is event-driven off our own dimension-change hook, which doubles as the "new visit" invalidation —
- * no polling, no per-tick work, no repeated cross-mod calls. Milestone writes are idempotent
+ * The cross-mod history query runs exactly once per player join; every later grant in the session is
+ * event-driven off our own dimension-change hook, which doubles as the "new visit" invalidation — no
+ * polling beyond the Fabric tick diff and no per-tick work. Milestone writes are idempotent
  * ({@code isObserved} is checked first) and Core persists them, so re-running a sync is harmless.
  *
  * <h2>Privacy (POPIA/GDPR)</h2>
- * This class stores nothing. The only per-player data it touches is the milestone grant itself, which
- * lives in Core's {@code MaterialMilestones} store and is therefore covered by Core's
- * {@code PlayerDataErasure} hook exactly like every other research milestone. Logs carry material and
- * dimension ids only — never player names or UUIDs.
+ * This class persists nothing. It reads the joining player's own Nerospace visit list (planet ids only)
+ * and uses it solely to grant that same player's milestones. The only per-player data it writes is the
+ * milestone grant itself, which lives in Core's {@code MaterialMilestones} store and is therefore
+ * covered by Core's {@code PlayerDataErasure} hook exactly like every other research milestone. Logs
+ * carry material and dimension ids only — never player names or UUIDs.
+ *
+ * <p>The one in-memory per-player value, {@link #LAST_DIMENSION}, is session-scoped and dropped on
+ * disconnect and on server stop, so it cannot outlive a session. It is nevertheless registered with
+ * Core's erasure hook by {@link #register()}: an erasure request should leave no trace of a player
+ * anywhere in this mod, including RAM, and "it would have been cleared eventually" is not an answer to
+ * give a data subject.
  *
  * <p>Disable with {@code compat.nerospace_visits = false} (default {@code true}).</p>
  */
@@ -72,14 +80,24 @@ public final class NerospaceVisitBridge {
 
     /**
      * Session-only last-seen dimension per player, fed exclusively by the tick poll. Transient
-     * operational data (never persisted, never logged), removed on disconnect and cleared on server
-     * stop via {@link #reset()} — so it needs no erasure-hook coverage.
+     * operational data: never persisted, never logged, removed on disconnect and cleared on server stop
+     * via {@link #reset()}. {@link #register()} additionally drops the row on a Core erasure request so
+     * the guarantee is "gone now", not "gone when you next log out".
      */
     private static final Map<UUID, Identifier> LAST_DIMENSION = new ConcurrentHashMap<>();
 
     private static int tickCounter;
 
     private NerospaceVisitBridge() { }
+
+    /**
+     * Registers the session map with Core's shared erasure hook. Called once from common init, next to
+     * the other {@code PlayerDataErasure} registrations.
+     */
+    public static void register() {
+        za.co.neroland.nerolandcore.data.PlayerDataErasure.register(
+                (server, uuid) -> LAST_DIMENSION.remove(uuid));
+    }
 
     /**
      * Tick-driven dimension diff for loaders whose API ships no server-side player dimension-change
@@ -111,13 +129,14 @@ public final class NerospaceVisitBridge {
 
     /**
      * Player joined: record the dimension they logged into, then backfill historical Nerospace visits
-     * (one reflective query; empty when Nerospace is absent or below the {@code 1.0.0-beta.8} floor).
+     * (one direct API query; empty when Nerospace is absent).
      */
     public static void onPlayerJoin(ServerPlayer player) {
         if (!AgricultureConfig.NEROSPACE_VISITS.get()) return;
         grantForDimension(player, player.level().dimension().identifier());
-        for (Identifier dimension : NerospaceVisitHistory.visitedDimensions(
-                player.level().getServer(), player.getUUID())) {
+        MinecraftServer server = player.level().getServer();
+        if (server == null || !NerospaceEnvironmentBridge.nerospaceLoaded()) return;
+        for (Identifier dimension : History.visitedDimensions(server, player.getUUID())) {
             grantForDimension(player, dimension);
         }
     }
@@ -153,6 +172,38 @@ public final class NerospaceVisitBridge {
             NeroAgricultureCommon.LOGGER.debug(
                     "[NeroAgriculture] Planet visit to {} discovered {} planet-bound material(s).",
                     dimension, granted);
+        }
+    }
+
+    /**
+     * The only place in this class that names a Nerospace type. Linked by the JVM on first use, which
+     * {@link #onPlayerJoin} only reaches once Nerospace is known to be loaded, so with Nerospace absent it
+     * is never touched. Its signature carries no Nerospace types.
+     */
+    private static final class History {
+
+        /** Set once the query has failed, so a broken or incompatible Nerospace is not retried every join. */
+        private static volatile boolean disabled;
+
+        private History() { }
+
+        /** Dimension ids of every Nerospace planet {@code player} has visited; empty on any failure. */
+        static java.util.List<Identifier> visitedDimensions(MinecraftServer server, UUID player) {
+            if (disabled) return java.util.List.of();
+            try {
+                java.util.List<Identifier> out = new java.util.ArrayList<>();
+                for (za.co.neroland.nerospace.api.PlanetId planet
+                        : za.co.neroland.nerospace.api.NerospaceVisits.visitedPlanets(server, player)) {
+                    out.add(planet.id());
+                }
+                return out;
+            } catch (RuntimeException | LinkageError e) {
+                disabled = true;
+                NeroAgricultureCommon.LOGGER.info(
+                        "[NeroAgriculture] Nerospace visit history unavailable ({}); planet visits are tracked "
+                        + "live only.", e.getClass().getSimpleName());
+                return java.util.List.of();
+            }
         }
     }
 }

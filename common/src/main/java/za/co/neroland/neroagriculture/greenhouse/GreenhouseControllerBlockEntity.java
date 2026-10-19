@@ -115,11 +115,14 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
             this.activeCrops = countCrops(level, result.interior());
             this.oxygenOffset = sumOxygen(level, result.interior());
         } else {
+            // The state change is published BEFORE the interior is dropped: the link module works out
+            // whose grow beds were inside from exactly this set, and once it is empty there is no way
+            // left to tell. Everything else here is order-independent.
+            setStructuralState(result.structure() == GreenhouseValidation.Structure.BREACHED
+                    ? GreenhouseState.BREACHED : GreenhouseState.UNFORMED);
             this.interior = Set.of();
             this.activeCrops = 0;
             this.oxygenOffset = 0;
-            setStructuralState(result.structure() == GreenhouseValidation.Structure.BREACHED
-                    ? GreenhouseState.BREACHED : GreenhouseState.UNFORMED);
             GreenhouseIndex.clear(level, worldPosition);
             retractOxygen(level);
         }
@@ -152,10 +155,22 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         }
     }
 
+    /**
+     * The one place this greenhouse's seal state changes, and therefore the one place the NeroLink
+     * {@code greenhouse} topic is published from. The interior is passed as it stands at this instant —
+     * see {@link #revalidate}, which deliberately calls this before clearing it — because a greenhouse
+     * has no owner of its own and the only people entitled to hear about it are the owners of the grow
+     * beds inside.
+     */
     private void setStructuralState(GreenhouseState next) {
-        if (state != next) {
-            state = next;
-            setChanged();
+        if (state == next) return;
+        GreenhouseState previous = state;
+        state = next;
+        setChanged();
+        if (level instanceof ServerLevel serverLevel) {
+            za.co.neroland.neroagriculture.link.AgricultureLinkEvents.greenhouseStateChanged(
+                    serverLevel, worldPosition, interior, previous, next, volume, activeCrops,
+                    oxygenOffset, leak);
         }
     }
 
