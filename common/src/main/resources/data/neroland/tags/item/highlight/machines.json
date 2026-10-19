@@ -1,0 +1,32 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "neroagriculture:biofuel_converter",
+      "required": false
+    },
+    "neroagriculture:crop_tower_controller",
+    "neroagriculture:crop_tower_frame",
+    "neroagriculture:fertiliser_applicator",
+    "neroagriculture:fertiliser_processor",
+    "neroagriculture:fragment_extractor",
+    "neroagriculture:fragment_infuser",
+    "neroagriculture:genetics_station",
+    "neroagriculture:greenhouse_controller",
+    "neroagriculture:greenhouse_door",
+    "neroagriculture:greenhouse_frame",
+    "neroagriculture:greenhouse_glass",
+    "neroagriculture:harvester",
+    "neroagriculture:planter",
+    "neroagriculture:pollination_beacon",
+    "neroagriculture:seed_research_bench",
+    "neroagriculture:seed_synthesizer",
+    "neroagriculture:terraforming_controller",
+    "neroagriculture:colonite_grow_bed",
+    "neroagriculture:forgite_grow_bed",
+    "neroagriculture:orbite_grow_bed",
+    "neroagriculture:territe_grow_bed",
+    "neroagriculture:voidite_grow_bed",
+    "neroagriculture:oxygen_plant"
+  ]
+}
