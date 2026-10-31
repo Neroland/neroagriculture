@@ -26,12 +26,34 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
     private static final int MUTED = 0xFF5E707C;
 
     public ProcessorScreen(ProcessorMenu menu, Inventory inventory, Component title) {
+        //? if >=26.1 {
         super(menu, inventory, title, 176, 166);
+        //?} else {
+        /*super(menu, inventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = 166;
+        *///?}
         titleLabelX = 8;
         inventoryLabelX = 8;
     }
 
-    @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    //? if <26.1 {
+    /*// Before 26.1 the panel is the container background (renderBg); render() then draws the slots, labels
+    // and tooltip on top, which 26.x does inside extractContents.
+    @Override protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+        this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    *///?}
+    //? if >=26.1 {
+    @Override
+    //?}
+    public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         int w = imageWidth;
@@ -65,7 +87,9 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
         Gauges.bar(g, font, x + 8, y + 56, x + 168, "Progress", menu.progress(),
                 Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
 
+        //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        //?}
     }
 
     @Override protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {

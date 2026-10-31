@@ -52,12 +52,34 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
     private boolean cachedAny;
 
     public GrowBedScreen(GrowBedMenu menu, Inventory inventory, Component title) {
+        //? if >=26.1 {
         super(menu, inventory, title, WIDTH, HEIGHT);
+        //?} else {
+        /*super(menu, inventory, title);
+        this.imageWidth = WIDTH;
+        this.imageHeight = HEIGHT;
+        *///?}
         titleLabelX = 8;
         inventoryLabelX = 8;
     }
 
-    @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    //? if <26.1 {
+    /*// Before 26.1 the panel is the container background (renderBg); render() then draws the slots, labels
+    // and tooltip on top, which 26.x does inside extractContents.
+    @Override protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+        this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    *///?}
+    //? if >=26.1 {
+    @Override
+    //?}
+    public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         int w = imageWidth;
@@ -113,7 +135,9 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
 
         drawPanel(g, x, y, bedTier);
 
+        //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        //?}
     }
 
     private void drawPanel(GuiGraphicsExtractor g, int x, int y, @Nullable FragmentTier bedTier) {

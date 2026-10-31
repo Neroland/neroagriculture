@@ -49,8 +49,8 @@ NeroAgriculture stores **no personal data**. Crop, genetics and terraforming sta
 
 ## Requirements & compatibility
 
-- **Requires [Neroland Core](https://modrinth.com/mod/nerolandcore)** — install it alongside NeroAgriculture (it loads first).
-- Optional but recommended: **[Nerospace](https://modrinth.com/mod/nerospace)** for the planet, atmosphere and oxygen rules that give off-world farming and terraforming their meaning.
+- **Requires [Neroland Core](https://nerolandmc.net/mods/neroland-core/)** — install it alongside NeroAgriculture (it loads first).
+- Optional but recommended: **[Nerospace](https://nerolandmc.net/mods/nerospace/)** for the planet, atmosphere and oxygen rules that give off-world farming and terraforming their meaning.
 - **Modpacks are allowed and encouraged** — any platform, no need to ask. Use the official files and credit *NeroAgriculture by Neroland* with links to the [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/neroagriculture) and the [GitHub repository](https://github.com/Neroland/neroagriculture). Full terms: [LICENSE](https://github.com/Neroland/neroagriculture/blob/main/LICENSE).
 
 ## Links

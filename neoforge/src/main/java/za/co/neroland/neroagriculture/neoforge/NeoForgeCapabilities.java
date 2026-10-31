@@ -5,8 +5,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+//? if >=1.21.9 {
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
+//?}
 
 import za.co.neroland.neroagriculture.registry.ModBlockEntities;
 import za.co.neroland.nerolandcore.machine.AbstractMachineBlockEntity;
@@ -30,11 +32,20 @@ public final class NeoForgeCapabilities {
                     (be, side) -> be.sideConfig().energyView(side));
             event.registerBlockEntity(NeoForgeFluidLookup.FLUID, type,
                     (be, side) -> be.sideConfig().fluidView(side));
+            //? if >=1.21.9 {
             event.registerBlockEntity(Capabilities.Item.BLOCK, type, (be, side) -> {
                 if (!(be instanceof WorldlyContainer container)) return null;
                 return side == null ? VanillaContainerWrapper.of(container)
                         : new WorldlyContainerWrapper(container, side);
             });
+            //?} else {
+            /*// Before 1.21.9 NeoForge has no transfer API: the item surface is IItemHandler.
+            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, type, (be, side) -> {
+                if (!(be instanceof WorldlyContainer container)) return null;
+                return side == null ? new net.neoforged.neoforge.items.wrapper.InvWrapper(container)
+                        : new net.neoforged.neoforge.items.wrapper.SidedInvWrapper(container, side);
+            });
+            *///?}
         }
     }
 }

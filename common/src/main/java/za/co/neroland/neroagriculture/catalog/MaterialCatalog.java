@@ -152,7 +152,11 @@ public final class MaterialCatalog {
             if (input == null || input == Items.AIR) return "input item does not exist: " + definition.input().id();
         } else {
             TagKey<Item> key = TagKey.create(net.minecraft.core.registries.Registries.ITEM, definition.input().id());
+            //? if >=1.21.2 {
             if (BuiltInRegistries.ITEM.get(key).isEmpty()) return "input tag does not exist: " + definition.input().id();
+            //?} else {
+            /*if (BuiltInRegistries.ITEM.getTag(key).isEmpty()) return "input tag does not exist: " + definition.input().id();
+            *///?}
         }
         return null;
     }
@@ -172,6 +176,9 @@ public final class MaterialCatalog {
     private static List<Candidate> discoverTaggedMaterials(List<String> errors) {
         List<Candidate> result = new ArrayList<>();
         BuiltInRegistries.ITEM.getTags()
+                //? if <1.21.2 {
+                /*.map(com.mojang.datafixers.util.Pair::getSecond)
+                *///?}
                 .filter(named -> named.key().location().getNamespace().equals("c")
                         && category(named.key().location().getPath()) != null)
                 .sorted(Comparator.comparing(named -> named.key().location().toString()))

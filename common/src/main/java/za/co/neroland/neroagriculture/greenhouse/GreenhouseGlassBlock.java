@@ -31,7 +31,11 @@ public final class GreenhouseGlassBlock extends Block {
     }
 
     @Override
+    //? if >=1.21.2 {
     protected boolean propagatesSkylightDown(BlockState state) {
+    //?} else {
+    /*protected boolean propagatesSkylightDown(BlockState state, net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
+    *///?}
         return true;
     }
 }

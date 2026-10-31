@@ -55,9 +55,17 @@ public final class FabricationCategory extends AbstractRecipeCategory<Fabricatio
             if (display.unlockOnly()) {
                 // Researching a resource unlocks its seed rather than handing one over, so the seed is shown
                 // but not registered as an output JEI would offer as a way to make it.
+                //? if >=1.21.2 {
                 builder.addSlot(RecipeIngredientRole.RENDER_ONLY, x, TOP).setStandardSlotBackground().add(output);
+                //?} else {
+                /*builder.addSlot(RecipeIngredientRole.RENDER_ONLY, x, TOP).setStandardSlotBackground().addItemStack(output);
+                *///?}
             } else {
+                //? if >=1.21.2 {
                 builder.addOutputSlot(x, TOP).setOutputSlotBackground().add(output);
+                //?} else {
+                /*builder.addOutputSlot(x, TOP).setOutputSlotBackground().addItemStack(output);
+                *///?}
             }
             x += OUTPUT_SLOT;
         }
@@ -65,7 +73,12 @@ public final class FabricationCategory extends AbstractRecipeCategory<Fabricatio
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, FabricationDisplay display, IFocusGroup focuses) {
+        //? if >=1.21.2 && <1.21.11 {
+        /*// JEI for 1.21.4 - 1.21.10 only has the placeable arrow (the widget form came back in later JEI lines).
+        builder.addRecipeArrow().setPosition(arrowX(display), TOP + 1);
+        *///?} else {
         builder.addRecipeArrowWidget().setPosition(arrowX(display), TOP + 1);
+        //?}
         builder.addText(List.<FormattedText>copyOf(display.statLines()), WIDTH, HEIGHT - TEXT_Y)
                 .setPosition(0, TEXT_Y)
                 .setTextAlignment(HorizontalAlignment.CENTER)

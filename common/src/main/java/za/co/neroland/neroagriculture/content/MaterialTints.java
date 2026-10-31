@@ -25,7 +25,12 @@ public final class MaterialTints {
     }
 
     public static void apply(ItemStack stack, int rgb) {
+        //? if >=1.21.4 {
         stack.set(DataComponents.CUSTOM_MODEL_DATA,
                 new CustomModelData(List.of(), List.of(), List.of(), List.of(rgb & 0xFFFFFF)));
+        //?} else {
+        /*// 1.21.1's custom model data is a single int; the client's item colour handler reads it as the tint.
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(rgb & 0xFFFFFF));
+        *///?}
     }
 }

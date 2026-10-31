@@ -33,6 +33,11 @@ public final class NeoForgeFluidFactory implements FluidFactory {
         }
     }
 
+    /** The registered fluid type for {@code kind} (client extensions before 26.1 attach to it). */
+    public static FluidType type(FluidKind kind) {
+        return TYPE_BY_KIND.get(kind).get();
+    }
+
     public static void registerFluidTypes(IEventBus bus) {
         TYPES.register(bus);
     }

@@ -39,9 +39,22 @@ public final class PollinationBeaconBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
+    //? if >=1.21.2 {
     @Override
     protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
             BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
+                useItemOnLegacy(stack, state, level, pos, player, hand, hit));
+    }
+
+    // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
+    private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         return useWithoutItem(state, level, pos, player, hit);
     }
 

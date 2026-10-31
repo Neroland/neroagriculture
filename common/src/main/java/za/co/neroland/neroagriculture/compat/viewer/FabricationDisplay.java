@@ -155,7 +155,11 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
             return Optional.empty();
         }
         boolean research = page == FabricationPage.SEED_RESEARCHING;
+        //? if >=1.21.2 {
         return Optional.of(new FabricationDisplay(page, holder.id().identifier(), List.copyOf(inputs),
+        //?} else {
+        /*return Optional.of(new FabricationDisplay(page, holder.id(), List.copyOf(inputs),
+        *///?}
                 List.copyOf(outputs), research ? 0 : recipe.energy(), research ? 0 : recipe.ticks(), unlockOnly));
     }
 
@@ -178,7 +182,13 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
 
     private static List<ItemStack> stacks(Ingredient ingredient, int count) {
         List<ItemStack> out = new ArrayList<>();
+        //? if >=1.21.2 {
         ingredient.items().forEach(holder -> out.add(new ItemStack(holder, count)));
+        //?} else {
+        /*for (ItemStack stack : ingredient.getItems()) {
+            out.add(stack.copyWithCount(count));
+        }
+        *///?}
         return out;
     }
 

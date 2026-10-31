@@ -56,8 +56,13 @@ public final class NeroAgricultureJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         for (FabricationPage page : FabricationPage.values()) {
+            //? if >=1.21.2 {
             registration.addCraftingStation(FabricationCategory.type(page),
                     page.workstations().toArray(Block[]::new));
+            //?} else {
+            /*registration.addRecipeCatalysts(FabricationCategory.type(page),
+                    page.workstations().toArray(Block[]::new));
+            *///?}
         }
     }
 }

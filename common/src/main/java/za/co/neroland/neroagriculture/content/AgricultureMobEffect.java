@@ -19,8 +19,13 @@ public final class AgricultureMobEffect extends MobEffect {
         this.behavior = behavior;
     }
 
+    //? if >=1.21.2 {
     @Override
     public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
+    //?} else {
+    /*@Override
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    *///?}
         switch (behavior) {
             case FREEZE_IMMUNITY -> entity.setTicksFrozen(0);
             case OXYGEN_EFFICIENCY -> {

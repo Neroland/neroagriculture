@@ -7,10 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Companion-client support, a two-way Nerospace environment bridge and two POPIA/GDPR fixes. No block,
-item, recipe or tag id changes, and no gameplay balance change.
+## [0.6.1-beta.1] - 2026-10-31
+
+First NeroAgriculture builds for Minecraft 1.21.x, companion-client support, a two-way Nerospace
+environment bridge and two POPIA/GDPR fixes. No block, item, recipe or tag id changes, and no gameplay
+balance change. Existing worlds load unchanged. **Now requires Neroland Core 1.17.0 or later** on every
+Minecraft version.
 
 ### Added
+
+- **Minecraft 1.21.x builds.** NeroAgriculture now also builds for Minecraft 1.21.1, 1.21.4, 1.21.5,
+  1.21.8 (also runs on 1.21.7), 1.21.10 (also runs on 1.21.9) and 1.21.11, on NeoForge, Fabric and
+  Forge, next to the 26.x jars. The 1.21.x jars need Java 21. Crops, grow beds, machines, greenhouses,
+  terraforming, the optional Nerospace integration, saved data and player-data export and erasure work
+  the same as on 26.x. JEI recipe pages are included on every version and EMI pages where EMI exists
+  (1.21.1 and 26.x). On Fabric 1.21.2 to 1.21.8 the server does not send fabrication recipes to the
+  client, so JEI there shows no fabrication pages. On 1.21.1 the recipes are converted to that
+  version's format at build time.
 
 **Nerospace environment and oxygen bridge**
 
@@ -26,8 +39,8 @@ item, recipe or tag id changes, and no gameplay balance change.
   Nerospace's reading of the same spot.
 - New config key `compat.nerospace_environment` (default `true`, server-authoritative).
 - Nerospace is consumed as an **optional compile-only** dependency (`nerospace_version`, new, pinned
-  to `1.1.0` — the first Nerospace release published for all nine loader x MC cells; the API surface
-  used has been stable since `1.0.3`). It is listed as optional in all three manifests, is neither
+  to `2.0.1` — the first Nerospace release built for every Minecraft version NeroAgriculture supports;
+  an older Nerospace is refused by the loader). It is listed as optional in all three manifests, is neither
   shipped nor required, and every Nerospace type sits behind a holder class the JVM only loads once
   the mod is confirmed present — so the mod runs unchanged with Nerospace absent. Nothing reflects.
 - **Not wired, deliberately:** `CycleApi` (Nerospace exposes no public space-weather query) and the
@@ -91,6 +104,10 @@ item, recipe or tag id changes, and no gameplay balance change.
 
 ### Changed
 
+- **Now requires Neroland Core 1.17.0 or later.**
+- Release uploads now target CurseForge and GitHub Releases only.
+- Removed automatic project description and gallery uploads.
+- Renamed the website overview source to `art/description.md` and refreshed public documentation links.
 - **The Nerospace visit-history backfill now calls Nerospace's public API directly.** On join,
   historical planet visits are read from `NerospaceVisits.visitedPlanets` (Nerospace 1.0.3+) through
   the same optional compile-only dependency as the environment bridge, replacing the reflective

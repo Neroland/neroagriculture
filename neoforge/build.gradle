@@ -17,6 +17,11 @@ def jeiVersion = project.findProperty("jei_version_${mc}")
 def emiFile = project.findProperty("emi_file_neoforge_${mc}")
 def nerolandcoreVersion = project.findProperty('nerolandcore_version')
 def nerospaceVersion = project.findProperty('nerospace_version')
+// Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
+def mcCeiling = project.findProperty("mc_ceiling_${mc}")
+def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
+// Official EMI (dev.emi on the TerraformersMC maven) for lines the unofficial 26.x port does not cover.
+def emiVersion = project.findProperty("emi_version_${mc}")
 
 // This node's projectDir is <loader>/versions/<v>; the authoritative loader source +
 // templates live in the BRANCH root (neoforge/). Resolve branch-root paths via the parent.
@@ -119,6 +124,18 @@ dependencies {
             runtimeOnly "curse.maven:emi-unofficial-port-unstable-1544558:${emiFile}"
         }
     }
+    if (emiVersion) {
+        compileOnly "dev.emi:emi-neoforge:${emiVersion}:api"
+        if (project.hasProperty('withEmi')) {
+            runtimeOnly "dev.emi:emi-neoforge:${emiVersion}"
+        }
+    }
+}
+
+// compat/emi compiles only where an EMI API exists for this Minecraft line (the 26.x port or official EMI on
+// 1.21.1). Elsewhere EMI itself does not exist, so the plugin is left out of the jar.
+if (!emiFile && !emiVersion) {
+    sourceSets.main.java.exclude('za/co/neroland/neroagriculture/compat/emi/**')
 }
 
 // Expand neoforge.mods.toml from src/main/templates into a generated resources dir
@@ -133,11 +150,11 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_name               : rootProject.mod_name,
         mod_authors            : rootProject.mod_authors,
         mod_license                : rootProject.mod_license,
-        minecraft_version_range    : "[${mc},)",
+        minecraft_version_range    : mcCeiling ? "[${mcFloor},${mcCeiling})" : "[${mc},)",
         nerolandcore_version_range : "[${nerolandcoreVersion},2.0)",
         // Optional dependency: floor at the API version we compile against, same no-hardcoded-range rule
         // as Core — an older Nerospace loading against this build is the known crash class.
-        nerospace_version_range    : "[${nerospaceVersion},2.0)",
+        nerospace_version_range    : "[${nerospaceVersion},3.0)",
     ]
     inputs.properties(props)
     expand(props)
@@ -215,7 +232,7 @@ tasks.register('ecjCheck', JavaExec) {
                 .join(File.pathSeparator)
         def srcDirs = sourceSets.main.java.srcDirs.findAll { it.exists() }.collect { it.absolutePath }
         args = [
-                '--release', '25',
+                '--release', "${project.javaRelease}",
                 '-proc:none',
                 '-d', 'none',
                 '-properties', rootProject.file('tools/ecj.prefs').absolutePath,

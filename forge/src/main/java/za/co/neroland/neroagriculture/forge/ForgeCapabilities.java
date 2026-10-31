@@ -37,9 +37,20 @@ import za.co.neroland.nerolandcore.platform.ForgeFluidLookup;
 public final class ForgeCapabilities {
     private static final Identifier ID = Identifier.fromNamespaceAndPath(NeroAgricultureCommon.MOD_ID, "machine_caps");
     private ForgeCapabilities() { }
-    public static void register() { AttachCapabilitiesEvent.BlockEntities.BUS.addListener(ForgeCapabilities::attach); }
+    public static void register() {
+        //? if >=1.21.6 {
+        AttachCapabilitiesEvent.BlockEntities.BUS.addListener(ForgeCapabilities::attach);
+        //?} else {
+        /*net.minecraftforge.common.MinecraftForge.EVENT_BUS.addGenericListener(
+                net.minecraft.world.level.block.entity.BlockEntity.class, ForgeCapabilities::attach);
+        *///?}
+    }
 
+    //? if >=1.21.6 {
     private static void attach(AttachCapabilitiesEvent.BlockEntities event) {
+    //?} else {
+    /*private static void attach(AttachCapabilitiesEvent<net.minecraft.world.level.block.entity.BlockEntity> event) {
+    *///?}
         if (event.getObject() instanceof AbstractMachineBlockEntity machine
                 && NeroAgricultureCommon.MOD_ID.equals(
                         net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(machine.getType()).getNamespace())) {

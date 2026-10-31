@@ -98,13 +98,25 @@ public final class PollinationBeaconBlockEntity extends AbstractMachineBlockEnti
                 + " NF=" + getEnergy().getAmount();
     }
 
+    //? if >=1.21.6 {
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
         output.putInt("Cursor", cursor);
         SideConfigMigration.save(output);
     }
+    //? if >=1.21.6 {
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ValueInput input = ValueInput.of(tag, registries);
+    *///?}
         SideConfigMigration.load(this, input);
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
     }

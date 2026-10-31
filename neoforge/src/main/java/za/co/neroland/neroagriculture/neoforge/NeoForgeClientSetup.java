@@ -21,6 +21,10 @@ public final class NeoForgeClientSetup {
         bus.addListener(NeoForgeClientSetup::screens);
         bus.addListener(NeoForgeClientSetup::blockTints);
         bus.addListener(NeoForgeClientSetup::fluidExtensions);
+        //? if <1.21.4 {
+        /*// 1.21.1 tints item stacks through colour handlers (1.21.4+ item models read the custom model data).
+        bus.addListener(NeoForgeClientSetup::itemTints);
+        *///?}
         // Clear all client-session caches on disconnect so server A's synced catalogs never leak into
         // a session on server B (or on a server without this mod, which sends no fresh snapshot).
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
@@ -28,11 +32,15 @@ public final class NeoForgeClientSetup {
                         za.co.neroland.neroagriculture.lifecycle.ClientStateReset.disconnected());
         // Keep the client's copy of the server's synced fabrication recipes for recipe viewers
         // (compat.jei / compat.emi); 26.x clients hold no full recipe list of their own.
+        // (1.21.1 still receives every recipe; ViewerRecipes reads the client level there.)
+        //? if >=1.21.2 {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.client.event.RecipesReceivedEvent event) ->
                         za.co.neroland.neroagriculture.compat.viewer.ViewerRecipes.accept(event.getRecipeMap()));
+        //?}
     }
 
+    //? if >=26.1 {
     /** Give every NeroAgriculture fluid its still/flow sprites (26.x fluid models, per-fluid registration). */
     private static void fluidExtensions(net.neoforged.neoforge.client.event.RegisterFluidModelsEvent event) {
         for (FluidKind kind : FluidKind.values()) {
@@ -52,6 +60,31 @@ public final class NeoForgeClientSetup {
     private static void blockTints(RegisterColorHandlersEvent.BlockTintSources event) {
         event.register(List.of(new CropTintSource()), ModBlocks.RESOURCE_CROP.get());
     }
+    //?} else {
+    /*// Before 26.1 the still/flow sprites come from each fluid type's client extensions.
+    private static void fluidExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        for (FluidKind kind : FluidKind.values()) {
+            net.minecraft.resources.Identifier still =
+                    net.minecraft.resources.Identifier.fromNamespaceAndPath("neroagriculture", "block/" + kind.id() + "_still");
+            net.minecraft.resources.Identifier flowing =
+                    net.minecraft.resources.Identifier.fromNamespaceAndPath("neroagriculture", "block/" + kind.id() + "_flow");
+            event.registerFluidType(new net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions() {
+                @Override public net.minecraft.resources.Identifier getStillTexture() { return still; }
+                @Override public net.minecraft.resources.Identifier getFlowingTexture() { return flowing; }
+            }, za.co.neroland.neroagriculture.platform.NeoForgeFluidFactory.type(kind));
+        }
+    }
+    private static void blockTints(RegisterColorHandlersEvent.Block event) {
+        event.register(new CropTintSource(), ModBlocks.RESOURCE_CROP.get());
+    }
+    *///?}
+    //? if <1.21.4 {
+    /*private static void itemTints(RegisterColorHandlersEvent.Item event) {
+        event.register(za.co.neroland.neroagriculture.client.MaterialItemTint::color,
+                za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_FRAGMENT.get(),
+                za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get());
+    }
+    *///?}
     private static void screens(RegisterMenuScreensEvent event) {
         // One canonical menu->screen table in common; adapted onto the NeoForge event here.
         ScreenBindings.registerAll(new ScreenBindings.Registrar() {

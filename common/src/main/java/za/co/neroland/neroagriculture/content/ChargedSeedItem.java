@@ -7,16 +7,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+//? if >=1.21.5 {
 import net.minecraft.world.item.component.TooltipDisplay;
+//?}
 
 import za.co.neroland.neroagriculture.registry.ModDataComponents;
 
 /** Charged blank whose tier identity is visible and persistent. */
 public final class ChargedSeedItem extends Item {
     public ChargedSeedItem(Properties properties) { super(properties); }
+    //? if >=1.21.5 {
     @Override public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
             Consumer<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, display, tooltip, flag);
+    //?} else {
+    /*@Override public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> lines,
+            TooltipFlag flag) {
+        super.appendHoverText(stack, context, lines, flag);
+        Consumer<Component> tooltip = lines::add;
+    *///?}
         FragmentCharge charge = stack.get(ModDataComponents.FRAGMENT_CHARGE.get());
         if (charge == null) {
             tooltip.accept(Component.translatable("warning.neroagriculture.invalid_charge")

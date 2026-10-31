@@ -89,7 +89,11 @@ public final class AgricultureGallery {
             source.sendFailure(Component.literal("The gallery is a creative-only showcase."));
             return 0;
         }
+        //? if >=1.21.6 {
         ServerLevel level = player.level();
+        //?} else {
+        /*ServerLevel level = player.serverLevel();
+        *///?}
         BlockPos origin = player.blockPosition();
         int fy = origin.getY();
         BlockState floor = ModBlocks.GREENHOUSE_FRAME.get().defaultBlockState();
@@ -231,7 +235,11 @@ public final class AgricultureGallery {
             source.sendFailure(Component.literal("The gallery is a creative-only showcase."));
             return 0;
         }
+        //? if >=1.21.6 {
         ServerLevel level = player.level();
+        //?} else {
+        /*ServerLevel level = player.serverLevel();
+        *///?}
         java.util.Set<BlockPos> placed = PLACED.remove(level.dimension().identifier());
         if (placed == null || placed.isEmpty()) {
             source.sendFailure(Component.literal("[NeroAgriculture] No gallery build recorded in this dimension "

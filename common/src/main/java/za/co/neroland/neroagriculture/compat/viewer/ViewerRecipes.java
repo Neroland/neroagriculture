@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.world.item.crafting.RecipeHolder;
+//? if >=1.21.2 {
 import net.minecraft.world.item.crafting.RecipeMap;
+//?}
 
 import za.co.neroland.neroagriculture.recipe.FabricationRecipe;
 
@@ -30,9 +32,11 @@ public final class ViewerRecipes {
     }
 
     /** NeoForge hands over a {@link RecipeMap}. */
+    //? if >=1.21.2 {
     public static void accept(RecipeMap recipeMap) {
         accept(recipeMap == null ? null : recipeMap.values());
     }
+    //?}
 
     /** Keeps only NeroAgriculture's fabrication recipes from whatever the server synced. */
     public static void accept(Collection<RecipeHolder<?>> holders) {
@@ -46,6 +50,13 @@ public final class ViewerRecipes {
 
     /** Every synced fabrication recipe; empty before the first sync or on a server that sends none. */
     public static List<RecipeHolder<FabricationRecipe>> all() {
+        //? if <1.21.2 {
+        /*// Before 1.21.2 vanilla still syncs every recipe to the client, so the client level has them all.
+        net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+        if (recipes.isEmpty() && level != null) {
+            return fabrication(level.getRecipeManager().getRecipes());
+        }
+        *///?}
         return recipes;
     }
 

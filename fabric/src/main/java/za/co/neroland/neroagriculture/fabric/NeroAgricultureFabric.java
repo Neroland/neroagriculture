@@ -5,7 +5,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+//? if >=1.21.9 {
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
+//?}
 
 import za.co.neroland.neroagriculture.NeroAgricultureCommon;
 import za.co.neroland.neroagriculture.catalog.CatalogSync;
@@ -45,7 +47,10 @@ public final class NeroAgricultureFabric implements ModInitializer {
         // server-scoped static caches so nothing leaks into the next (single-player) world.
         ServerLifecycleEvents.SERVER_STARTED.register(ServerStateReset::serverStarted);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerStateReset.serverStopped());
+        // Fabric API's recipe sync starts at 1.21.9 (1.21.1 still syncs every recipe on its own).
+        //? if >=1.21.9 {
         registerRecipeSync();
+        //?}
     }
 
     /**
@@ -53,6 +58,7 @@ public final class NeroAgricultureFabric implements ModInitializer {
      * receives the fabrication recipes and recipe viewers (compat.jei / compat.emi) would show empty pages.
      * Recipe definitions only; no player data crosses the wire.
      */
+    //? if >=1.21.9 {
     private static void registerRecipeSync() {
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.EXTRACTION_SERIALIZER.get());
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.INFUSING_SERIALIZER.get());
@@ -61,4 +67,5 @@ public final class NeroAgricultureFabric implements ModInitializer {
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.CONVERSION_SERIALIZER.get());
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipeSerializers.FUSION_SERIALIZER.get());
     }
+    //?}
 }

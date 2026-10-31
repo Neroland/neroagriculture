@@ -38,7 +38,11 @@ final class FabricationRecipeCache {
 
     private static Index rebuild(Collection<RecipeHolder<?>> recipes) {
         Map<RecipeType<?>, List<FabricationRecipe>> byType = recipes.stream()
+                //? if >=1.21.2 {
                 .sorted(Comparator.comparing(holder -> holder.id().identifier().toString()))
+                //?} else {
+                /*.sorted(Comparator.comparing(holder -> holder.id().toString()))
+                *///?}
                 .map(RecipeHolder::value)
                 .filter(recipe -> recipe instanceof FabricationRecipe)
                 .map(recipe -> (FabricationRecipe) recipe)

@@ -37,9 +37,22 @@ public final class TerraformingControllerBlock extends BaseEntityBlock {
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TerraformingControllerBlockEntity(pos, state); }
 
+    //? if >=1.21.2 {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
             InteractionHand hand, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit) {
+        return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
+                useItemOnLegacy(stack, state, level, pos, player, hand, hit));
+    }
+
+    // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
+    private net.minecraft.world.InteractionResult useItemOnLegacy(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (!stack.is(ModItems.TERRAFORMING_SEED.get())) return useWithoutItem(state, level, pos, player, hit);
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer

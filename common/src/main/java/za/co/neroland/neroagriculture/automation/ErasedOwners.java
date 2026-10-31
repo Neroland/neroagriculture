@@ -18,6 +18,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neroagriculture.config.AgricultureConfig;
+import za.co.neroland.nerolandcore.data.SavedDataCompat;
 import za.co.neroland.nerolandcore.data.SavedDataRecovery;
 
 /**
@@ -56,7 +57,7 @@ public final class ErasedOwners extends SavedData {
         ).apply(instance, Entry::new));
     }
 
-    public static final SavedDataType<ErasedOwners> TYPE = new SavedDataType<>(ID, ErasedOwners::new, codec(), null);
+    public static final SavedDataType<ErasedOwners> TYPE = SavedDataCompat.type(ID, ErasedOwners::new, codec());
 
     /** Erased owner UUID → wall-clock erasure time (millis); bounded by the retention prune. */
     private final Map<UUID, Long> erased = new HashMap<>();

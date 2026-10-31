@@ -343,7 +343,11 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
 
     public boolean tryResearch(ServerPlayer player) {
         if (kind() != MachineKind.RESEARCH_BENCH || !stillValid(player)) return false;
+        //? if >=1.21.6 {
         ServerLevel level = player.level();
+        //?} else {
+        /*ServerLevel level = player.serverLevel();
+        *///?}
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.RESEARCHING.get(), candidate -> true);
         if (recipe == null || recipe.material().isEmpty()) {
             stop(MachineBlockedReason.NO_RECIPE);
@@ -478,9 +482,14 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     }
 
     /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    //? if >=1.21.5 {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
+    //?} else {
+    /*// Before 1.21.5 there is no block-entity removal hook; the block's onRemove calls this.
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    *///?}
         if (this.level instanceof ServerLevel) Containers.dropContents(this.level, pos, this);
     }
 
@@ -532,9 +541,19 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         }
     }
 
+    //? if >=1.21.6 {
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
+        //? if >=1.21.6 {
         ContainerHelper.saveAllItems(output, items);
+        //?} else {
+        /*ContainerHelper.saveAllItems(output.tag(), items, output.registries());
+        *///?}
         output.putInt("FluidAmount", fluid.getRawAmount());
         output.putString("Fluid", BuiltInRegistries.FLUID.getKey(fluid.getRawFluid()).toString());
         output.putInt("FabricationProgress", fabricationProgress);
@@ -545,10 +564,20 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         SideConfigMigration.save(output);
     }
 
+    //? if >=1.21.6 {
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ValueInput input = ValueInput.of(tag, registries);
+    *///?}
         SideConfigMigration.load(this, input);
+        //? if >=1.21.6 {
         ContainerHelper.loadAllItems(input, items);
+        //?} else {
+        /*ContainerHelper.loadAllItems(input.tag(), items, input.registries());
+        *///?}
         fluid.setRaw(BuiltInRegistries.FLUID.getValue(
                 net.minecraft.resources.Identifier.parse(input.getStringOr("Fluid", "minecraft:empty"))),
                 input.getIntOr("FluidAmount", 0));

@@ -47,9 +47,22 @@ public final class ModRecipeSerializers {
         java.util.concurrent.atomic.AtomicReference<RecipeSerializer<FabricationRecipe>> self =
                 new java.util.concurrent.atomic.AtomicReference<>();
         RegistryEntry<RecipeSerializer<FabricationRecipe>> entry = SERIALIZERS.register(name, key -> {
+            //? if >=26.1 {
             RecipeSerializer<FabricationRecipe> serializer = new RecipeSerializer<>(
                     FabricationRecipe.mapCodec(type::get, self::get),
                     FabricationRecipe.streamCodec(type::get, self::get));
+            //?} else {
+            /*// Before 26.1 RecipeSerializer is an interface rather than a record.
+            com.mojang.serialization.MapCodec<FabricationRecipe> codec = FabricationRecipe.mapCodec(type::get, self::get);
+            net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, FabricationRecipe> stream =
+                    FabricationRecipe.streamCodec(type::get, self::get);
+            RecipeSerializer<FabricationRecipe> serializer = new RecipeSerializer<>() {
+                @Override public com.mojang.serialization.MapCodec<FabricationRecipe> codec() { return codec; }
+                @Override public net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, FabricationRecipe> streamCodec() {
+                    return stream;
+                }
+            };
+            *///?}
             self.set(serializer);
             return serializer;
         });

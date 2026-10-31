@@ -322,19 +322,39 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
                 + " owner=" + (owner == null ? "none" : "set") + " speed=x" + modifiers().speedMultiplier();
     }
 
+    //? if >=1.21.6 {
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
+        //? if >=1.21.6 {
         ContainerHelper.saveAllItems(output, items);
+        //?} else {
+        /*ContainerHelper.saveAllItems(output.tag(), items, output.registries());
+        *///?}
         output.putInt("Cursor", cursor);
         output.putBoolean("ShowArea", showArea);
         AutomationOwner.save(output, owner);
         SideConfigMigration.save(output);
     }
 
+    //? if >=1.21.6 {
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ValueInput input = ValueInput.of(tag, registries);
+    *///?}
         SideConfigMigration.load(this, input);
+        //? if >=1.21.6 {
         ContainerHelper.loadAllItems(input, items);
+        //?} else {
+        /*ContainerHelper.loadAllItems(input.tag(), items, input.registries());
+        *///?}
         cursor = Math.max(0, input.getIntOr("Cursor", 0));
         showArea = input.getBooleanOr("ShowArea", false);
         owner = AutomationOwner.load(input);
@@ -350,9 +370,14 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
     }
 
     /** Breaking/replacing the machine (any cause, creative and explosions included) drops the contents. */
+    //? if >=1.21.5 {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
+    //?} else {
+    /*// Before 1.21.5 there is no block-entity removal hook; the block's onRemove calls this.
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    *///?}
         if (this.level instanceof ServerLevel) net.minecraft.world.Containers.dropContents(this.level, pos, this);
     }
 }

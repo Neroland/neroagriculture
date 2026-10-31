@@ -14,16 +14,23 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
+//? if >=1.21.2 {
 import net.minecraft.world.item.crafting.PlacementInfo;
+//?}
 import net.minecraft.world.item.crafting.Recipe;
+//? if >=1.21.2 {
 import net.minecraft.world.item.crafting.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
+//?}
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
 import za.co.neroland.neroagriculture.content.FragmentTier;
+//? if <26.1 {
+/*import za.co.neroland.neroagriculture.recipe.compat.CommonInfo;
+*///?}
 
 /**
  * Datapack fabrication recipe with bounded costs and optional material/tier identity.
@@ -122,13 +129,29 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
     @Override public boolean matches(SingleRecipeInput input, Level level) {
         return input.item().getCount() >= inputCount && ingredient.test(input.item());
     }
+    //? if >=26.1 {
     @Override public ItemStack assemble(SingleRecipeInput input) { return result.create(); }
+    //?} else {
+    /*@Override public ItemStack assemble(SingleRecipeInput input, net.minecraft.core.HolderLookup.Provider registries) {
+        return result.create();
+    }
+    // 26.x's one-argument form, kept so the machines call it the same way on every line.
+    public ItemStack assemble(SingleRecipeInput input) { return result.create(); }
+    *///?}
     @Override public boolean showNotification() { return commonInfo.showNotification(); }
-    @Override public String group() { return ""; }
     @Override public RecipeSerializer<FabricationRecipe> getSerializer() { return serializer.get(); }
     @Override public RecipeType<FabricationRecipe> getType() { return type.get(); }
+    //? if >=1.21.2 {
+    @Override public String group() { return ""; }
     @Override public PlacementInfo placementInfo() { return PlacementInfo.create(ingredient); }
     @Override public RecipeBookCategory recipeBookCategory() { return RecipeBookCategories.CRAFTING_MISC; }
+    //?} else {
+    /*// 1.21.1's recipe contract: machine recipes never show in the recipe book.
+    @Override public String getGroup() { return ""; }
+    @Override public boolean canCraftInDimensions(int width, int height) { return true; }
+    @Override public ItemStack getResultItem(net.minecraft.core.HolderLookup.Provider registries) { return result.create(); }
+    @Override public boolean isSpecial() { return true; }
+    *///?}
 
     public CommonInfo commonInfo() { return commonInfo; }
     public Ingredient ingredient() { return ingredient; }

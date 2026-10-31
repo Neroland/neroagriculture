@@ -45,7 +45,13 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
     @Nullable private BlockPos machinePos;
 
     public FoundationMachineScreen(FoundationMachineMenu menu, Inventory inventory, Component title) {
+        //? if >=26.1 {
         super(menu, inventory, title, 176, 172);
+        //?} else {
+        /*super(menu, inventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = 172;
+        *///?}
         titleLabelX = 8;
         inventoryLabelX = 8;
         inventoryLabelY = 76;
@@ -55,7 +61,23 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         return menu.machineKind() == MachineKind.RESEARCH_BENCH ? ACCENT_ORBITE : ACCENT_GREEN;
     }
 
-    @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    //? if <26.1 {
+    /*// Before 26.1 the panel is the container background (renderBg); render() then draws the slots, labels
+    // and tooltip on top, which 26.x does inside extractContents.
+    @Override protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+        this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    *///?}
+    //? if >=26.1 {
+    @Override
+    //?}
+    public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         int w = imageWidth;
@@ -102,7 +124,9 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
             g.text(font, research, x + 143 - font.width(research) / 2, y + 56, ACCENT_ORBITE, false);
         }
 
+        //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        //?}
     }
 
     @Override protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
@@ -110,7 +134,12 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, MUTED, false);
     }
 
+    //? if >=1.21.9 {
     @Override public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    //?} else {
+    /*@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, button);
+    *///?}
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH
                 && event.x() >= leftPos + 112 && event.x() < leftPos + 168
                 && event.y() >= topPos + 50 && event.y() < topPos + 68) {
@@ -118,7 +147,11 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
             if (pos != null) Services.NETWORK.sendToServer(new MachineActionPayload(pos.asLong(), 0, 0));
             return true;
         }
+        //? if >=1.21.9 {
         return super.mouseClicked(event, doubleClick);
+        //?} else {
+        /*return super.mouseClicked(mouseX, mouseY, button);
+        *///?}
     }
 
     @Nullable

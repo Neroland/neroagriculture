@@ -31,10 +31,25 @@ public final class BiofuelConverterBlock extends BaseEntityBlock {
     // Contents drop from BiofuelConverterBlockEntity#preRemoveSideEffects (covers creative breaks and
     // explosions too), so no playerDestroy override is needed here.
 
+    //? if >=1.21.2 {
     @Override
     protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
             BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
+                useItemOnLegacy(stack, state, level, pos, player, hand, hit));
+    }
+
+    // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
+    private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack,
+            BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+    *///?}
         return useWithoutItem(state, level, pos, player, hit);
     }
 
@@ -53,4 +68,16 @@ public final class BiofuelConverterBlock extends BaseEntityBlock {
         return level.isClientSide() ? null : createTickerHelper(type, ModBlockEntities.BIOFUEL_CONVERTER.get(),
                 BiofuelConverterBlockEntity::tick);
     }
+
+    //? if <1.21.5 {
+    /*// Before 1.21.5 removal side effects run from the block (block entities get preRemoveSideEffects later).
+    @Override
+    protected void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState,
+            boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof za.co.neroland.neroagriculture.biofuel.BiofuelConverterBlockEntity be) {
+            be.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 }

@@ -68,10 +68,15 @@ public final class NeroAgricultureEmiPlugin implements EmiPlugin {
     private static List<RecipeHolder<FabricationRecipe>> syncedRecipes(EmiRegistry registry) {
         //? if >=26.3 {
         /*Collection<RecipeHolder<?>> fromEmi = registry.getRecipes();
-        *///?} else {
+        *///?}
+        //? if >=1.21.2 && <26.3 {
         net.minecraft.world.item.crafting.RecipeMap recipeMap = registry.getRecipeMap();
         Collection<RecipeHolder<?>> fromEmi = recipeMap == null ? null : recipeMap.values();
         //?}
+        //? if <1.21.2 {
+        /*// EMI for 1.21.1 hands out the client's full recipe manager (every recipe still syncs there).
+        Collection<RecipeHolder<?>> fromEmi = registry.getRecipeManager().getRecipes();
+        *///?}
         List<RecipeHolder<FabricationRecipe>> fabrication = fromEmi == null ? List.of() : ViewerRecipes.fabrication(fromEmi);
         return fabrication.isEmpty() ? ViewerRecipes.all() : fabrication;
     }

@@ -30,12 +30,34 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
     @org.jetbrains.annotations.Nullable private net.minecraft.core.BlockPos machinePos;
 
     public AreaMachineScreen(AreaMachineMenu menu, Inventory inventory, Component title) {
+        //? if >=26.1 {
         super(menu, inventory, title, 176, 166);
+        //?} else {
+        /*super(menu, inventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = 166;
+        *///?}
         titleLabelX = 8;
         inventoryLabelX = 8;
     }
 
-    @Override public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+    //? if <26.1 {
+    /*// Before 26.1 the panel is the container background (renderBg); render() then draws the slots, labels
+    // and tooltip on top, which 26.x does inside extractContents.
+    @Override protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        extractContents(g, mouseX, mouseY, partialTick);
+    }
+
+    @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+        this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    *///?}
+    //? if >=26.1 {
+    @Override
+    //?}
+    public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         int x = leftPos;
         int y = topPos;
         int w = imageWidth;
@@ -75,10 +97,17 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
         Gauges.bar(g, font, x + 84, y + 58, x + 148, "Energy", menu.energy(),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
 
+        //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        //?}
     }
 
+    //? if >=1.21.9 {
     @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+    //?} else {
+    /*@Override public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        net.minecraft.client.input.MouseButtonEvent event = new net.minecraft.client.input.MouseButtonEvent(mouseX, mouseY, button);
+    *///?}
         if (event.x() >= leftPos + 84 && event.x() < leftPos + 148
                 && event.y() >= topPos + 41 && event.y() < topPos + 54) {
             if (machinePos == null) {
@@ -90,7 +119,11 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
             }
             return true;
         }
+        //? if >=1.21.9 {
         return super.mouseClicked(event, doubleClick);
+        //?} else {
+        /*return super.mouseClicked(mouseX, mouseY, button);
+        *///?}
     }
 
     @Override protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {

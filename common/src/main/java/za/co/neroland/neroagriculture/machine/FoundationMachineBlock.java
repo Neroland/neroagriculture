@@ -59,10 +59,25 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
+    //? if >=1.21.2 {
     @Override
     protected InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state,
             net.minecraft.world.level.Level level, BlockPos pos, Player player,
             net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state,
+            net.minecraft.world.level.Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
+                useItemOnLegacy(stack, state, level, pos, player, hand, hit));
+    }
+
+    // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
+    private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack, BlockState state,
+            net.minecraft.world.level.Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         // Open the UI with an item in hand too (instead of vanilla placing the held block).
         return useWithoutItem(state, level, pos, player, hit);
     }
@@ -74,4 +89,16 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
         return level.isClientSide() ? null : createTickerHelper(type, ModBlockEntities.FOUNDATION_MACHINE.get(),
                 FoundationMachineBlockEntity::tick);
     }
+
+    //? if <1.21.5 {
+    /*// Before 1.21.5 removal side effects run from the block (block entities get preRemoveSideEffects later).
+    @Override
+    protected void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState,
+            boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof za.co.neroland.neroagriculture.machine.FoundationMachineBlockEntity be) {
+            be.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 }

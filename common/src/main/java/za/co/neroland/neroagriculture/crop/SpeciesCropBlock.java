@@ -13,7 +13,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+//? if >=1.21.2 {
 import net.minecraft.world.level.ScheduledTickAccess;
+//?}
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -63,11 +65,19 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
     @Override protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock()) != null;
     }
+    //? if >=1.21.2 {
     @Override protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks,
             BlockPos pos, Direction direction, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
         return state.canSurvive(level, pos) ? super.updateShape(state, level, ticks, pos, direction,
                 neighbourPos, neighbourState, random) : Blocks.AIR.defaultBlockState();
     }
+    //?} else {
+    /*@Override protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbourState,
+            net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+        return state.canSurvive(level, pos) ? super.updateShape(state, direction, neighbourState, level, pos,
+                neighbourPos) : Blocks.AIR.defaultBlockState();
+    }
+    *///?}
 
     @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!(level.getBlockEntity(pos) instanceof SpeciesCropBlockEntity crop)) return;

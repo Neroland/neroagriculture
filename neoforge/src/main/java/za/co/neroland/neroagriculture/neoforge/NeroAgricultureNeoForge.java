@@ -36,7 +36,11 @@ public final class NeroAgricultureNeoForge {
         RegistrationProvider.attach(modEventBus);
         NeoForgeNetwork.register(modEventBus);
         NeoForgeCapabilities.register(modEventBus);
+        //? if >=1.21.9 {
         if (FMLEnvironment.getDist() == Dist.CLIENT) NeoForgeClientSetup.init(modEventBus);
+        //?} else {
+        /*if (FMLEnvironment.dist == Dist.CLIENT) NeoForgeClientSetup.init(modEventBus);
+        *///?}
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) ->
                 AgricultureCommands.register(event.getDispatcher()));
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> {
@@ -46,6 +50,8 @@ public final class NeroAgricultureNeoForge {
         // Recipe sync is opt-in on NeoForge (26.x clients hold no full recipe list): send the fabrication
         // recipes so recipe viewers (compat.jei / compat.emi) can list them. Recipe definitions only; no
         // player data crosses the wire.
+        // Before 1.21.2 vanilla still syncs every recipe, and the event has no sendRecipes.
+        //? if >=1.21.2 {
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> event.sendRecipes(
                 ModRecipeSerializers.EXTRACTION.get(),
                 ModRecipeSerializers.INFUSING.get(),
@@ -53,6 +59,7 @@ public final class NeroAgricultureNeoForge {
                 ModRecipeSerializers.RESEARCHING.get(),
                 ModRecipeSerializers.CONVERSION.get(),
                 ModRecipeSerializers.FUSION.get()));
+        //?}
         // Optional Nerospace planet-visit adapter (join backfill + live dimension-change tracking).
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) CompatContracts.playerJoined(player);

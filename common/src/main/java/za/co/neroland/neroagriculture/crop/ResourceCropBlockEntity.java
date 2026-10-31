@@ -61,8 +61,14 @@ public final class ResourceCropBlockEntity extends BlockEntity {
 
     public boolean permitsGrowth() { return catalogState().permitsGrowth(); }
 
+    //? if >=1.21.6 {
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
         output.putInt("Format", variant.formatVersion());
         output.putString("Material", variant.material().toString());
         output.putString("Family", variant.family().name());
@@ -70,8 +76,14 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         GeneticsCodecs.save(output, genetics);
     }
 
+    //? if >=1.21.6 {
     @Override protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ValueInput input = ValueInput.of(tag, registries);
+    *///?}
         int format = input.getIntOr("Format", CropVariantState.CURRENT_FORMAT);
         int harvests = input.getIntOr("HarvestCount", 0);
         try {

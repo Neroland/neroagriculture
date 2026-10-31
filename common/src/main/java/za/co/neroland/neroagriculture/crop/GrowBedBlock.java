@@ -50,11 +50,28 @@ public final class GrowBedBlock extends BaseEntityBlock {
         return net.minecraft.world.InteractionResult.SUCCESS;
     }
 
+    //? if >=1.21.2 {
     @Override
     protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
             BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
             net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
             net.minecraft.world.phys.BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+            BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
+        return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
+                useItemOnLegacy(stack, state, level, pos, player, hand, hit));
+    }
+
+    // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
+    private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack,
+            BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
+    *///?}
         // Seeds keep their hand-planting behaviour (the seed item's useOn plants above the bed).
         if (stack.is(za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get())
                 || stack.is(za.co.neroland.neroagriculture.registry.ModItems.FOOD_SEED.get())
@@ -72,4 +89,16 @@ public final class GrowBedBlock extends BaseEntityBlock {
         return level.isClientSide() ? null : createTickerHelper(type,
                 za.co.neroland.neroagriculture.registry.ModBlockEntities.GROW_BED.get(), GrowBedBlockEntity::tick);
     }
+
+    //? if <1.21.5 {
+    /*// Before 1.21.5 removal side effects run from the block (block entities get preRemoveSideEffects later).
+    @Override
+    protected void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState,
+            boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof za.co.neroland.neroagriculture.crop.GrowBedBlockEntity be) {
+            be.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 }

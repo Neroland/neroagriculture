@@ -6,7 +6,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+//? if >=1.21.5 {
 import net.minecraft.world.item.component.TooltipDisplay;
+//?}
 import net.minecraft.world.item.TooltipFlag;
 
 import org.jetbrains.annotations.Nullable;
@@ -50,10 +52,18 @@ public class MaterialVariantItem extends Item {
         return MaterialNames.leafName(id);
     }
 
+    //? if >=1.21.5 {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
             Consumer<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, display, tooltip, flag);
+    //?} else {
+    /*@Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, java.util.List<Component> lines,
+            TooltipFlag flag) {
+        super.appendHoverText(stack, context, lines, flag);
+        Consumer<Component> tooltip = lines::add;
+    *///?}
         if (!appendVariantDetails(stack, tooltip)) return;
         tooltip.accept(Component.translatable("tooltip.neroagriculture.harvests",
                 stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0)).withStyle(ChatFormatting.DARK_GRAY));

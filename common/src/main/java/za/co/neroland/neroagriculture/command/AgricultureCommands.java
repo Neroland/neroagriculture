@@ -20,7 +20,11 @@ public final class AgricultureCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("neroagriculture")
+                //? if >=1.21.6 {
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                //?} else {
+                /*.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                *///?}
                 .then(Commands.literal("catalog")
                         .then(Commands.literal("list").executes(context -> list(context.getSource())))
                         .then(Commands.literal("show")

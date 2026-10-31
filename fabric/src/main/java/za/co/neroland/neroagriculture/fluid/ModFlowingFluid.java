@@ -35,7 +35,11 @@ public abstract class ModFlowingFluid extends FlowingFluid {
     @Override public Fluid getSource() { return this.kind.source().get(); }
     @Override public Item getBucket() { return this.kind.bucket().get(); }
     @Override public boolean isSame(Fluid fluid) { return fluid == getSource() || fluid == getFlowing(); }
+    //? if >=1.21.2 {
     @Override protected boolean canConvertToSource(ServerLevel level) { return false; }
+    //?} else {
+    /*@Override protected boolean canConvertToSource(net.minecraft.world.level.Level level) { return false; }
+    *///?}
     @Override protected void beforeDestroyingBlock(LevelAccessor level, BlockPos pos, BlockState state) { }
     @Override protected int getSlopeFindDistance(LevelReader level) { return 2; }
     @Override protected int getDropOff(LevelReader level) { return 2; }
