@@ -3,6 +3,10 @@
 Stage 5 connects physical resource samples to repeatable cultivation without trusting client item data.
 All three processing machines use Neroland Core energy storage, upgrades, and item/energy Side Config.
 Their five-slot inventory is exposed through the native automation capability on every loader.
+The starter generator, extractor, research bench, synthesizer and grow beds also show short instructions
+when hovered in an inventory or recipe viewer. NeroQuests adds an optional guided Field Ledger chapter.
+To plant by hand, aim at the visible top of a grow bed and use the resource seed. Powered beds also
+accept resource seeds in their seed slot and can plant and harvest them automatically.
 
 ## Field Generator
 
@@ -10,6 +14,7 @@ Craft the Field Generator from iron, copper, a furnace and redstone. Place it ne
 machine and insert coal or charcoal into its first slot. Each fuel produces 3,200 NF at 8 NF per tick;
 the generator pauses when its buffer is full and resumes without consuming another fuel. Energy output
 uses Core's side configuration, and its fuel and remaining burn time persist across reloads.
+Its amber flame panel distinguishes it from the Extractor's green funnel panel.
 
 ## Fragment Extractor
 

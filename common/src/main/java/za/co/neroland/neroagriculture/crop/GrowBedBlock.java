@@ -27,6 +27,16 @@ public final class GrowBedBlock extends BaseEntityBlock {
     public FragmentTier tier() { return tier; }
     protected MapCodec<GrowBedBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state,
+            net.minecraft.world.level.BlockGetter level, BlockPos pos,
+            net.minecraft.world.phys.shapes.CollisionContext context) {
+        return box(0, 0, 0, 16, 10, 16);
+    }
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getCollisionShape(BlockState state,
+            net.minecraft.world.level.BlockGetter level, BlockPos pos,
+            net.minecraft.world.phys.shapes.CollisionContext context) {
+        return net.minecraft.world.phys.shapes.Shapes.block();
+    }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GrowBedBlockEntity(pos, state); }
 
     @Override

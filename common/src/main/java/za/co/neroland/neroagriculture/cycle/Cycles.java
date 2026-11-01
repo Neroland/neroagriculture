@@ -46,7 +46,19 @@ public final class Cycles {
         return base;
     }
 
-    /** Short forecast for diagnostics: active phase key and seconds until the next phase. */
+    /** Localized forecast for the crop readout. */
+    public static net.minecraft.network.chat.Component describeComponent(@Nullable MinecraftServer server, Identifier dimension, long time) {
+        if (!AgricultureConfig.CYCLES_ENABLED.get()) return net.minecraft.network.chat.Component.translatable("message.neroagriculture.cycle.off");
+        CycleProfile profile = CycleCatalog.profile(server, dimension);
+        if (profile == null) return net.minecraft.network.chat.Component.translatable("message.neroagriculture.cycle.none");
+        CycleModifier modifier = current(server, dimension, time);
+        return net.minecraft.network.chat.Component.translatable("message.neroagriculture.cycle.forecast",
+                net.minecraft.network.chat.Component.translatable(profile.phaseAt(time).displayKey()),
+                modifier.growth(), modifier.yield(),
+                net.minecraft.network.chat.Component.translatable(profile.nextPhase(time).displayKey()),
+                profile.ticksUntilNextPhase(time) / 20);
+    }
+
     public static String describe(@Nullable MinecraftServer server, Identifier dimension, long time) {
         if (!AgricultureConfig.CYCLES_ENABLED.get()) return "off";
         CycleProfile profile = CycleCatalog.profile(server, dimension);

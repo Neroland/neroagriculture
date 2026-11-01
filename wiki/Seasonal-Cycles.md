@@ -15,6 +15,8 @@ to 1.0.
 
 A gentle four-season cycle ships for the Overworld by default. Active and upcoming phases show in the crop
 shift-click readout and in the greenhouse and crop-tower status.
+When a cycle period does not divide evenly into its phases, the final phase includes the remaining
+ticks and the forecast counts down to the actual wraparound.
 
 ## Datapack configuration
 

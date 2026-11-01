@@ -40,3 +40,25 @@ instructions' skeleton description is obsolete. This is a partial source audit, 
 
 No milestone is complete until its tests and runtime checks pass. In particular, no native ecosystem
 coverage, balance, save compatibility, or visual completion is claimed by this baseline.
+
+## NeoForge 26.3 verification notes
+
+- The client loaded the optional Nerospace 2.0.1, NeroQuests and NeroColonies test jars together.
+  Cindrite was rejected for planting in the Overworld and auto-planted from a Colonite bed's seed slot
+  on Cindara. This confirms the dimension check and slot-driven planting, not greenhouse growth or
+  hand planting on a powered bed.
+- Both engineered food and alien produce matched NeroColonies' colony-food tag. The Field Ledger
+  loaded in NeroQuests and its first collection objective advanced. These are targeted checks, not
+  a complete colony feeding or survival playthrough.
+- A command-assisted machine test used a coal-fuelled Field Generator to power extraction of one
+  coal into two Territe fragments and one coal fragment. The research bench consumed coal and
+  reported success; an empty research attempt reported failure. A powered, owner-claimed synthesizer
+  made a coal seed from coal, two Territe fragments and Prospora, then converted eight supplied coal
+  fragments into one coal. The inputs were supplied by commands, not gathered in survival.
+- A command-built 27-block greenhouse with a controller in the outside wall reported unpowered,
+  formed with generator power, breached when a wall block was removed, and recovered after repair.
+  With command-supplied nutrient and bed energy and accelerated random ticks, an Orbite diamond
+  crop grew and auto-harvested into its bed. This is not a normal-rate balance measurement.
+- The 26.3 build, unit tests and ECJ analysis pass. Coal seed hand planting on a Forgite bed was
+  verified in the client after aligning the bed's selection outline with its visible top. Full
+  first-loop survival play, greenhouse growth, extended automation and balance measurements remain open.

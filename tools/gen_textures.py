@@ -8,15 +8,15 @@ composite housing with a bio-green accent (keyed to the mod logo's green), soil 
 organics for beds and crops, and the five fragment tiers coloured from the material catalog
 (BuiltinMaterials.java) so textures stay in lockstep with the data.
 
-This tool is the single source of truth for BOTH the PNG textures AND their block/blockstate/
-item model JSON, so art and models can never drift. Re-run with --force to repaint the whole
-set (additive by default: never clobbers an existing asset).
+The original PNG textures and model JSON were generated here. Some models and blockstates are
+now hand-maintained. The default run fills missing assets; --force also replaces existing JSON.
+Use --refresh-panels to repaint only grow-bed and machine panel textures without touching models.
 
 Outputs (under common/src/main/resources/assets/neroagriculture):
   textures/block/*.png, textures/item/*.png, textures/gui/*.png
   models/block/*.json, models/item/*.json, blockstates/*.json
 
-Usage:  python3 tools/gen_textures.py [--force]
+Usage:  python3 tools/gen_textures.py [--force | --refresh-panels]
 Deps:   Pillow
 """
 
@@ -43,6 +43,7 @@ for d in (BLOCK_TEX, ITEM_TEX, GUI_TEX, BLOCK_MODEL, ITEM_MODEL, BLOCKSTATE):
 
 S = 32
 FORCE = "--force" in sys.argv
+PANELS_ONLY = "--refresh-panels" in sys.argv
 NS = "neroagriculture"
 
 # ---------------- palette (RGBA) ----------------
@@ -216,10 +217,13 @@ def vglow(px, x, y0, y1, ramp):
 
 
 def save_tex(img, folder, name):
+    if PANELS_ONLY and (folder != "block" or not (
+            name.endswith("_side") or ("_grow_bed_" in name and name.endswith("_top")))):
+        return
     d = {"block": BLOCK_TEX, "item": ITEM_TEX, "gui": GUI_TEX}[folder]
     PAINTED[folder].add(name + ".png")
     path = os.path.join(d, name + ".png")
-    if os.path.exists(path) and not FORCE:
+    if os.path.exists(path) and not (FORCE or (PANELS_ONLY and folder == "block")):
         print("skip", os.path.relpath(path, ROOT))
         return
     img.save(path)
@@ -245,8 +249,12 @@ def greyscale_tint_base(name):
     img.save(path)
 
 def write_json(folder, name, obj):
+    if PANELS_ONLY:
+        return
     d = {"block_model": BLOCK_MODEL, "item_model": ITEM_MODEL, "blockstate": BLOCKSTATE}[folder]
     path = os.path.join(d, name + ".json")
+    if os.path.exists(path) and not FORCE:
+        return
     with open(path, "w") as f:
         json.dump(obj, f, separators=(",", ":"))
 
@@ -447,6 +455,12 @@ def gen_machine(name, kind, accent=G2, top_kind="grid"):
     img = panel_base(name)
     px = img.load()
     recess(px, 8, 8, 23, 23, RECESS_FILL)
+    # A dark instrument bezel and a broad identifying stripe keep machines legible at a distance.
+    for x in range(9, 23):
+        px[x, 9] = mix(accent, RECESS_FILL, 0.7)
+        px[x, 22] = mix(accent, RECESS_FILL, 0.5)
+    for x in range(9, 23):
+        px[x, 26] = mix(accent, LAB_DARK, 0.45)
     _glyph(px, kind, accent)
     led(px, 5, 5, LED_G)
     led(px, 26, 5, accent if accent != G2 else LED_G)
@@ -517,17 +531,26 @@ def gen_grow_bed(name, tier):
     rng = rng_for(name)
     # side — tank with a tier-coloured level window
     img = new_img()
-    noise_fill(img, LAB, rng)
+    noise_fill(img, [LAB[1], LAB[1], LAB[3]], rng)
     bevel(img)
     rivets(img)
     px = img.load()
-    recess(px, 5, 12, 26, 24, mix(tc, (0, 0, 0, 255), 0.5))
-    for y in range(14, 23):
-        for x in range(6, 26):
-            px[x, y] = mix(tc, WATER[1], 0.35) if (x + y) % 3 else mix(tc, (255, 255, 255, 255), 0.2)
-    for x in range(6, 26):
-        px[x, 14] = mix(tc, (255, 255, 255, 255), 0.5)  # surface catch-light
-    led(px, 4, 5, mix(tc, LED_CORE, 0.4))
+    recess(px, 5, 11, 26, 25, mix(tc, RECESS_FILL, 0.7))
+    for y in range(13, 24):
+        for x in range(7, 25):
+            px[x, y] = mix(tc, WATER[0], 0.65 if y > 17 else 0.4)
+    for x in range(7, 25):
+        px[x, 13] = mix(tc, WATER[2], 0.65)
+        if x % 5 < 3:
+            px[x, 18] = mix(tc, WATER[1], 0.55)
+    for y in range(14, 23, 3):
+        px[8, y] = WATER[2]
+        px[9, y] = WATER[2]
+    # Tier marks use a count as well as colour, making upgrades distinguishable without colour.
+    for i in range(TIER_ORDER.index(tier) + 1):
+        for x in range(8 + i * 3, 10 + i * 3):
+            px[x, 15] = mix(tc, LED_CORE, 0.7)
+            px[x, 16] = mix(tc, LED_CORE, 0.45)
     save_tex(img, "block", name + "_side")
     # top — soil tray with tier sprouts
     img = new_img()
@@ -542,11 +565,18 @@ def gen_grow_bed(name, tier):
         px[x, 27] = LAB_SEAM
         px[4, x] = LAB_DARK
         px[27, x] = LAB_SEAM
+    for x in range(7, 25):
+        px[x, 6] = mix(tc, LAB_DARK, 0.6)
+        px[x, 25] = mix(tc, LAB_SEAM, 0.65)
+    for y in range(8, 25, 4):
+        for x in range(7, 25):
+            if (x + y) % 7:
+                px[x, y] = SOIL_DAMP
     for (sx, sy) in ((10, 12), (20, 10), (14, 20), (22, 22), (9, 22)):
         px[sx, sy] = G1
         px[sx, sy - 1] = G2
-        px[sx - 1, sy] = mix(G1, tc, 0.4)
-        px[sx + 1, sy] = mix(G1, tc, 0.4)
+        px[sx - 1, sy] = G1
+        px[sx + 1, sy] = G2
     save_tex(img, "block", name + "_top")
     img = panel_base(name + "_bottom")
     save_tex(img, "block", name + "_bottom")
@@ -1094,6 +1124,7 @@ def gen_gui():
 
 # ---------------- catalogues ----------------
 MACHINES = [
+    ("field_generator", "flame", AMBER[2], "vent"),
     ("fragment_extractor", "extractor", G2, "grid"),
     ("fragment_infuser", "infuser", G2, "grid"),
     ("seed_synthesizer", "synthesizer", G2, "grid"),
@@ -1122,6 +1153,12 @@ ALL_BLOCKS = ([m[0] for m in MACHINES] + [b[0] for b in BEDS] + [e[0] for e in F
 
 
 def main():
+    if PANELS_ONLY:
+        for (name, kind, accent, top) in MACHINES:
+            gen_machine(name, kind, accent, top)
+        for (name, tier) in BEDS:
+            gen_grow_bed(name, tier)
+        return
     for (name, kind, accent, top) in MACHINES:
         gen_machine(name, kind, accent, top)
     gen_pollination_beacon()

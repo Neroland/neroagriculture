@@ -56,7 +56,8 @@ public final class ModItems {
     static {
         for (RegistryEntry<? extends net.minecraft.world.level.block.Block> block : ModBlocks.ALL) {
             RegistryEntry<BlockItem> entry = ITEMS.register(block.id().getPath(), key ->
-                    new BlockItem(block.get(), new Item.Properties().setId(key).useBlockDescriptionPrefix()));
+                    new za.co.neroland.neroagriculture.content.GuidedBlockItem(block.get(),
+                            new Item.Properties().setId(key).useBlockDescriptionPrefix(), block.id().getPath()));
             TAB_ITEMS.add(entry);
         }
     }

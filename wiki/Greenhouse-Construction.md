@@ -16,6 +16,8 @@ for when sealing is required.
 
 The controller flood-fills the interior air pocket, bounded by the surrounding solid blocks and capped by
 the configured volume limit. Crops (and empty air) count as interior; grow beds and walls are boundary.
+For a controller in a wall, the sealed pocket is selected separately from the outside air. If several
+sealed pockets touch the controller, the largest is used.
 The check runs on a slow safety interval (a few seconds by default) — never every tick.
 
 The Greenhouse Controller's screen carries this build guide **in-GUI**: a panel down its left-hand column

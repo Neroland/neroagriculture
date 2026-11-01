@@ -117,21 +117,19 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             int nextYield = definition == null ? 0
                     : YieldCurve.nextCapped(definition.yield(), harvests, multiplier, cap);
             int maxYield = definition == null ? 0 : YieldCurve.maxCapped(definition.yield(), multiplier, cap);
-            FragmentTier actualBed = ModBlocks.growBedTier(level.getBlockState(pos.below()).getBlock());
-            String gate = definition == null || definition.gate() == null ? "none"
-                    : definition.gate() + ":" + (ProgressionGates.isOpen(serverPlayer, definition.gate())
-                            ? "open" : "closed");
-            String cycle = za.co.neroland.neroagriculture.cycle.Cycles.describe(level.getServer(),
+            Component cycle = za.co.neroland.neroagriculture.cycle.Cycles.describeComponent(level.getServer(),
                     level.dimension().identifier(), level.getGameTime());
-            //? if >=26.1 {
-            player.sendSystemMessage(Component.literal("Material=" + crop.variant().material() + " tier="
-            //?} else {
-            /*serverPlayer.sendSystemMessage(Component.literal("Material=" + crop.variant().material() + " tier="
-            *///?}
-                    + requiredBed + " gate=" + gate + " requiredBed=" + requiredBed + " bed=" + actualBed
-                    + " age=" + state.getValue(AGE) + " harvests=" + harvests
-                    + " yield=" + yield + " next=" + nextYield + " max=" + maxYield + " cap=" + cap
-                    + " cycle=" + cycle + " blocked=" + reason));
+            Component name = za.co.neroland.neroagriculture.content.MaterialNames.display(
+                    crop.variant().material(), definition == null ? null : definition.displayKey());
+            Component status = state.getValue(AGE) == MAX_AGE && lookup.permitsGrowth()
+                    && reason != GrowthRules.BlockedReason.GATE_CLOSED
+                    ? Component.translatable("message.neroagriculture.crop.mature")
+                    : Component.translatable("machine.neroagriculture.status."
+                            + reason.name().toLowerCase(java.util.Locale.ROOT));
+            serverPlayer.sendSystemMessage(Component.translatable("message.neroagriculture.crop.summary",
+                    name, requiredBed.name(), state.getValue(AGE), MAX_AGE, status));
+            serverPlayer.sendSystemMessage(Component.translatable("message.neroagriculture.crop.yield",
+                    harvests, yield, nextYield, maxYield, cycle));
             return InteractionResult.SUCCESS;
         }
         if (state.getValue(AGE) < MAX_AGE) return InteractionResult.PASS;

@@ -59,4 +59,22 @@ class GreenhouseValidationTest {
         assertTrue(result.interior().stream().noneMatch(key -> key == CONTROLLER.asLong()),
                 "controller must never be counted as interior");
     }
+
+    @Test
+    void wallControllerSelectsTheSealedInteriorRatherThanOutsideAir() {
+        Set<Long> room = smallSealedPocket();
+        GreenhouseValidation.Passable outsideAndRoom = pos -> pos.getX() < 0 || room.contains(pos.asLong());
+        GreenhouseValidation.Result result = GreenhouseValidation.validate(CONTROLLER, outsideAndRoom, 64);
+        assertEquals(GreenhouseValidation.Structure.FORMED, result.structure());
+        assertEquals(room, result.interior());
+    }
+
+    @Test
+    void connectingTheRoomToOutsideReportsABreach() {
+        Set<Long> room = smallSealedPocket();
+        GreenhouseValidation.Passable breached = pos -> pos.getY() == 0 || room.contains(pos.asLong());
+        GreenhouseValidation.Result result = GreenhouseValidation.validate(CONTROLLER, breached, 64);
+        assertEquals(GreenhouseValidation.Structure.BREACHED, result.structure());
+        assertNotNull(result.leak());
+    }
 }

@@ -14,5 +14,5 @@ non-creative player returns exactly one Resource Seed with the allowed material 
 Pistons cannot move crops, and unsupported, exploded, or indirectly replaced crops do not create extra
 seeds or fragment.
 
-Sneak-use a planted crop for a diagnostic line containing material, tier, age, harvest history, current
-yield, and the first condition blocking growth.
+Sneak-use a planted crop for a readout of its material, tier, growth, harvest history, current and next
+yield, seasonal cycle and the first condition blocking growth.

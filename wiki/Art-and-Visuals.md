@@ -39,15 +39,18 @@ for each tier that should use the design, and retain the fallback for unrecognis
 
 ## Texture pipeline
 
-All textures **and** their model/blockstate/item-model JSON are produced by a single deterministic
-generator, so the art and the models can never drift apart:
+Most original textures and models were produced by a deterministic generator. The resource crop
+blockstate and curated resource models are hand-maintained and must not be overwritten by regeneration.
+Grow beds have tier marks as well as colour, a planted soil tray and a nutrient-window motif; machine
+faces have distinct functional glyphs and instrument panels.
 
 - `tools/gen_textures.py` — 32×32 pixel-art painters in the shared Neroland family style
   (cf. `../nerotech/tools/gen_textures.py`): a lab-white composite base with a 2px bevel and corner
   rivets, recessed screens, green status LEDs, and a per-name deterministic seed so a re-run is
   byte-stable.
-- Run `python3 tools/gen_textures.py` to fill in any missing assets, or `--force` to repaint the
-  whole set. The tool is **additive by default** and never clobbers an existing PNG without `--force`.
+- Run `python3 tools/gen_textures.py --refresh-panels` to repaint only machine side and grow-bed side
+  and top textures, without changing models or blockstates. The general generator also writes model
+  and blockstate JSON, including hand-maintained files; review its effects before running it.
 - It writes `textures/block/*`, `textures/item/*`, `textures/gui/*` and the matching
   `models/block/*`, `models/item/*`, `blockstates/*` under
   `common/src/main/resources/assets/neroagriculture`.

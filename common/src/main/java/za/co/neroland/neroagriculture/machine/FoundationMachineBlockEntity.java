@@ -138,7 +138,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             tickGenerator();
             return;
         }
-        if (kind() == MachineKind.OTHER || kind() == MachineKind.RESEARCH_BENCH) {
+        if (kind() == MachineKind.RESEARCH_BENCH) return;
+        if (kind() == MachineKind.OTHER) {
             stop(MachineBlockedReason.IDLE);
             return;
         }

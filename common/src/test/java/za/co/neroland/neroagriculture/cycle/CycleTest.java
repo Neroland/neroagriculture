@@ -57,6 +57,20 @@ class CycleTest {
     }
 
     @Test
+    void forecastIncludesTheRemainderInTheLastPhase() {
+        CycleProfile profile = new CycleProfile(Identifier.parse("test:uneven"), 10L, 0L, List.of(
+                new CycleProfile.Phase("a", CycleModifier.IDENTITY),
+                new CycleProfile.Phase("b", CycleModifier.IDENTITY),
+                new CycleProfile.Phase("c", CycleModifier.IDENTITY)));
+        assertEquals(4L, profile.ticksUntilNextPhase(6));
+        assertEquals(1L, profile.ticksUntilNextPhase(9));
+        assertEquals(3L, profile.ticksUntilNextPhase(10));
+        CycleProfile shortPeriod = new CycleProfile(Identifier.parse("test:short"), 2L, 0L, profile.phases());
+        assertEquals("a", shortPeriod.nextPhase(1).displayKey());
+        assertEquals(1L, shortPeriod.ticksUntilNextPhase(1));
+    }
+
+    @Test
     void aProfileOfIdentityPhasesNeverChangesOutput() {
         CycleProfile flat = new CycleProfile(Identifier.parse("test:flat"), 100L, 0L,
                 List.of(new CycleProfile.Phase("a", CycleModifier.IDENTITY)));

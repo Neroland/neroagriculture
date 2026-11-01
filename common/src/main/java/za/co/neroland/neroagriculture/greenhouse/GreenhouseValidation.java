@@ -29,24 +29,37 @@ public final class GreenhouseValidation {
     private GreenhouseValidation() { }
 
     public static Result validate(BlockPos controller, Passable passable, int volumeCap) {
-        Set<Long> interior = new HashSet<>();
-        Deque<BlockPos> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+        Result best = null;
+        Result breach = null;
         for (Direction direction : Direction.values()) {
             BlockPos seed = controller.relative(direction);
-            if (passable.test(seed) && interior.add(seed.asLong())) queue.add(seed);
-        }
-        if (interior.isEmpty()) return new Result(Structure.UNFORMED, Set.of(), null, 0);
-        while (!queue.isEmpty()) {
-            BlockPos pos = queue.poll();
-            for (Direction direction : Direction.values()) {
-                BlockPos next = pos.relative(direction);
-                if (next.equals(controller) || !passable.test(next)) continue;
-                if (interior.add(next.asLong())) {
-                    if (interior.size() > volumeCap) return new Result(Structure.BREACHED, interior, next, interior.size());
+            if (!passable.test(seed) || visited.contains(seed.asLong())) continue;
+            Set<Long> interior = new HashSet<>();
+            Deque<BlockPos> queue = new ArrayDeque<>();
+            interior.add(seed.asLong());
+            visited.add(seed.asLong());
+            queue.add(seed);
+            BlockPos leak = null;
+            while (!queue.isEmpty() && leak == null) {
+                BlockPos pos = queue.poll();
+                for (Direction neighbourDirection : Direction.values()) {
+                    BlockPos next = pos.relative(neighbourDirection);
+                    if (next.equals(controller) || !passable.test(next) || !interior.add(next.asLong())) continue;
+                    visited.add(next.asLong());
+                    if (interior.size() > volumeCap) {
+                        leak = next;
+                        break;
+                    }
                     queue.add(next);
                 }
             }
+            Result result = new Result(leak == null ? Structure.FORMED : Structure.BREACHED,
+                    interior, leak, interior.size());
+            if (leak == null && (best == null || result.volume() > best.volume())) best = result;
+            if (leak != null) breach = result;
         }
-        return new Result(Structure.FORMED, interior, null, interior.size());
+        if (best != null) return best;
+        return breach == null ? new Result(Structure.UNFORMED, Set.of(), null, 0) : breach;
     }
 }

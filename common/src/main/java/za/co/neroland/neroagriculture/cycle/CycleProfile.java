@@ -40,11 +40,15 @@ public record CycleProfile(Identifier dimension, long period, long phaseOffset, 
     /** Ticks until the next phase begins (for forecast text). */
     public long ticksUntilNextPhase(long time) {
         long span = Math.max(1, period / phases.size());
-        long into = normalised(time) % span;
-        return span - into;
+        long position = normalised(time);
+        int index = phaseIndex(time);
+        long boundary = index == phases.size() - 1 ? period : Math.min(period, (index + 1L) * span);
+        return boundary - position;
     }
 
     public Phase nextPhase(long time) {
-        return phases.get((phaseIndex(time) + 1) % phases.size());
+        int index = phaseIndex(time);
+        long span = Math.max(1, period / phases.size());
+        return phases.get(index == phases.size() - 1 || (index + 1L) * span >= period ? 0 : index + 1);
     }
 }
