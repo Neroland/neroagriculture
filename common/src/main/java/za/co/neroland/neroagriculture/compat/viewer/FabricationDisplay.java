@@ -204,7 +204,9 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
         }
         try {
             stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier.get()));
-            MaterialTints.apply(stack, material);
+            MaterialCatalogSyncPayload.Entry entry = ClientMaterialCatalog.entries().get(material);
+            if (entry == null) MaterialTints.apply(stack, material);
+            else MaterialTints.apply(stack, entry.color(), entry.visualFamily());
         } catch (RuntimeException invalid) {
             return new ItemStack(item, Math.max(1, count));
         }

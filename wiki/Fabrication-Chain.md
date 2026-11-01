@@ -4,6 +4,13 @@ Stage 5 connects physical resource samples to repeatable cultivation without tru
 All three processing machines use Neroland Core energy storage, upgrades, and item/energy Side Config.
 Their five-slot inventory is exposed through the native automation capability on every loader.
 
+## Field Generator
+
+Craft the Field Generator from iron, copper, a furnace and redstone. Place it next to a processing
+machine and insert coal or charcoal into its first slot. Each fuel produces 3,200 NF at 8 NF per tick;
+the generator pauses when its buffer is full and resumes without consuming another fuel. Energy output
+uses Core's side configuration, and its fuel and remaining burn time persist across reloads.
+
 ## Fragment Extractor
 
 The Extractor accepts a real sample in its first input. It resolves one deterministic material from the
@@ -32,8 +39,9 @@ resource item.
 
 Player- or team-scoped checks (gates, research milestones, tier unlocks) are **owner-bound**: each
 machine records its placer's UUID (opt-out via `automation.track_owner`; server-only, erasure-aware —
-see [Privacy](Privacy-and-Erasure.md)) and credits that player. Only an ownerless machine falls back to
-an eligible player within 16 blocks, so opting out never bricks progression. The screen shows progress,
+see [Privacy](Privacy-and-Erasure.md)) and credits that player. Player-bound fabrication pauses if that
+owner is offline or owner tracking is disabled. Opening an older ownerless machine claims it when owner
+tracking is enabled. The screen shows progress,
 NF, and explicit blocked states such as no power, closed gate, missing research, invalid components, or
 full output.
 

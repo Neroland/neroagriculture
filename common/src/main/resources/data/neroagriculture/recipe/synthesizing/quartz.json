@@ -1,0 +1,11 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "c:quartz",
+  "ticks": 140,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "#neroagriculture:quartz_samples",
+  "energy": 2400,
+  "family": "forgite"
+}

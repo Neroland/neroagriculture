@@ -18,7 +18,9 @@ public final class BuiltinMaterials {
 
     public static List<Candidate> candidates() {
         List<Candidate> result = new ArrayList<>();
-        ore(result, "coal", "minecraft:coal", FragmentTier.TERRITE, 0x343434);
+        add(result, Identifier.parse("c:coal"),
+                new InputSelector(Kind.TAG, Identifier.parse("neroagriculture:coal_samples")),
+                "minecraft:coal", FragmentTier.TERRITE, 0x343434);
         ore(result, "copper", "minecraft:raw_copper", FragmentTier.FORGITE, 0xC46B48);
         ore(result, "iron", "minecraft:raw_iron", FragmentTier.FORGITE, 0xD8D8D8);
         ore(result, "gold", "minecraft:raw_gold", FragmentTier.FORGITE, 0xF4D03F);
@@ -38,7 +40,8 @@ public final class BuiltinMaterials {
 
     private static void ore(List<Candidate> out, String material, String output, FragmentTier tier, int color) {
         Identifier id = Identifier.parse("c:" + material);
-        add(out, id, new InputSelector(Kind.TAG, Identifier.parse("c:ores/" + material)), output, tier, color);
+        add(out, id, new InputSelector(Kind.TAG, Identifier.parse("neroagriculture:" + material + "_samples")),
+                output, tier, color);
     }
 
     private static void direct(List<Candidate> out, String material, String output, FragmentTier tier, int color) {
@@ -48,11 +51,14 @@ public final class BuiltinMaterials {
 
     private static void add(List<Candidate> out, Identifier id, InputSelector selector, String output,
             FragmentTier tier, int color) {
+        Yield yield = id.equals(Identifier.parse("c:coal")) ? new Yield(2, 3, 32)
+                : new Yield(TierBalance.defaultYieldMin(tier), TierBalance.defaultYieldMax(tier),
+                        TierBalance.defaultRamp(tier));
         MaterialDefinition definition = new MaterialDefinition(id, selector, Identifier.parse(output), tier,
                 MaterialDefinitionParser.defaultGate(tier),
-                new Yield(TierBalance.defaultYieldMin(tier), TierBalance.defaultYieldMax(tier), TierBalance.defaultRamp(tier)),
+                yield,
                 TierBalance.conversionCount(tier), "material." + id.getNamespace() + "." + id.getPath().replace('/', '.'),
-                color, true, null);
+                color, true, null, za.co.neroland.neroagriculture.crop.CropVisuals.family(id));
         out.add(new Candidate(definition, CatalogSource.BUILTIN, "built-in " + id));
     }
 }

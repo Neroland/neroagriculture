@@ -1,0 +1,11 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "c:gold",
+  "ticks": 140,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "#neroagriculture:gold_samples",
+  "energy": 2400,
+  "family": "forgite"
+}

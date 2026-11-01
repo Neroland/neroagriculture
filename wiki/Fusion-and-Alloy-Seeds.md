@@ -7,9 +7,14 @@ obtain alloys that do not exist as ores. It is a **data-driven** recipe type
 ## How it works
 
 Put a **Resource Fragment** (the primary input) in the Infuser's primary slot and the **second input**
-(an item or tag) in the secondary slot. Unlike ordinary synthesis, fusion does **not** require the
-alloy resource itself — it invents the seed. The alloy seed takes the alloy resource's **own catalog
-tier**, so the downstream grow → fragments → resource loop stays consistent.
+(an item or tag) in the secondary slot. Fusion does not consume the alloy itself, but with research
+enabled the machine owner must already have discovered and researched that alloy. The alloy seed takes
+the alloy resource's **own catalog tier**, so the downstream loop stays consistent. A research recipe
+for the alloy is required. Nero Alloy has one; third-party alloys require a suitable datapack research
+recipe when research is enabled.
+
+The input Resource Fragment must refer to an enabled catalog material and carry its current tier and
+component version. Disabled, unknown, outdated or mismatched fragments cannot be used for fusion.
 
 ## Curated built-in alloys
 

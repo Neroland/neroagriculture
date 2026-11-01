@@ -1,0 +1,17 @@
+{
+  "requires_item": "nerospace:raw_nerosteel",
+  "input": {
+    "item": "nerospace:raw_nerosteel"
+  },
+  "output": "nerospace:raw_nerosteel",
+  "tier": "orbite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 16,
+  "display_key": "material.nerospace.nerosteel",
+  "color": "#667F90",
+  "enabled": true
+}

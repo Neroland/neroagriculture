@@ -2,6 +2,13 @@
 
 Every seed can carry **genetics** — five traits that tune how a crop performs. Genetics travel with the
 seed and the planted crop through planting, harvest, breaking, the Planter/Harvester, storage, and reloads.
+Seed tooltips show each current trait and the total against the 15-point cap.
+
+A resource crop can roll the configured bonus-seed chance only on its first harvest. The bonus seed
+inherits the parent's genetics and begins its own harvest history; the planted parent keeps its history
+when broken and replanted. Each seed therefore gets at most one reproduction opportunity instead of
+repeatedly cloning improved genetics on every harvest. Area harvesters and crop towers do not award
+bonus seeds. Existing seeds and their traits are retained.
 
 ## Traits and caps
 

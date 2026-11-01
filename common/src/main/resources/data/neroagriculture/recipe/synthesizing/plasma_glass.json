@@ -1,0 +1,10 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "nerolandcore:plasma_glass",
+  "ticks": 160,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "nerolandcore:plasma_glass",
+  "energy": 3600
+}

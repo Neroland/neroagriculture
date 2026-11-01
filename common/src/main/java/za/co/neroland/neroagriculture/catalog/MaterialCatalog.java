@@ -119,6 +119,10 @@ public final class MaterialCatalog {
                             errors.add(id + ": definition must be a JSON object in " + layer.sourcePackId());
                             continue;
                         }
+                        if (!requirementMet(json.getAsJsonObject(), idToCheck -> {
+                            Item item = BuiltInRegistries.ITEM.getValue(idToCheck);
+                            return item != null && item != Items.AIR;
+                        })) continue;
                         MaterialDefinitionParser.Result parsed = MaterialDefinitionParser.parse(id, json.getAsJsonObject());
                         if (!parsed.valid()) {
                             errors.add(parsed.error() + " (pack " + layer.sourcePackId() + ")");
@@ -141,6 +145,10 @@ public final class MaterialCatalog {
             errors.add("datapack scan failed: " + e.getMessage());
         }
         return result;
+    }
+
+    static boolean requirementMet(com.google.gson.JsonObject json, java.util.function.Predicate<Identifier> exists) {
+        return !json.has("requires_item") || exists.test(Identifier.parse(json.get("requires_item").getAsString()));
     }
 
     @Nullable
@@ -202,7 +210,8 @@ public final class MaterialCatalog {
                             new Yield(TierBalance.defaultYieldMin(tier), TierBalance.defaultYieldMax(tier),
                                     TierBalance.defaultRamp(tier)),
                             TierBalance.conversionCount(tier),
-                            "material." + id.getNamespace() + "." + id.getPath().replace('/', '.'), color, true, null);
+                            "material." + id.getNamespace() + "." + id.getPath().replace('/', '.'), color, true, null,
+                            za.co.neroland.neroagriculture.crop.CropVisuals.family(id));
                     // Rank the detail string so, among same-id discoveries, the preferred category wins the
                     // resolver tiebreak (all share CatalogSource.ORE_TAG priority; detail breaks the tie).
                     String rank = Integer.toString(DISCOVERY_CATEGORIES.indexOf(category));

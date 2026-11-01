@@ -1,0 +1,12 @@
+{
+  "result": {
+    "count": 2,
+    "id": "neroagriculture:orbite_fragment"
+  },
+  "material": "c:emerald",
+  "ticks": 120,
+  "type": "neroagriculture:material_extraction",
+  "ingredient": "#neroagriculture:emerald_samples",
+  "energy": 1800,
+  "family": "orbite"
+}

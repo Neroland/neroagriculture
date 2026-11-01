@@ -118,6 +118,7 @@ class SeedCompatibilityTest {
     }
 
     private static Entry entry(String id, FragmentTier tier) {
-        return new Entry(Identifier.parse(id), tier, "material." + id.replace(':', '.'), 0x7FA0C0);
+        return new Entry(Identifier.parse(id), tier, "material." + id.replace(':', '.'), 0x7FA0C0,
+                0, 1, 4, 64, 12, "", "");
     }
 }

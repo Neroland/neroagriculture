@@ -33,23 +33,14 @@ import za.co.neroland.neroagriculture.platform.Services;
  *
  * <p>NeroAgriculture's only notion of "whose is this" is
  * {@link za.co.neroland.neroagriculture.automation.AutomationOwner}: a bare owner UUID recorded in the
- * NBT of four block entities — grow beds, the area machines (Planter / Harvester / Fertiliser
- * Applicator), the fabrication machines, and the Terraforming Controller. Every section below starts
+ * NBT of grow beds, area machines, fabrication machines, the Crop Tower Controller and the Terraforming
+ * Controller. Every section below starts
  * from {@code AutomationOwner.ownedBy(playerId)} and reports nothing that is not reachable from a block
  * the requesting player owns.
  *
  * <h2>Why there is no {@code towers} section</h2>
  *
- * <p>The Crop Tower Controller <b>has no owner field at all</b>. Its gate checks resolve a player with
- * {@code level.getNearestPlayer(..., 24.0)}, which is a reasonable-enough approximation for "who is
- * standing here operating this" and a completely unacceptable one for "who may read this over the
- * internet" — proximity is not permission, and a player idling near somebody else's tower would be
- * handed its contents. Nor is there a containing structure to inherit ownership from: a tower is a
- * controller plus a frame column and belongs to nothing.
- *
- * <p>So the section is omitted rather than approximated. Towers become reportable the day the
- * controller records a placing player like the other four block entities do (which is the open audit
- * item behind the {@code getNearestPlayer} gate check as well); at that point {@code towers} is an
+ * <p>Towers now record an owner, but remain outside the existing link schema. Exposing them requires an
  * additive section and a {@link #SCHEMA_VERSION} bump.
  *
  * <p>The {@code greenhouse} section survives the same test only because it is scoped <em>indirectly</em>

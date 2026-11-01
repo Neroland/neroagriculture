@@ -1,0 +1,17 @@
+{
+  "requires_item": "nerocreatures:stalker_hide",
+  "input": {
+    "item": "nerocreatures:stalker_hide"
+  },
+  "output": "nerocreatures:stalker_hide",
+  "tier": "colonite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 20,
+  "display_key": "material.nerocreatures.stalker_hide",
+  "color": "#8B92A2",
+  "enabled": true
+}

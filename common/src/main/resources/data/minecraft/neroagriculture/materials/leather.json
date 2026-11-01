@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:leather",
+  "input": {
+    "item": "minecraft:leather"
+  },
+  "output": "minecraft:leather",
+  "tier": "forgite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 4,
+    "ramp_harvests": 64
+  },
+  "conversion": 12,
+  "display_key": "item.minecraft.leather",
+  "color": "#A3613D",
+  "enabled": true
+}

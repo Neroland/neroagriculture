@@ -83,6 +83,7 @@ public final class ModBlocks {
                             .noCollision().strength(100.0F).noLootTable()));
 
     public static final RegistryEntry<FoundationMachineBlock> FRAGMENT_EXTRACTOR = machine("fragment_extractor");
+    public static final RegistryEntry<FoundationMachineBlock> FIELD_GENERATOR = machine("field_generator");
     public static final RegistryEntry<FoundationMachineBlock> FRAGMENT_INFUSER = machine("fragment_infuser");
     public static final RegistryEntry<FoundationMachineBlock> SEED_SYNTHESIZER = machine("seed_synthesizer");
     public static final RegistryEntry<za.co.neroland.neroagriculture.automation.AreaMachineBlock> PLANTER = areaMachine("planter");
@@ -126,7 +127,7 @@ public final class ModBlocks {
             ORBITE_GROW_BED, COLONITE_GROW_BED, VOIDITE_GROW_BED, RESOURCE_CROP, ENGINEERED_FOOD_CROP,
             ALIEN_CROP, GREENHOUSE_FRAME, GREENHOUSE_GLASS, CROP_TOWER_FRAME, TERRITE_FRAGMENT_BLOCK,
             FORGITE_FRAGMENT_BLOCK, ORBITE_FRAGMENT_BLOCK, COLONITE_FRAGMENT_BLOCK, VOIDITE_FRAGMENT_BLOCK,
-            FRAGMENT_DECOR, FRAGMENT_EXTRACTOR, FRAGMENT_INFUSER, SEED_SYNTHESIZER, PLANTER, HARVESTER,
+            FRAGMENT_DECOR, FRAGMENT_EXTRACTOR, FIELD_GENERATOR, FRAGMENT_INFUSER, SEED_SYNTHESIZER, PLANTER, HARVESTER,
             SEED_RESEARCH_BENCH, GREENHOUSE_CONTROLLER, FERTILISER_PROCESSOR, FERTILISER_APPLICATOR,
             GENETICS_STATION, OXYGEN_PLANT, BIOFUEL_CONVERTER, CROP_TOWER_CONTROLLER, POLLINATION_BEACON,
             TERRAFORMING_CONTROLLER);

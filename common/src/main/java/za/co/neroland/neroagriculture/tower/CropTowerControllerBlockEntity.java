@@ -58,7 +58,7 @@ import za.co.neroland.nerolandcore.sideconfig.SlotGroup;
  * SAME shared rules as ordinary crops, so a tower can never out-produce an equivalent farm or duplicate. The
  * structure is validated on a slow interval only — never scanned per tick.
  */
-public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider {
+public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEntity implements WorldlyContainer, MenuProvider, za.co.neroland.neroagriculture.automation.AutomationOwner.Owned {
     private static final int SEED_START = 0;
     private static final int SEED_END = 2;
     private static final int FERTILISER = 3;
@@ -78,6 +78,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     private int revalidateTimer;
     private int blockedReason = CropTowerMenu.NO_CROP;
     private long blockedReasonTick = Long.MIN_VALUE;
+    @Nullable private java.util.UUID owner;
 
     // Gauge slots ship as permille fractions: ContainerData syncs shorts, and the configured energy
     // (up to 10,000,000 NF) and fluid (up to 1,000,000 mB) capacities exceed 32,767 (see menu.GaugeData).
@@ -158,7 +159,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         if (!formed) return GrowthRules.BlockedReason.NOT_FORMED.ordinal();
         int active = activeSlots();
         var catalog = MaterialCatalog.forServer(level.getServer());
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
         int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
         boolean hasPower = energyCost <= 0 || getEnergy().extract(energyCost, true) >= energyCost;
@@ -185,8 +186,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             @Nullable ServerPlayer player) {
         if (definition == null) return true;
         return (definition.gate() == null || player != null && ProgressionGates.isOpen(player, definition.gate()))
-                && (player == null
-                || za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()));
+                && za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier());
     }
 
     /**
@@ -198,7 +198,11 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     private boolean outputHasRoomFor(TowerSlot slot) {
         ItemStack probe = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), 1);
         probe.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
-        za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material());
+        if (level != null && level.getServer() != null) {
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material(), level.getServer());
+        } else {
+            za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material());
+        }
         return outputCapacityFor(probe) > 0;
     }
 
@@ -261,7 +265,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         int active = activeSlots();
         if (active <= 0) return;
         int perPass = AgricultureConfig.TOWER_SLOTS_PER_PASS.get();
-        ServerPlayer player = nearbyPlayer(level);
+        ServerPlayer player = gatePlayer(level);
         for (int i = 0; i < perPass; i++) {
             int index = Math.floorMod(cursor + i, active);
             TowerSlot slot = slots[index];
@@ -298,7 +302,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
         if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
-                || (player != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()))) return;
+                || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) return;
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get() * environmentCostMultiplier(level, slot, definition.tier(), slotIndex);
         int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
         if (energyCost > 0 && getEnergy().extract(energyCost, true) < energyCost) return;
@@ -340,22 +344,22 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
         if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
-                || (player != null && !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()))) return;
+                || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) return;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),
                 AgricultureConfig.YIELD_TIER_CAP_STEP.get());
         double cycleYield = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
                 level.dimension().identifier(), level.getGameTime()).yield();
         boolean fertilised = items.get(FERTILISER).is(ModItems.YIELD_FERTILISER.get());
-        int amount = (int) Math.floor(YieldCurve.scaledCapped(definition.yield(), slot.harvestCount(),
-                AgricultureConfig.YIELD_MULTIPLIER.get(), cap) * cycleYield) + GeneticEffects.yieldBonus(slot.genetics())
-                + (fertilised ? AgricultureConfig.FERTILISER_MAX_DOSE.get() : 0);
+        int amount = YieldCurve.harvest(definition.yield(), slot.harvestCount(),
+                AgricultureConfig.YIELD_MULTIPLIER.get(), cycleYield, GeneticEffects.yieldBonus(slot.genetics())
+                + (fertilised ? AgricultureConfig.FERTILISER_MAX_DOSE.get() : 0), cap);
         if (amount <= 0) {
             slot.harvested();
             return;
         }
         ItemStack probe = new ItemStack(ModItems.RESOURCE_FRAGMENT.get());
         probe.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
-        za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material());
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, definition.color(), definition.visualFamily());
         if (outputCapacityFor(probe) < amount) return; // output jammed: keep the slot mature, consume nothing
         insertAmount(probe, amount);
         TowerOutputChannel.recordHarvest(level, amount);
@@ -398,10 +402,28 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     }
 
     @Nullable
-    private ServerPlayer nearbyPlayer(ServerLevel level) {
-        Player player = level.getNearestPlayer(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5,
-                worldPosition.getZ() + 0.5, 24.0, false);
-        return player instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+    private ServerPlayer gatePlayer(ServerLevel level) {
+        return za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, owner);
+    }
+
+    @Override public @Nullable java.util.UUID automationOwner() { return owner; }
+    @Override public void clearAutomationOwner() { owner = null; setChanged(); }
+    public void setOwner(@Nullable java.util.UUID owner) {
+        this.owner = za.co.neroland.neroagriculture.automation.AutomationOwner.trackingEnabled()
+                ? za.co.neroland.neroagriculture.automation.ErasedOwners.filter(owner,
+                        level == null ? null : level.getServer()) : null;
+        setChanged();
+    }
+    @Override public void setRemoved() {
+        za.co.neroland.neroagriculture.automation.AutomationOwner.untrack(this);
+        super.setRemoved();
+    }
+    @Override public void clearRemoved() {
+        super.clearRemoved();
+        za.co.neroland.neroagriculture.automation.AutomationOwner.track(this);
+        if (owner != null && level instanceof ServerLevel serverLevel) {
+            owner = za.co.neroland.neroagriculture.automation.ErasedOwners.filter(owner, serverLevel.getServer());
+        }
     }
 
     public String status() {
@@ -433,7 +455,11 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             if (slot.isEmpty()) continue;
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
             seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
-            za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material());
+            if (level.getServer() != null) {
+                za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material(), level.getServer());
+            } else {
+                za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material());
+            }
             seed.set(ModDataComponents.HARVEST_COUNT.get(), slot.harvestCount());
             if (!slot.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), slot.genetics());
             net.minecraft.world.level.block.Block.popResource(level, worldPosition, seed);
@@ -471,6 +497,12 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     @Override public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return slot >= OUTPUT_START; }
     @Override public void clearContent() { items.clear(); setChanged(); }
 
+    @Override public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        var tag = saveCustomOnly(registries);
+        tag.remove("Owner");
+        return tag;
+    }
+
     //? if >=1.21.6 {
     @Override protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
@@ -488,6 +520,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         output.putInt("NutrientAmount", nutrient.getRawAmount());
         output.putInt("Height", height);
         output.putInt("Cursor", cursor);
+        za.co.neroland.neroagriculture.automation.AutomationOwner.save(output, owner);
         for (int i = 0; i < slots.length; i++) {
             TowerSlot slot = slots[i];
             if (slot.isEmpty()) continue;
@@ -513,6 +546,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         ValueInput input = ValueInput.of(tag, registries);
     *///?}
         SideConfigMigration.load(this, input);
+        owner = za.co.neroland.neroagriculture.automation.AutomationOwner.load(input);
         //? if >=1.21.6 {
         ContainerHelper.loadAllItems(input, items);
         //?} else {

@@ -1,1 +1,1 @@
-{ "type": "neroagriculture:material_extraction", "ingredient": "#c:ores/coal", "result": { "id": "neroagriculture:territe_fragment", "count": 2 }, "energy": 800, "ticks": 80, "material": "c:coal", "family": "territe" }
+{ "type": "neroagriculture:material_extraction", "ingredient": "#neroagriculture:coal_samples", "result": { "id": "neroagriculture:territe_fragment", "count": 2 }, "energy": 800, "ticks": 80, "material": "c:coal", "family": "territe" }

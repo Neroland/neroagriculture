@@ -1,0 +1,18 @@
+{
+  "requires_item": "nerospace:glacite",
+  "input": {
+    "item": "nerospace:glacite"
+  },
+  "output": "nerospace:glacite",
+  "tier": "colonite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 20,
+  "display_key": "material.nerospace.glacite",
+  "color": "#7ECFE7",
+  "enabled": true,
+  "dimension": "nerospace:glacira"
+}

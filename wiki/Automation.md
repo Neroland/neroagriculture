@@ -34,10 +34,11 @@ cost, exactly as on the fabrication machines.
 
 If owner tracking is enabled (config `automation.track_owner`, on by default), a machine records only the
 placing player's UUID — never a name — so a claims/protection mod can authorise its edits. Fabrication
-machines and powered grow beds record their placer the same way, and progression checks (gate unlocks,
-research requirements) are made **owner-first**: they credit the machine's owner, falling back to the
-nearest player only when no owner is recorded, so opting out never bricks progression. Standalone, with
-no claims mod, machines work freely on loaded chunks. A player-data erasure request clears the stored owner
+machines, powered grow beds and crop towers record their placer the same way. Progression checks use only
+the recorded owner, never a nearby player. If the owner is offline or absent, player-gated work pauses;
+operations with no player-specific gate can continue. Opening an older ownerless machine or tower records
+the interacting player when tracking is enabled. With tracking disabled, player-gated automation cannot
+resolve an owner; use manual play for those operations. A player-data erasure request clears the stored owner
 from any loaded machine (and from unloaded ones when their chunks load — see
 [Privacy](Privacy-and-Erasure.md)).
 

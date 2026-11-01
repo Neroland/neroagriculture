@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:gunpowder",
+  "input": {
+    "item": "minecraft:gunpowder"
+  },
+  "output": "minecraft:gunpowder",
+  "tier": "forgite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 4,
+    "ramp_harvests": 64
+  },
+  "conversion": 12,
+  "display_key": "item.minecraft.gunpowder",
+  "color": "#77716C",
+  "enabled": true
+}

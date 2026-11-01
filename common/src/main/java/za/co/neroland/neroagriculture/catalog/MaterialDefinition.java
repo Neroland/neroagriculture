@@ -11,7 +11,7 @@ import za.co.neroland.neroagriculture.content.FragmentTier;
 /** Complete immutable server-side definition of one component-backed resource material. */
 public record MaterialDefinition(Identifier id, InputSelector input, Identifier output, FragmentTier tier,
         @Nullable Identifier gate, Yield yield, int conversion, String displayKey, int color, boolean enabled,
-        @Nullable WorldRestriction worldRestriction) {
+        @Nullable WorldRestriction worldRestriction, int visualFamily) {
 
     public static final int MAX_DISPLAY_KEY_LENGTH = 128;
 
@@ -31,6 +31,7 @@ public record MaterialDefinition(Identifier id, InputSelector input, Identifier 
         if ((color & 0xFF000000) != 0) {
             throw new IllegalArgumentException("color must be a 24-bit RGB value");
         }
+        if (visualFamily < 0 || visualFamily > 3) throw new IllegalArgumentException("invalid crop visual family");
     }
 
     public MaterialDefinition withOverrides(MaterialOverride override) {
@@ -41,12 +42,12 @@ public record MaterialDefinition(Identifier id, InputSelector input, Identifier 
         boolean resolvedEnabled = override.enabled() == null ? enabled : override.enabled();
         int resolvedColor = override.color() == null ? color : override.color();
         return new MaterialDefinition(id, input, output, resolvedTier, resolvedGate, resolvedYield,
-                resolvedConversion, displayKey, resolvedColor, resolvedEnabled, worldRestriction);
+                resolvedConversion, displayKey, resolvedColor, resolvedEnabled, worldRestriction, visualFamily);
     }
 
     public MaterialDefinition disabled() {
         return new MaterialDefinition(id, input, output, tier, gate, yield, conversion, displayKey, color,
-                false, worldRestriction);
+                false, worldRestriction, visualFamily);
     }
 
     public record InputSelector(Kind kind, Identifier id) {

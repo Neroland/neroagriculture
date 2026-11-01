@@ -35,7 +35,9 @@ public final class CropTintSource implements BlockColor {
     public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
 *///?}
         if (level.getBlockEntity(pos) instanceof ResourceCropBlockEntity crop) {
-            return 0xFF000000 | (MaterialColors.resolve(crop.variant().material().getPath()) & 0xFFFFFF);
+            var id = crop.variant().material();
+            var entry = za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog.entries().get(id);
+            return 0xFF000000 | (entry == null ? MaterialColors.resolve(id.getPath()) : entry.color());
         }
         return -1;
     }

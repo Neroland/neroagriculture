@@ -1,0 +1,11 @@
+{
+  "material": "nerolandcore:plasma_glass",
+  "energy": 0,
+  "ingredient": "nerolandcore:plasma_glass",
+  "input_count": 1,
+  "type": "neroagriculture:seed_researching",
+  "ticks": 1,
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  }
+}

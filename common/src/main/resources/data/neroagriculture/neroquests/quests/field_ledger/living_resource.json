@@ -1,0 +1,20 @@
+{
+  "title": "quest.neroagriculture.field_ledger.living_resource.title",
+  "description": "quest.neroagriculture.field_ledger.living_resource.desc",
+  "icon": "neroagriculture:resource_seed",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "count": 1,
+      "item": "neroagriculture:resource_seed",
+      "type": "neroquests:collect_item"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 20
+    }
+  ],
+  "scope": "player"
+}

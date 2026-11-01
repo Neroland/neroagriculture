@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:blaze_rod",
+  "input": {
+    "item": "minecraft:blaze_rod"
+  },
+  "output": "minecraft:blaze_rod",
+  "tier": "orbite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 5,
+    "ramp_harvests": 96
+  },
+  "conversion": 16,
+  "display_key": "item.minecraft.blaze_rod",
+  "color": "#EEA52E",
+  "enabled": true
+}

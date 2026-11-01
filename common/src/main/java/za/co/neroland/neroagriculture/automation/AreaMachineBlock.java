@@ -62,6 +62,7 @@ public final class AreaMachineBlock extends BaseEntityBlock {
         if (stack.isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (level.getBlockEntity(pos) instanceof AreaMachineBlockEntity machine) {
+            if (AutomationOwner.canClaim(machine.automationOwner())) machine.setOwner(player.getUUID());
             ItemStack leftover = machine.insertHeld(stack);
             if (leftover.getCount() != stack.getCount() || !ItemStack.matches(leftover, stack)) {
                 if (!player.getAbilities().instabuild) player.setItemInHand(hand, leftover);
@@ -78,6 +79,7 @@ public final class AreaMachineBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
             BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AreaMachineBlockEntity machine) {
+            if (AutomationOwner.canClaim(machine.automationOwner())) machine.setOwner(player.getUUID());
             player.openMenu(machine);
         }
         return InteractionResult.SUCCESS;

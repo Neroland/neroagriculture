@@ -217,13 +217,7 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
 
     @Nullable
     private ServerPlayer gatePlayer(ServerLevel level) {
-        if (owner != null) {
-            ServerPlayer online = level.getServer().getPlayerList().getPlayer(owner);
-            if (online != null) return online;
-        }
-        Player nearest = level.getNearestPlayer(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5,
-                worldPosition.getZ() + 0.5, 48.0, false);
-        return nearest instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+        return AutomationOwner.gatePlayer(level, owner);
     }
 
     // --- container ---------------------------------------------------------

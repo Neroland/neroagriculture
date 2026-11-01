@@ -29,7 +29,8 @@ public final class MeteorMaterialAdapter {
                     entry.item(), tier, entry.minGate() == null ? MaterialDefinitionParser.defaultGate(tier) : entry.minGate(),
                     new Yield(1, tier.ordinal() + 3, 32 * (tier.ordinal() + 1)), 8 + tier.ordinal() * 4,
                     "material." + entry.id().getNamespace() + "." + entry.id().getPath().replace('/', '.'),
-                    palette(entry.id().toString()), entry.enabled(), entry.planet() == null ? null : new WorldRestriction(entry.planet()));
+                    palette(entry.id().toString()), entry.enabled(), entry.planet() == null ? null : new WorldRestriction(entry.planet()),
+                    za.co.neroland.neroagriculture.crop.CropVisuals.family(entry.id()));
             result.add(new Candidate(definition, CatalogSource.METEOR, "Core meteor metadata " + entry.id()));
         }
         return List.copyOf(result);

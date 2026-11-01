@@ -56,10 +56,10 @@ public final class CropPollination {
     private static boolean researchOk(ServerLevel level, BlockPos pos, BreedingCatalog.Definition definition) {
         if (definition.research() == null) return true;
         // Owner-first: the research gate is checked against the grow bed's recorded owner where one
-        // exists; the nearest player is only a fallback for ownerless beds (owner tracking opted out).
+        // exists; ownerless beds have no player progression context.
         java.util.UUID owner = level.getBlockEntity(pos.below())
                 instanceof za.co.neroland.neroagriculture.crop.GrowBedBlockEntity bed ? bed.automationOwner() : null;
-        ServerPlayer player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, pos, owner, 48.0);
+        ServerPlayer player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, owner);
         return player != null && ProgressionGates.isOpen(player, definition.research());
     }
 }

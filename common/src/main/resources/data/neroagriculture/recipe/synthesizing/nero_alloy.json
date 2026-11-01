@@ -1,0 +1,10 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "nerolandcore:nero_alloy",
+  "ticks": 140,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "nerolandcore:nero_alloy_dust",
+  "energy": 2400
+}

@@ -1,0 +1,11 @@
+{
+  "material": "nerolandcore:nero_alloy",
+  "energy": 0,
+  "ingredient": "nerolandcore:nero_alloy_dust",
+  "input_count": 1,
+  "type": "neroagriculture:seed_researching",
+  "ticks": 1,
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  }
+}

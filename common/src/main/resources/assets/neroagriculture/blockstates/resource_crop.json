@@ -1,1 +1,100 @@
-{"variants":{"age=0":{"model":"neroagriculture:block/resource_crop_stage0"},"age=1":{"model":"neroagriculture:block/resource_crop_stage1"},"age=2":{"model":"neroagriculture:block/resource_crop_stage2"},"age=3":{"model":"neroagriculture:block/resource_crop_stage3"},"age=4":{"model":"neroagriculture:block/resource_crop_stage4"},"age=5":{"model":"neroagriculture:block/resource_crop_stage5"},"age=6":{"model":"neroagriculture:block/resource_crop_stage6"},"age=7":{"model":"neroagriculture:block/resource_crop_stage7"}}}
+{
+  "variants": {
+    "age=0,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage0"
+    },
+    "age=0,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage0"
+    },
+    "age=0,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage0"
+    },
+    "age=0,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage0"
+    },
+    "age=1,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage1"
+    },
+    "age=1,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage1"
+    },
+    "age=1,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage1"
+    },
+    "age=1,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage1"
+    },
+    "age=2,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage2"
+    },
+    "age=2,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage2"
+    },
+    "age=2,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage2"
+    },
+    "age=2,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage2"
+    },
+    "age=3,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage3"
+    },
+    "age=3,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage3"
+    },
+    "age=3,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage3"
+    },
+    "age=3,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage3"
+    },
+    "age=4,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage4"
+    },
+    "age=4,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage4"
+    },
+    "age=4,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage4"
+    },
+    "age=4,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage4"
+    },
+    "age=5,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage5"
+    },
+    "age=5,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage5"
+    },
+    "age=5,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage5"
+    },
+    "age=5,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage5"
+    },
+    "age=6,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage6"
+    },
+    "age=6,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage6"
+    },
+    "age=6,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage6"
+    },
+    "age=6,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage6"
+    },
+    "age=7,visual=0": {
+      "model": "neroagriculture:block/resource_crop_stage7"
+    },
+    "age=7,visual=1": {
+      "model": "neroagriculture:block/resource_crop_metal_stage7"
+    },
+    "age=7,visual=2": {
+      "model": "neroagriculture:block/resource_crop_crystal_stage7"
+    },
+    "age=7,visual=3": {
+      "model": "neroagriculture:block/resource_crop_carbon_stage7"
+    }
+  }
+}

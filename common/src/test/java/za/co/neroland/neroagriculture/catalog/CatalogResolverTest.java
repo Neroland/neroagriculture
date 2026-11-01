@@ -21,6 +21,24 @@ import za.co.neroland.neroagriculture.content.FragmentTier;
 
 class CatalogResolverTest {
     @Test
+    void optionalDefinitionsRequireTheirSourceItem() {
+        var optional = JsonParser.parseString("{\"requires_item\":\"example:ore\"}").getAsJsonObject();
+        assertTrue(MaterialCatalog.requirementMet(optional, id -> id.equals(Identifier.parse("example:ore"))));
+        assertFalse(MaterialCatalog.requirementMet(optional, id -> false));
+        assertTrue(MaterialCatalog.requirementMet(JsonParser.parseString("{}").getAsJsonObject(), id -> false));
+    }
+
+    @Test
+    void materialTintUsesCatalogOverrideAndFallsBackForUnknownIds() {
+        Identifier id = Identifier.parse("test:iron");
+        ResolvedCatalog catalog = CatalogResolver.resolve(List.of(candidate(id, CatalogSource.BUILTIN,
+                FragmentTier.FORGITE, "builtin")), Set.of(),
+                Map.of(id, new MaterialOverride(null, null, false, null, null, null, 0x123456)), 16, List.of());
+        assertEquals(0x123456, za.co.neroland.neroagriculture.content.MaterialTints.color(catalog, id));
+        assertEquals(MaterialColors.resolve("unknown"), za.co.neroland.neroagriculture.content.MaterialTints.color(
+                catalog, Identifier.parse("test:unknown")));
+    }
+    @Test
     void precedenceAndConfigOverlayAreDeterministic() {
         Identifier id = Identifier.parse("test:iron");
         List<Candidate> candidates = List.of(candidate(id, CatalogSource.ORE_TAG, FragmentTier.ORBITE, "tag"),
@@ -69,6 +87,11 @@ class CatalogResolverTest {
         MaterialDefinitionParser.Result result = MaterialDefinitionParser.parse(id, valid);
         assertTrue(result.valid());
         assertNull(result.definition().gate(), "no hard gates by default");
+        valid.addProperty("visual_family", "crystal");
+        assertEquals(za.co.neroland.neroagriculture.crop.CropVisuals.CRYSTAL,
+                MaterialDefinitionParser.parse(id, valid).definition().visualFamily());
+        valid.addProperty("visual_family", "not_a_family");
+        assertFalse(MaterialDefinitionParser.parse(id, valid).valid());
 
         var invalid = JsonParser.parseString("""
                 {"input":{"item":"bad id","tag":"c:ores/copper"},"output":"minecraft:copper_ingot",
@@ -93,6 +116,6 @@ class CatalogResolverTest {
         return new Candidate(new MaterialDefinition(id,
                 new MaterialDefinition.InputSelector(MaterialDefinition.InputSelector.Kind.ITEM, Identifier.parse("minecraft:iron_ingot")),
                 Identifier.parse("minecraft:iron_ingot"), tier, MaterialDefinitionParser.defaultGate(tier),
-                new MaterialDefinition.Yield(1, 4, 32), 8, "material.test." + id.getPath(), 0xA0A0A0, true, null), source, detail);
+                new MaterialDefinition.Yield(1, 4, 32), 8, "material.test." + id.getPath(), 0xA0A0A0, true, null, 0), source, detail);
     }
 }

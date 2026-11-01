@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:emerald",
+    {
+      "id": "#c:ores/emerald",
+      "required": false
+    }
+  ]
+}

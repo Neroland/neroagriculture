@@ -81,6 +81,9 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     @Nullable private UUID owner;
     private boolean inputsDirty = true;
     private int idleRecheck;
+    private static final int GENERATOR_RATE = 8;
+    private static final int GENERATOR_BURN_TICKS = 400;
+    private int burnTicks;
 
     // Gauge slots ship as permille fractions: ContainerData syncs shorts, and both the configured
     // energy capacity and datapack recipe ticks can exceed 32,767 (see menu.GaugeData).
@@ -107,12 +110,14 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 AgricultureConfig.MACHINE_ENERGY_CAPACITY.get(), AgricultureConfig.MACHINE_ENERGY_RATE.get(),
                 2, AgricultureUpgradeItem.CLASSIFIER);
         this.fluid = new FluidBuffer(AgricultureConfig.MACHINE_FLUID_CAPACITY.get(), this::setChanged);
+        boolean generator = kind() == MachineKind.GENERATOR;
         installSideConfig(SideConfig.builder()
                 .channel(Channel.ITEM, SlotGroup.of("input", PRIMARY, SECONDARY, TERTIARY),
                         SlotGroup.of("output", OUTPUT, SECONDARY_OUTPUT))
                 .channel(Channel.FLUID).channel(Channel.ENERGY)
-                .defaultPreset(SidePreset.PROCESSOR)
-                .allow(Channel.ENERGY, SideMode.OUTPUT, false).build())
+                .defaultPreset(generator ? SidePreset.GENERATOR : SidePreset.PROCESSOR)
+                .autoEject(Channel.ENERGY, generator)
+                .allow(Channel.ENERGY, generator ? SideMode.INPUT : SideMode.OUTPUT, false).build())
                 .withItems(() -> this).withFluid(this::getFluid);
     }
 
@@ -129,6 +134,10 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     }
 
     private void tickFabrication(ServerLevel level) {
+        if (kind() == MachineKind.GENERATOR) {
+            tickGenerator();
+            return;
+        }
         if (kind() == MachineKind.OTHER || kind() == MachineKind.RESEARCH_BENCH) {
             stop(MachineBlockedReason.IDLE);
             return;
@@ -150,8 +159,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             activeRecipe = operation.key;
         }
         var modifiers = modifiers();
-        fabricationMax = Math.max(1, (int) Math.round(operation.recipe.ticks() / modifiers.speedMultiplier()));
-        int totalEnergy = Math.max(0, (int) Math.round(operation.recipe.energy() * modifiers.energyMultiplier()));
+        fabricationMax = Math.max(1, (int) Math.round(operation.ticks / modifiers.speedMultiplier()));
+        int totalEnergy = Math.max(0, (int) Math.round(operation.energy * modifiers.energyMultiplier()));
         int energyPerTick = FabricationRules.energyPerTick(totalEnergy, fabricationMax);
         if (getEnergy().extract(energyPerTick, true) < energyPerTick) {
             blockedReason = MachineBlockedReason.NO_POWER;
@@ -174,6 +183,28 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         setChanged();
     }
 
+    private void tickGenerator() {
+        if (!FabricationRules.canGenerate(energy.getAmount(), energy.getCapacity(), GENERATOR_RATE)) {
+            blockedReason = MachineBlockedReason.OUTPUT_FULL;
+            return;
+        }
+        if (burnTicks == 0) {
+            ItemStack fuel = items.get(PRIMARY);
+            if (!fuel.is(net.minecraft.world.item.Items.COAL) && !fuel.is(net.minecraft.world.item.Items.CHARCOAL)) {
+                blockedReason = MachineBlockedReason.IDLE;
+                return;
+            }
+            fuel.shrink(1);
+            burnTicks = GENERATOR_BURN_TICKS;
+        }
+        energy.generate(GENERATOR_RATE);
+        burnTicks--;
+        fabricationProgress = GENERATOR_BURN_TICKS - burnTicks;
+        fabricationMax = GENERATOR_BURN_TICKS;
+        blockedReason = MachineBlockedReason.RUNNING;
+        setChanged();
+    }
+
     private Resolution resolve(ServerLevel level) {
         return switch (kind()) {
             case EXTRACTOR -> resolveExtraction(level);
@@ -192,13 +223,15 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (!catalog.lookup(definition.id()).permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.EXTRACTION.get(),
                 candidate -> candidate.material().isEmpty() || candidate.material().get().equals(definition.id()));
-        if (recipe == null) return fail(MachineBlockedReason.NO_RECIPE);
+        boolean fallback = recipe == null && fallbackAllowed(level, ModRecipeSerializers.EXTRACTION.get(), match.get());
+        if (recipe == null && !fallback) return fail(MachineBlockedReason.NO_RECIPE);
         ItemStack neutral = new ItemStack(MaterialOperations.neutralFragment(definition.tier()),
-                recipe.resultTemplate().count());
+                recipe == null ? 2 : recipe.resultTemplate().count());
         ItemStack material = new ItemStack(ModItems.RESOURCE_FRAGMENT.get());
         material.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
-        za.co.neroland.neroagriculture.content.MaterialTints.apply(material, definition.id());
-        Operation operation = operation(recipe, recipe.inputCount(), 0, 0, neutral, material);
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(material, definition.color(), definition.visualFamily());
+        Operation operation = recipe == null ? catalogOperation("extract", definition, 1, 0, 0, neutral, material)
+                : operation(recipe, recipe.inputCount(), 0, 0, neutral, material);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
     }
 
@@ -225,8 +258,9 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
 
     /**
      * Fuse two resources into a combined/alloy seed (e.g. Iron Fragment + Coal → Steel Seed). Unlike
-     * ordinary synthesis, fusion does not require the alloy resource as an input — it invents the seed —
-     * but the alloy must exist in the catalog (a mod provides it) for the seed to grow and convert, so
+     * ordinary synthesis, fusion does not consume the alloy resource as an input, but requires the
+     * player's discovery and research of it when research is enabled. The alloy must exist in the
+     * catalog (a mod provides it) for the seed to grow and convert, so
      * fusion is dormant-safe when the alloy is absent. The alloy seed inherits the alloy resource's own
      * catalog tier so the downstream grow → fragments → resource loop stays consistent.
      */
@@ -234,6 +268,12 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (!AgricultureConfig.FUSION_ENABLED.get()) return fail(MachineBlockedReason.NO_RECIPE);
         MaterialVariant primary = items.get(PRIMARY).get(ModDataComponents.MATERIAL_VARIANT.get());
         if (primary == null) return fail(MachineBlockedReason.INVALID_COMPONENT);
+        var primaryLookup = MaterialCatalog.forServer(level.getServer()).lookup(primary.material());
+        if (!primaryLookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
+        FragmentTier primaryTier = primaryLookup.material().orElseThrow().definition().tier();
+        if (!FabricationRules.materialMatches(primary, primary.material(), primaryTier)) {
+            return fail(MachineBlockedReason.INVALID_COMPONENT);
+        }
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.FUSION.get(), candidate ->
                 candidate.material().isPresent() && candidate.material().get().equals(primary.material())
                         && candidate.resultMaterial().isPresent() && candidate.secondary().isPresent()
@@ -245,12 +285,19 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         var alloy = recipe.resultMaterial().get();
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(alloy);
         if (!lookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
-        FragmentTier tier = lookup.material().orElseThrow().definition().tier();
+        var definition = lookup.material().orElseThrow().definition();
+        FragmentTier tier = definition.tier();
         if (tier.ordinal() > fusionMaxTier().ordinal()) return fail(MachineBlockedReason.CATALOG_DISABLED);
-        if (!gateOpen(level, tier)) return fail(MachineBlockedReason.GATE_CLOSED);
+        ServerPlayer player = gatePlayer(level);
+        if (player == null || !gateOpen(player, tier)
+                || definition.gate() != null && !ProgressionGates.isOpen(player, definition.gate())) {
+            return fail(MachineBlockedReason.GATE_CLOSED);
+        }
+        MachineBlockedReason researchBlock = researchBlock(player, alloy);
+        if (researchBlock != null) return fail(researchBlock);
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
         seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(alloy, tier));
-        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, alloy);
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.color(), definition.visualFamily());
         Operation operation = operation(recipe, recipe.inputCount(), recipe.secondaryCount(), 0, seed, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
     }
@@ -272,7 +319,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.SYNTHESIZING.get(), candidate ->
                 (candidate.material().isEmpty() || candidate.material().get().equals(definition.id()))
                         && (candidate.family().isEmpty() || candidate.family().get() == definition.tier()));
-        if (recipe == null) return fail(MachineBlockedReason.NO_RECIPE);
+        boolean fallback = recipe == null && fallbackAllowed(level, ModRecipeSerializers.SYNTHESIZING.get(), match.get());
+        if (recipe == null && !fallback) return fail(MachineBlockedReason.NO_RECIPE);
         // Resource seed = the real resource (PRIMARY) + N matching Tier Fragments (SECONDARY) + a Prospora
         // Seed base (TERTIARY). Requiring the real resource keeps seeds an amplifier, never a way to obtain
         // a resource the player has never seen; the Tier Fragment ties seed cost to ladder progress.
@@ -284,18 +332,25 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             return fail(MachineBlockedReason.INVALID_COMPONENT);
         }
         ServerPlayer player = gatePlayer(level);
-        if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
-        if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
-            if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
-                    definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
-            if (!MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH,
-                    definition.id())) return fail(MachineBlockedReason.RESEARCH_REQUIRED);
+        if (player == null || !gateOpen(player, definition.tier())
+                || definition.gate() != null && !ProgressionGates.isOpen(player, definition.gate())) {
+            return fail(MachineBlockedReason.GATE_CLOSED);
         }
+        MachineBlockedReason researchBlock = researchBlock(player, definition.id());
+        if (researchBlock != null) return fail(researchBlock);
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
         seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
-        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.id());
-        Operation operation = operation(recipe, recipe.inputCount(), fragmentCost, 1, seed, ItemStack.EMPTY);
+        za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.color(), definition.visualFamily());
+        Operation operation = recipe == null ? catalogOperation("synthesize", definition, 1, fragmentCost, 1, seed, ItemStack.EMPTY)
+                : operation(recipe, recipe.inputCount(), fragmentCost, 1, seed, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
+    }
+
+    @Nullable
+    private static MachineBlockedReason researchBlock(ServerPlayer player, net.minecraft.resources.Identifier material) {
+        return FabricationRules.researchBlock(AgricultureConfig.REQUIRE_RESEARCH.get(),
+                MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED, material),
+                MaterialMilestones.isObserved(player, MachineProgression.RESOURCE_RESEARCH, material));
     }
 
     private Resolution resolveConversion(ServerLevel level) {
@@ -306,7 +361,10 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         var definition = lookup.material().orElseThrow().definition();
         if (variant.family() != definition.tier()) return fail(MachineBlockedReason.INVALID_COMPONENT);
         ServerPlayer player = gatePlayer(level);
-        if (player == null || !gateOpen(player, definition.tier())) return fail(MachineBlockedReason.GATE_CLOSED);
+        if (player == null || !gateOpen(player, definition.tier())
+                || definition.gate() != null && !ProgressionGates.isOpen(player, definition.gate())) {
+            return fail(MachineBlockedReason.GATE_CLOSED);
+        }
         if (AgricultureConfig.REQUIRE_RESEARCH.get()) {
             if (!MaterialMilestones.isObserved(player, MaterialMilestoneDefinitions.MATERIAL_DISCOVERED,
                     definition.id())) return fail(MachineBlockedReason.MILESTONE_REQUIRED);
@@ -349,12 +407,16 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         /*ServerLevel level = player.serverLevel();
         *///?}
         FabricationRecipe recipe = findRecipe(level, ModRecipeSerializers.RESEARCHING.get(), candidate -> true);
-        if (recipe == null || recipe.material().isEmpty()) {
+        var match = MaterialOperations.matchAny(items.get(PRIMARY), MaterialCatalog.forServer(level.getServer()));
+        boolean fallback = recipe == null && match.isPresent()
+                && fallbackAllowed(level, ModRecipeSerializers.RESEARCHING.get(), match.get());
+        if (!fallback && (recipe == null || recipe.material().isEmpty())) {
             stop(MachineBlockedReason.NO_RECIPE);
             return false;
         }
-        var subject = recipe.material().get();
-        ItemStack displayResult = recipe.assemble(new SingleRecipeInput(items.get(PRIMARY)));
+        var subject = recipe == null ? match.orElseThrow().definition().id() : recipe.material().orElseThrow();
+        ItemStack displayResult = recipe == null ? new ItemStack(ModItems.RESOURCE_SEED.get())
+                : recipe.assemble(new SingleRecipeInput(items.get(PRIMARY)));
         var milestone = displayResult.is(ModItems.FOOD_SEED.get()) ? MachineProgression.FOOD_RESEARCH
                 : displayResult.is(ModItems.ALIEN_SEED.get()) ? MachineProgression.ALIEN_RESEARCH
                 : MachineProgression.RESOURCE_RESEARCH;
@@ -389,7 +451,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             stop(MachineBlockedReason.RESEARCH_REQUIRED);
             return false;
         }
-        items.get(PRIMARY).shrink(recipe.inputCount());
+        items.get(PRIMARY).shrink(recipe == null ? 1 : recipe.inputCount());
         if (milestone == MachineProgression.FOOD_RESEARCH || milestone == MachineProgression.ALIEN_RESEARCH) {
             za.co.neroland.neroagriculture.food.FoodCatalog.lookup(level.getServer(), subject).ifPresent(definition -> {
                 ItemStack seed = new ItemStack(definition.kind() == za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN
@@ -421,6 +483,14 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         return null;
     }
 
+    private boolean fallbackAllowed(ServerLevel level, RecipeType<FabricationRecipe> type, ResolvedMaterial material) {
+        boolean explicit = FabricationRecipeCache.recipes(level, type).stream()
+                .anyMatch(recipe -> recipe.material().filter(material.definition().id()::equals).isPresent()
+                        || recipe.material().isEmpty() && recipe.ingredient().test(items.get(PRIMARY)));
+        return CatalogFabrication.eligible(material.source(), material.definition().id(), explicit)
+                && MaterialCatalog.forServer(level.getServer()).lookup(material.definition().id()).permitsGrowth();
+    }
+
     private boolean gateOpen(ServerLevel level, FragmentTier family) {
         if (MachineProgression.gate(family) == null) return true;
         ServerPlayer player = gatePlayer(level);
@@ -429,7 +499,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
 
     /**
      * When the machine finishes producing a tier fragment, open the next tier's native gate for the
-     * machine's owner — or, only when no owner is recorded, the nearest player — (respecting the gate's
+     * machine's owner (respecting the gate's
      * prerequisites via {@link ProgressionGates#tryOpen}). This is the standalone unlock: extracting
      * Territe opens Refinement, condensing Forgite opens Synthesis, and so on up the ladder — no sibling
      * mod required.
@@ -462,7 +532,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     /** Owner-first (nearest-player fallback only when no owner is recorded) — see {@link AutomationOwner#gatePlayer}. */
     @Nullable
     private ServerPlayer gatePlayer(ServerLevel level) {
-        return AutomationOwner.gatePlayer(level, worldPosition, owner, 16.0);
+        return AutomationOwner.gatePlayer(level, owner);
     }
 
     @Override public @Nullable UUID automationOwner() { return owner; }
@@ -526,7 +596,16 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 + BuiltInRegistries.ITEM.getKey(recipe.resultTemplate().item().value()) + "|"
                 + recipe.resultTemplate().count() + "|" + recipe.inputCount() + "|" + recipe.energy()
                 + "|" + recipe.ticks() + "|" + BuiltInRegistries.ITEM.getKey(output.getItem());
-        return new Operation(key, recipe, primary, secondary, tertiary, output, secondaryOutput);
+        return new Operation(key, recipe.energy(), recipe.ticks(), primary, secondary, tertiary, output, secondaryOutput);
+    }
+
+    private static Operation catalogOperation(String action, za.co.neroland.neroagriculture.catalog.MaterialDefinition definition,
+            int primary, int secondary, int tertiary, ItemStack output, ItemStack secondaryOutput) {
+        int energy = CatalogFabrication.extractionEnergy(definition.tier());
+        int ticks = CatalogFabrication.extractionTicks(definition.tier());
+        if (action.equals("synthesize")) { energy *= 2; ticks += 40; }
+        String key = "catalog|" + action + "|" + definition.id() + "|" + definition.tier();
+        return new Operation(key, energy, ticks, primary, secondary, tertiary, output, secondaryOutput);
     }
 
     private static Resolution ok(Operation operation) { return new Resolution(MachineBlockedReason.RUNNING, operation); }
@@ -560,6 +639,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         output.putInt("FabricationMax", fabricationMax);
         output.putInt("BlockedReason", blockedReason.ordinal());
         output.putString("ActiveRecipe", activeRecipe);
+        output.putInt("GeneratorBurnTicks", burnTicks);
         AutomationOwner.save(output, owner);
         SideConfigMigration.save(output);
     }
@@ -585,6 +665,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         fabricationMax = Math.max(0, input.getIntOr("FabricationMax", 0));
         blockedReason = MachineBlockedReason.byOrdinal(input.getIntOr("BlockedReason", 0));
         activeRecipe = input.getStringOr("ActiveRecipe", "");
+        burnTicks = Math.clamp(input.getIntOr("GeneratorBurnTicks", 0), 0, GENERATOR_BURN_TICKS);
         owner = AutomationOwner.load(input);
         inputsDirty = true;
     }
@@ -636,6 +717,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (slot >= UPGRADE_START) return upgrades.isModule(stack);
         if (slot >= OUTPUT) return false;
         return switch (kind()) {
+            case GENERATOR -> slot == PRIMARY && (stack.is(net.minecraft.world.item.Items.COAL)
+                    || stack.is(net.minecraft.world.item.Items.CHARCOAL));
             case EXTRACTOR, RESEARCH_BENCH -> slot == PRIMARY;
             case INFUSER -> slot == PRIMARY || slot == SECONDARY && stack.is(ModItems.BLANK_SEED.get());
             // Mirrors what the resolvers actually consume: synthesis (resolveSynthesis) takes neutral
@@ -656,7 +739,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         setChanged();
     }
 
-    private record Operation(String key, FabricationRecipe recipe, int consumePrimary, int consumeSecondary,
+    private record Operation(String key, int energy, int ticks, int consumePrimary, int consumeSecondary,
             int consumeTertiary, ItemStack output, ItemStack secondaryOutput) { }
     private record Resolution(MachineBlockedReason reason, @Nullable Operation operation) { }
 }

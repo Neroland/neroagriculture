@@ -21,6 +21,14 @@ public final class YieldCurve {
         return Math.min(Math.max(0, tierCap), scaled(yield, harvestCount, multiplier));
     }
 
+    public static int harvest(MaterialDefinition.Yield yield, int harvestCount, double multiplier,
+            double cycleMultiplier, int bonus, int tierCap) {
+        int cap = Math.max(0, tierCap);
+        double amount = Math.floor(scaled(yield, harvestCount, multiplier) * Math.max(0.0, cycleMultiplier))
+                + Math.max(0, bonus);
+        return (int) Math.max(0, Math.min(cap, amount));
+    }
+
     /** Capped yield after one more harvest, for current/next/max diagnostics. Saturates at the ramp end. */
     public static int nextCapped(MaterialDefinition.Yield yield, int harvestCount, double multiplier, int tierCap) {
         return scaledCapped(yield, harvestCount + 1, multiplier, tierCap);

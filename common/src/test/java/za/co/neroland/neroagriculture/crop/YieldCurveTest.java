@@ -54,6 +54,14 @@ class YieldCurveTest {
     }
 
     @Test
+    void harvestClampsCycleAndBonusesAfterTheyAreApplied() {
+        MaterialDefinition.Yield yield = new MaterialDefinition.Yield(2, 3, 32);
+        assertEquals(2, YieldCurve.harvest(yield, 0, 1.0, 1.0, 0, 3));
+        assertEquals(3, YieldCurve.harvest(yield, 0, 1.0, 5.0, 20, 3));
+        assertEquals(0, YieldCurve.harvest(yield, 0, 1.0, 0.0, 0, 3));
+    }
+
+    @Test
     void nextAndMaxAreMonotonicAcrossTheRamp() {
         MaterialDefinition.Yield yield = new MaterialDefinition.Yield(1, 6, 10);
         int cap = 100;

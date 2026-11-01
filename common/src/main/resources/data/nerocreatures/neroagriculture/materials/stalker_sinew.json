@@ -1,0 +1,17 @@
+{
+  "requires_item": "nerocreatures:stalker_sinew",
+  "input": {
+    "item": "nerocreatures:stalker_sinew"
+  },
+  "output": "nerocreatures:stalker_sinew",
+  "tier": "colonite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 20,
+  "display_key": "material.nerocreatures.stalker_sinew",
+  "color": "#C6AB9E",
+  "enabled": true
+}

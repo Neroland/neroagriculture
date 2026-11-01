@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:ender_pearl",
+  "input": {
+    "item": "minecraft:ender_pearl"
+  },
+  "output": "minecraft:ender_pearl",
+  "tier": "orbite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 5,
+    "ramp_harvests": 96
+  },
+  "conversion": 16,
+  "display_key": "item.minecraft.ender_pearl",
+  "color": "#4A9B84",
+  "enabled": true
+}

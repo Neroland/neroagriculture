@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:slime_ball",
+  "input": {
+    "item": "minecraft:slime_ball"
+  },
+  "output": "minecraft:slime_ball",
+  "tier": "forgite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 4,
+    "ramp_harvests": 64
+  },
+  "conversion": 12,
+  "display_key": "item.minecraft.slime_ball",
+  "color": "#79C75D",
+  "enabled": true
+}

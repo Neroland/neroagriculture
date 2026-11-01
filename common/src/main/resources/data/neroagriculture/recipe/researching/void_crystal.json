@@ -1,0 +1,11 @@
+{
+  "material": "nerolandcore:void_crystal",
+  "energy": 0,
+  "ingredient": "nerolandcore:void_crystal_dust",
+  "input_count": 1,
+  "type": "neroagriculture:seed_researching",
+  "ticks": 1,
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  }
+}

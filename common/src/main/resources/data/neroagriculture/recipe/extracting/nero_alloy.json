@@ -1,0 +1,11 @@
+{
+  "result": {
+    "count": 2,
+    "id": "neroagriculture:forgite_fragment"
+  },
+  "material": "nerolandcore:nero_alloy",
+  "ticks": 100,
+  "type": "neroagriculture:material_extraction",
+  "ingredient": "nerolandcore:nero_alloy_dust",
+  "energy": 1200
+}

@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "TBT",
-    "ILI",
+    "ICI",
     "III"
   ],
   "key": {
     "T": "neroagriculture:territe_fragment",
     "B": "minecraft:book",
     "I": "minecraft:iron_ingot",
-    "L": "minecraft:lectern"
+    "C": "minecraft:crafting_table"
   },
   "result": {
     "id": "neroagriculture:seed_research_bench",

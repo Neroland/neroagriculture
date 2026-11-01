@@ -33,7 +33,13 @@ public final class ResourceCropBlockEntity extends BlockEntity {
         setChanged();
         // The client tints the crop from this BE's material, so a real change must be broadcast.
         if (changed && level != null && !level.isClientSide()) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            BlockState state = getBlockState();
+            int visual = CropVisuals.resolve(level, variant.material());
+            if (state.hasProperty(ResourceCropBlock.VISUAL) && state.getValue(ResourceCropBlock.VISUAL) != visual) {
+                level.setBlock(worldPosition, state.setValue(ResourceCropBlock.VISUAL, visual), 3);
+            } else {
+                level.sendBlockUpdated(worldPosition, state, state, 3);
+            }
         }
     }
     public za.co.neroland.neroagriculture.genetics.Genetics genetics() { return genetics; }

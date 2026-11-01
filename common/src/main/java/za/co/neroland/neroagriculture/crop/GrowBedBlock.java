@@ -45,6 +45,7 @@ public final class GrowBedBlock extends BaseEntityBlock {
             net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.phys.BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof GrowBedBlockEntity bed) {
+            if (za.co.neroland.neroagriculture.automation.AutomationOwner.canClaim(bed.automationOwner())) bed.setOwner(player.getUUID());
             player.openMenu(bed);
         }
         return net.minecraft.world.InteractionResult.SUCCESS;

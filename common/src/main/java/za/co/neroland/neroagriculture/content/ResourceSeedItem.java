@@ -70,7 +70,7 @@ public final class ResourceSeedItem extends MaterialVariantItem {
      * gate/overlay and dimension rules as hand-planting (with {@code player} as the gate context, no chat
      * feedback), then plants above {@code bedPos} and shrinks {@code stack}. Returns whether it planted.
      */
-    public static boolean tryPlantAbove(net.minecraft.server.level.ServerLevel level, ServerPlayer player,
+    public static boolean tryPlantAbove(net.minecraft.server.level.ServerLevel level, @org.jetbrains.annotations.Nullable ServerPlayer player,
             net.minecraft.core.BlockPos bedPos, ItemStack stack) {
         MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
         if (variant == null) return false;
@@ -79,7 +79,7 @@ public final class ResourceSeedItem extends MaterialVariantItem {
         var definition = lookup.material().orElseThrow().definition();
         var bedTier = ModBlocks.growBedTier(level.getBlockState(bedPos).getBlock());
         if (bedTier == null || bedTier.ordinal() < definition.tier().ordinal()) return false;
-        if ((definition.gate() != null && !ProgressionGates.isOpen(player, definition.gate()))
+        if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
                 || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) {
             return false;
         }

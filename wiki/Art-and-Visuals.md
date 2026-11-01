@@ -2,8 +2,40 @@
 
 NeroAgriculture ships a cohesive **"hydroponics lab"** look: bright white/light-grey composite
 housing with a bio-green accent (keyed to the mod logo), soil and foliage organics for beds and
-crops, and the five fragment tiers coloured from the material catalog. Every block, item and crop has
-a hand-tuned procedural texture — no vanilla placeholders remain.
+crops, and the five fragment tiers coloured from the material catalog. Most blocks, items and crops use
+the mod's procedural textures; the curated seed models below intentionally reuse Minecraft's material
+textures on custom geometry.
+
+## Resource seed models
+
+Minecraft 26.1.2 and newer select the seed model directly from the saved material component, so existing
+seeds retain their identity and genetics without conversion. These designs use separate
+geometry and familiar material textures:
+
+| Resource | Model detail |
+| --- | --- |
+| Coal | Irregular dark shell |
+| Iron | Metal casing with side plates |
+| Copper | Copper shell with weathered accents |
+| Gold | Filigree rails and crown |
+| Redstone | Wide angular core |
+| Diamond | Stepped crystal point |
+| Nerosium | Pale metallic shell with asymmetric fins |
+| Nerosteel | Dark casing with bright braces |
+| Xertz Quartz | Violet crystal with side spurs |
+| Cindrite | Warm fractured shell with a crest |
+| Glacite | Broad icy base and pointed tip |
+
+The same materials have matching fragment models based on the seed's mineral shape. Other materials can
+use the tintable metal, crystal or carbon item families through their datapack `visual_family`; generic
+and unknown materials use the existing tinted seed and fragment models. Items made before this field
+was added keep their saved appearance data until replaced, and older Minecraft versions retain the
+generic item fallback. Planted crops use bounded metal, crystal,
+carbon or generic model families across all eight growth stages; unknown materials use generic. Older
+plants keep their saved material and history and adopt their family's shape when they next grow or are
+harvested. Resource packs can extend the component selector in
+`assets/neroagriculture/items/resource_seed.json` and add models under `models/item/seed/`; include a case
+for each tier that should use the design, and retain the fallback for unrecognised materials.
 
 ## Texture pipeline
 

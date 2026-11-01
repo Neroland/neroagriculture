@@ -77,6 +77,31 @@
       "quest": "neroagriculture:field_ledger/green_world",
       "x": 12,
       "y": 4
+    },
+    {
+      "quest": "neroagriculture:field_ledger/starter_power",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "quest": "neroagriculture:field_ledger/first_extraction",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "quest": "neroagriculture:field_ledger/prospora_start",
+      "x": 4,
+      "y": 6
+    },
+    {
+      "quest": "neroagriculture:field_ledger/study_sample",
+      "x": 6,
+      "y": 6
+    },
+    {
+      "quest": "neroagriculture:field_ledger/living_resource",
+      "x": 8,
+      "y": 6
     }
   ]
 }

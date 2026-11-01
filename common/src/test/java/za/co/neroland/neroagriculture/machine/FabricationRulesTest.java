@@ -56,4 +56,17 @@ class FabricationRulesTest {
             assertTrue(FabricationRules.fragmentsPerSeed(tier) >= 1);
         }
     }
+
+    @Test void seedCreationRequiresDiscoveryAndResearchUnlessExplicitlyDisabled() {
+        assertEquals(MachineBlockedReason.MILESTONE_REQUIRED, FabricationRules.researchBlock(true, false, false));
+        assertEquals(MachineBlockedReason.RESEARCH_REQUIRED, FabricationRules.researchBlock(true, true, false));
+        assertEquals(null, FabricationRules.researchBlock(true, true, true));
+        assertEquals(null, FabricationRules.researchBlock(false, false, false));
+    }
+
+    @Test void generatorPausesWithoutDiscardingFuelWhenItsBufferIsFull() {
+        assertTrue(FabricationRules.canGenerate(92, 100, 8));
+        assertFalse(FabricationRules.canGenerate(93, 100, 8));
+        assertFalse(FabricationRules.canGenerate(0, 100, 0));
+    }
 }

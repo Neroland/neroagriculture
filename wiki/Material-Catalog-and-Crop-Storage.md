@@ -13,6 +13,17 @@ datapacks load. The precedence is:
 Core metadata is adapted read-only. Conflicts and validation failures are retained for operator
 diagnostics rather than silently discarded.
 
+Sample-based definitions cover string, leather, slime balls, gunpowder, blaze rods and ender pearls.
+Each requires its real item for extraction, research and seed synthesis. The first four use Forgite;
+the latter two use Orbite. Pack authors can replace or disable these definitions.
+
+An optional `visual_family` field selects the planted crop's shape: `generic`, `metal`, `crystal` or
+`carbon`. On Minecraft 26.1.2 and newer, newly produced non-curated seeds and fragments also use that
+family and the catalog color. Omitted values use the curated material's family or the generic fallback.
+An unrecognised value rejects that definition with a catalog diagnostic rather than silently selecting
+a different shape. Existing items keep their saved appearance data; after an appearance change they may
+occupy separate stacks from newly produced items.
+
 ## Datapack format
 
 The file path defines the material id. For example,
@@ -37,6 +48,11 @@ The file path defines the material id. For example,
 items/tags, impossible yield ranges, conversion values, colors, and oversized display keys produce an
 actionable catalog error.
 
+An optional `requires_item` identifier skips a definition when that item is absent, allowing a pack to
+ship compatibility definitions without requiring the other mod. An invalid present definition is still
+reported. When more than one definition accepts a sample, catalog source priority is applied before the
+material id, so an explicit definition takes precedence over generic tag discovery.
+
 `color` accepts a 24-bit RGB value in any of `#RRGGBB`, `0xRRGGBB`, bare hex, decimal-integer, or JSON
 number form — datapack material and food definitions and the config override `color=` field all share one
 parser, so the same input never parses differently by source.
@@ -52,9 +68,11 @@ material metadata only and contain no player data.
 
 ## Client and save safety
 
-Clients receive only id, display key, tier, and RGB palette metadata. The packet is capped at 4,096
-entries and 256 KiB. The configured discovery cap and blacklist apply before entries are exposed or
-synced.
+Clients receive the id, display key, tier, color, base yield and ramp, conversion count, and any
+configured gate or world restriction. Seed tooltips show these values; growth modifiers and actual
+progression state remain server-authoritative. The packet is capped at 4,096 entries and 256 KiB. The
+configured discovery cap and blacklist apply before entries are exposed or synced. The revised catalog
+packet requires the same overhaul build on clients and servers.
 
 Seeds and crops store the literal material identifier, never a numeric catalog index. Removing or
 disabling a definition therefore preserves the item/crop and its harvest history, displays a warning,

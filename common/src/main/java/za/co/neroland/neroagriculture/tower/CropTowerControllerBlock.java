@@ -33,9 +33,19 @@ public final class CropTowerControllerBlock extends BaseEntityBlock {
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new CropTowerControllerBlockEntity(pos, state); }
 
     @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state,
+            @Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide() && placer instanceof Player player
+                && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
+            tower.setOwner(player.getUUID());
+        }
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CropTowerControllerBlockEntity tower) {
-            // Opening a formed tower is the personal milestone; recorded on interaction, no owner stored. Gates nothing.
+            if (za.co.neroland.neroagriculture.automation.AutomationOwner.canClaim(tower.automationOwner())) tower.setOwner(player.getUUID());
             if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer && tower.formed()) {
                 AgricultureMilestones.record(serverPlayer, AgricultureMilestones.TOWER_GROWER);
             }

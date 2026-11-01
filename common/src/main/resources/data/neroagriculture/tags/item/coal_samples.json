@@ -1,0 +1,6 @@
+{
+  "values": [
+    "minecraft:coal",
+    { "id": "#c:ores/coal", "required": false }
+  ]
+}

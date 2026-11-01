@@ -50,14 +50,8 @@ Growth is standing state and lives in the `crops` section instead.
 
 ## Why there is no `towers` section
 
-The **Crop Tower Controller records no owner**. In-world it decides who to check gates against with
-"nearest player within 24 blocks", which is a fair approximation of *who is standing here operating
-this* and a completely unacceptable one for *who may read this from the internet* — a player idling near
-somebody else's tower would be handed its contents. There is no enclosing structure to inherit ownership
-from either: a tower is a controller and a frame column, and belongs to nothing.
-
-So towers are left out rather than guessed at. When the controller records a placing player the way grow
-beds and the other machines do, `towers` becomes an additive section and a schema bump.
+Crop towers now record a placing player for progression, but are not yet included in the existing link
+schema. Adding a `towers` section requires an additive schema change and a version bump.
 
 The `greenhouse` section passes the same test only because it is scoped **indirectly**. A greenhouse
 controller has no owner either, so a greenhouse is reported to you only when it encloses a grow bed you

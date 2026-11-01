@@ -34,6 +34,10 @@ Each cycle the controller works a bounded number of slots from a rolling cursor:
 advances a growing one (paying NF/nutrient), or harvests a mature one. Planting, the progression gate,
 capped yield, and genetics/fertiliser bonuses all use the **same shared logic** as ordinary crops.
 
+With owner tracking enabled, the controller records its placing player for progression checks. Older
+ownerless controllers record the first player to open them. A player-gated crop pauses while that owner is
+offline; an ungated crop can continue. See [Ownership and claims](Automation.md#ownership-and-claims).
+
 ### Environment surcharge
 
 Towers keep working in hostile environments, but not for free. Each layer runs the **same climate check

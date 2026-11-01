@@ -1,0 +1,17 @@
+{
+  "requires_item": "minecraft:string",
+  "input": {
+    "item": "minecraft:string"
+  },
+  "output": "minecraft:string",
+  "tier": "forgite",
+  "yield": {
+    "minimum": 1,
+    "maximum": 4,
+    "ramp_harvests": 64
+  },
+  "conversion": 12,
+  "display_key": "item.minecraft.string",
+  "color": "#D8D5C8",
+  "enabled": true
+}

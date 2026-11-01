@@ -1,0 +1,6 @@
+{
+  "parent": "neroagriculture:block/tinted_crop_crystal",
+  "textures": {
+    "crop": "neroagriculture:block/resource_crop_stage1"
+  }
+}

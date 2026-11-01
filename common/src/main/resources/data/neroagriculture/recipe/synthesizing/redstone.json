@@ -1,0 +1,11 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "c:redstone",
+  "ticks": 140,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "#neroagriculture:redstone_samples",
+  "energy": 2400,
+  "family": "forgite"
+}

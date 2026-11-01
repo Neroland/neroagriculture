@@ -1,0 +1,11 @@
+{
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  },
+  "material": "c:emerald",
+  "ticks": 160,
+  "type": "neroagriculture:seed_synthesizing",
+  "ingredient": "#neroagriculture:emerald_samples",
+  "energy": 3600,
+  "family": "orbite"
+}

@@ -1,0 +1,18 @@
+{
+  "requires_item": "nerospace:xertz_quartz",
+  "input": {
+    "item": "nerospace:xertz_quartz"
+  },
+  "output": "nerospace:xertz_quartz",
+  "tier": "orbite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 16,
+  "display_key": "material.nerospace.xertz_quartz",
+  "color": "#B179D8",
+  "enabled": true,
+  "dimension": "nerospace:greenxertz"
+}

@@ -19,7 +19,7 @@ class MaterialCatalogSyncPayloadTest {
     void minimalMetadataRoundTrips() {
         MaterialCatalogSyncPayload payload = new MaterialCatalogSyncPayload(List.of(
                 new MaterialCatalogSyncPayload.Entry(Identifier.parse("test:iron"), FragmentTier.FORGITE,
-                        "material.test.iron", 0xAABBCC)));
+                        "material.test.iron", 0xAABBCC, 2, 1, 4, 64, 12, "test:gate", "test:world")));
         RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
         MaterialCatalogSyncPayload.STREAM_CODEC.encode(buffer, payload);
         assertEquals(payload, MaterialCatalogSyncPayload.STREAM_CODEC.decode(buffer));
@@ -29,6 +29,8 @@ class MaterialCatalogSyncPayloadTest {
     @Test
     void rejectsOversizedMetadata() {
         assertThrows(IllegalArgumentException.class, () -> new MaterialCatalogSyncPayload.Entry(
-                Identifier.parse("test:iron"), FragmentTier.ORBITE, "x".repeat(129), 0));
+                Identifier.parse("test:iron"), FragmentTier.ORBITE, "x".repeat(129), 0, 0, 1, 4, 64, 12, "", ""));
+        assertThrows(IllegalArgumentException.class, () -> new MaterialCatalogSyncPayload.Entry(
+                Identifier.parse("test:iron"), FragmentTier.ORBITE, "valid", 0, 0, 4, 1, 64, 12, "", ""));
     }
 }

@@ -1,0 +1,11 @@
+{
+  "result": {
+    "count": 2,
+    "id": "neroagriculture:voidite_fragment"
+  },
+  "material": "nerolandcore:starsteel",
+  "ticks": 200,
+  "type": "neroagriculture:material_extraction",
+  "ingredient": "nerolandcore:starsteel_dust",
+  "energy": 4000
+}

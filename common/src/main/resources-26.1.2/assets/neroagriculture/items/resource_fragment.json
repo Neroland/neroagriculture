@@ -1,0 +1,674 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "neroagriculture:material_variant",
+    "cases": [
+      {
+        "when": {
+          "version": 1,
+          "material": "c:coal",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/coal"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:coal",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/coal"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:coal",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/coal"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:coal",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/coal"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:coal",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/coal"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:iron",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/iron"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:iron",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/iron"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:iron",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/iron"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:iron",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/iron"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:iron",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/iron"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:copper",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/copper"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:copper",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/copper"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:copper",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/copper"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:copper",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/copper"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:copper",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/copper"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:gold",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/gold"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:gold",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/gold"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:gold",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/gold"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:gold",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/gold"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:gold",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/gold"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:redstone",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/redstone"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:redstone",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/redstone"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:redstone",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/redstone"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:redstone",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/redstone"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:redstone",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/redstone"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:diamond",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/diamond"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:diamond",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/diamond"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:diamond",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/diamond"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:diamond",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/diamond"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "c:diamond",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/fragment/diamond"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosium",
+          "family": "territe"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosium",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosium",
+          "family": "forgite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosium",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosium",
+          "family": "orbite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosium",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosium",
+          "family": "colonite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosium",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosium",
+          "family": "voidite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosium",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosteel",
+          "family": "territe"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosteel",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosteel",
+          "family": "forgite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosteel",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosteel",
+          "family": "orbite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosteel",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosteel",
+          "family": "colonite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosteel",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_nerosteel",
+          "family": "voidite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/raw_nerosteel",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:xertz_quartz",
+          "family": "territe"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/xertz_quartz",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:xertz_quartz",
+          "family": "forgite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/xertz_quartz",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:xertz_quartz",
+          "family": "orbite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/xertz_quartz",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:xertz_quartz",
+          "family": "colonite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/xertz_quartz",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:xertz_quartz",
+          "family": "voidite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/xertz_quartz",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:cindrite",
+          "family": "territe"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/cindrite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:cindrite",
+          "family": "forgite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/cindrite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:cindrite",
+          "family": "orbite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/cindrite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:cindrite",
+          "family": "colonite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/cindrite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:cindrite",
+          "family": "voidite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/cindrite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:glacite",
+          "family": "territe"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/glacite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:glacite",
+          "family": "forgite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/glacite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:glacite",
+          "family": "orbite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/glacite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:glacite",
+          "family": "colonite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/glacite",
+          "type": "minecraft:model"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:glacite",
+          "family": "voidite"
+        },
+        "model": {
+          "model": "neroagriculture:item/fragment/glacite",
+          "type": "minecraft:model"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:select",
+      "property": "minecraft:custom_model_data",
+      "fallback": {
+        "type": "minecraft:model",
+        "model": "neroagriculture:item/resource_fragment",
+        "tints": [
+          {
+            "type": "minecraft:custom_model_data",
+            "default": 8947848,
+            "index": 0
+          }
+        ]
+      },
+      "index": 0,
+      "cases": [
+        {
+          "model": {
+            "type": "minecraft:model",
+            "model": "neroagriculture:item/fragment/family_metal",
+            "tints": [
+              {
+                "type": "minecraft:custom_model_data",
+                "default": 16777215,
+                "index": 0
+              }
+            ]
+          },
+          "when": "metal"
+        },
+        {
+          "model": {
+            "type": "minecraft:model",
+            "model": "neroagriculture:item/fragment/family_crystal",
+            "tints": [
+              {
+                "type": "minecraft:custom_model_data",
+                "default": 16777215,
+                "index": 0
+              }
+            ]
+          },
+          "when": "crystal"
+        },
+        {
+          "model": {
+            "type": "minecraft:model",
+            "model": "neroagriculture:item/fragment/family_carbon",
+            "tints": [
+              {
+                "type": "minecraft:custom_model_data",
+                "default": 16777215,
+                "index": 0
+              }
+            ]
+          },
+          "when": "carbon"
+        }
+      ]
+    }
+  }
+}

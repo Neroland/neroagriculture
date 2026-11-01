@@ -1,0 +1,11 @@
+{
+  "result": {
+    "count": 2,
+    "id": "neroagriculture:orbite_fragment"
+  },
+  "material": "nerolandcore:plasma_glass",
+  "ticks": 120,
+  "type": "neroagriculture:material_extraction",
+  "ingredient": "nerolandcore:plasma_glass",
+  "energy": 1800
+}

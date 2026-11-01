@@ -5,10 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -49,21 +47,29 @@ public final class AutomationOwner {
     /**
      * Owner-first progression resolution: when a machine has a recorded owner, gates and milestones are
      * checked against (and credited to) that player only — {@code null} while the owner is offline, so
-     * progression fails closed rather than crediting a bystander. Only an <em>ownerless</em> machine
-     * (owner tracking opted out, or pre-owner worlds) falls back to the nearest player, so the opt-out
-     * never bricks progression.
+     * progression fails closed rather than crediting a bystander. Ownerless machines have no player
+     * context; operations without a player-specific gate can still proceed.
      */
     @Nullable
-    public static ServerPlayer gatePlayer(ServerLevel level, BlockPos pos, @Nullable UUID owner,
-            double fallbackRange) {
-        if (owner != null) return level.getServer().getPlayerList().getPlayer(owner);
-        Player nearest = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                fallbackRange, false);
-        return nearest instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+    public static ServerPlayer gatePlayer(ServerLevel level, @Nullable UUID owner) {
+        return onlineOwner(owner, id -> level.getServer().getPlayerList().getPlayer(id));
+    }
+
+    @Nullable
+    static <T> T onlineOwner(@Nullable UUID owner, java.util.function.Function<UUID, T> lookup) {
+        return owner == null ? null : lookup.apply(owner);
     }
 
     public static boolean trackingEnabled() {
         return AgricultureConfig.AUTOMATION_TRACK_OWNER.get();
+    }
+
+    public static boolean canClaim(@Nullable UUID owner) {
+        return canClaim(owner, trackingEnabled());
+    }
+
+    static boolean canClaim(@Nullable UUID owner, boolean trackingEnabled) {
+        return trackingEnabled && owner == null;
     }
 
     public static void track(Owned owned) { TRACKED.add(owned); }

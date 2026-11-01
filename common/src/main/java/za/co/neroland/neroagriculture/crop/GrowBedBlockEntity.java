@@ -156,8 +156,7 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         ItemStack seed = items.get(SEED_SLOT);
         if (seed.isEmpty() || !seed.is(za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get())) return;
         if (!level.getBlockState(pos.above()).canBeReplaced()) return;
-        Player nearest = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32.0, false);
-        if (!(nearest instanceof ServerPlayer player)) return;
+        ServerPlayer player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, owner);
         if (za.co.neroland.neroagriculture.content.ResourceSeedItem.tryPlantAbove(level, player, pos, seed)) {
             setChanged();
         }

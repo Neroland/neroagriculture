@@ -1,0 +1,17 @@
+{
+  "requires_item": "nerospace:raw_nerosium",
+  "input": {
+    "item": "nerospace:raw_nerosium"
+  },
+  "output": "nerospace:raw_nerosium",
+  "tier": "forgite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 12,
+  "display_key": "material.nerospace.nerosium",
+  "color": "#839BA6",
+  "enabled": true
+}

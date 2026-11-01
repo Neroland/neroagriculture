@@ -1,0 +1,20 @@
+{
+  "title": "quest.neroagriculture.field_ledger.starter_power.title",
+  "description": "quest.neroagriculture.field_ledger.starter_power.desc",
+  "icon": "neroagriculture:field_generator",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "count": 1,
+      "item": "neroagriculture:field_generator",
+      "type": "neroquests:collect_item"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 20
+    }
+  ],
+  "scope": "player"
+}

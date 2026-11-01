@@ -1,0 +1,18 @@
+{
+  "requires_item": "nerospace:cindrite",
+  "input": {
+    "item": "nerospace:cindrite"
+  },
+  "output": "nerospace:cindrite",
+  "tier": "colonite",
+  "yield": {
+    "ramp_harvests": 128,
+    "maximum": 4,
+    "minimum": 1
+  },
+  "conversion": 20,
+  "display_key": "material.nerospace.cindrite",
+  "color": "#E87035",
+  "enabled": true,
+  "dimension": "nerospace:cindara"
+}

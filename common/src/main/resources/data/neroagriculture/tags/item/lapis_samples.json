@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:lapis_lazuli",
+    {
+      "id": "#c:ores/lapis",
+      "required": false
+    }
+  ]
+}

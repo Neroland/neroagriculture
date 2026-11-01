@@ -1,0 +1,12 @@
+{
+  "material": "c:copper",
+  "energy": 0,
+  "ingredient": "#neroagriculture:copper_samples",
+  "input_count": 1,
+  "type": "neroagriculture:seed_researching",
+  "family": "forgite",
+  "ticks": 1,
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  }
+}

@@ -29,7 +29,9 @@ Values are grouped by system; the most useful keys are listed below. Lists use c
 
 - `automation.interval_ticks`, `automation.columns_per_pass`, `automation.energy_per_op` — Planter/Harvester pacing.
 - `automation.track_owner` — record placer UUIDs for claim checks and owner-bound progression (opt-out;
-  see [Privacy](Privacy-and-Erasure.md)).
+  player-gated automation cannot resolve an owner while disabled; see [Privacy](Privacy-and-Erasure.md)).
+- `growth.seed_return_percent` — chance for a bonus seed on a resource crop's first manual or grow-bed
+  harvest; later harvests cannot roll again, even after replanting.
 - `privacy.erasure_retention_days` — how long erasure tombstones are kept so owners saved in unloaded
   chunks are still purged when those chunks load (default 90 days). The window applies to the tombstone
   file's crash-recovery backup too.

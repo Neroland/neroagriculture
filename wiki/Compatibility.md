@@ -1,5 +1,15 @@
 # Compatibility
 
+NeroAgriculture's engineered food and alien produce contribute to the common `c:foods` item tag.
+NeroColonies includes that tag in its food supply, so either produce can supply a colony when both mods
+are installed. The colony counts each item as one ration; player-specific food effects do not apply to
+colony stock. The tag also works without NeroColonies and does not replace other mods' entries.
+
+NeroCreatures' Stalker Hide and Stalker Sinew have optional Colonite definitions. Their seeds require
+the corresponding physical drop and research, and convert 20 fragments per item. They are omitted
+when the items are absent. Technical drops, boss rewards and processed components are not included in
+these curated definitions.
+
 NeroAgriculture hard-depends on **Neroland Core alone**. Every other integration is optional and dormant
 until the other mod is present — the mod runs fully standalone with nothing registered. External mods
 interoperate only through Core capabilities, `c:` common tags, and the provider seams in

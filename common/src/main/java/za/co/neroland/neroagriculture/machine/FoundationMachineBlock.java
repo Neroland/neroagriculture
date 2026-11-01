@@ -54,6 +54,7 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
             BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine) {
+            if (za.co.neroland.neroagriculture.automation.AutomationOwner.canClaim(machine.automationOwner())) machine.setOwner(player.getUUID());
             player.openMenu(machine);
         }
         return InteractionResult.SUCCESS;

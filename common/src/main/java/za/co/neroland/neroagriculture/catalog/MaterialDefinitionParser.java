@@ -41,8 +41,11 @@ public final class MaterialDefinitionParser {
             MaterialDefinition.WorldRestriction restriction = json.has("dimension") && !json.get("dimension").isJsonNull()
                     ? new MaterialDefinition.WorldRestriction(identifier(json.get("dimension").getAsString(), "dimension"))
                     : null;
+            int visualFamily = json.has("visual_family")
+                    ? za.co.neroland.neroagriculture.crop.CropVisuals.parse(requiredString(json, "visual_family"))
+                    : za.co.neroland.neroagriculture.crop.CropVisuals.family(id);
             return new Result(new MaterialDefinition(id, selector, output, tier, gate, yield, conversion,
-                    displayKey, color, enabled, restriction), null);
+                    displayKey, color, enabled, restriction, visualFamily), null);
         } catch (RuntimeException e) {
             return new Result(null, id + ": " + e.getMessage());
         }

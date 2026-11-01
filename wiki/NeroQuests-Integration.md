@@ -6,10 +6,15 @@ installed the chapter appears in the quest book; without it the files are simply
 
 ## Chapter: Field Ledger
 
-Chapter id `neroagriculture:field_ledger`, 15 quests, all player-scope except the last.
+Chapter id `neroagriculture:field_ledger`, 20 quests, all player-scope except Green World.
 
 | Quest | How to complete it | Leads to |
 | --- | --- | --- |
+| A Spark for the Field | Hold a Field Generator | — |
+| A Resource Worth Studying | Hold a Fragment Extractor | — |
+| The First Living Base | Hold a Prospora Seed | — |
+| Study Before Sowing | Hold a Seed Research Bench | — |
+| A Seed That Makes Resources | Hold a Resource Seed | — |
 | First Compost | Craft four Fertiliser | Quick Growth, Heavy Harvest, First Reaping, Ledger Opened |
 | Quick Growth | Craft two Speed Fertiliser | Ledger Opened |
 | Heavy Harvest | Craft two Yield Fertiliser | Ledger Opened |
@@ -25,6 +30,8 @@ Chapter id `neroagriculture:field_ledger`, 15 quests, all player-scope except th
 
 Rewards are quest XP and NeroQuests currency; First Compost also hands out bone meal. Machine output
 never counts as a craft, so the five crafting quests want the hand-crafted vanilla-ingredient recipes.
+The five introductory objectives check the player's inventory without consuming items; their descriptions
+explain the early loop and they do not depend on the fertiliser branch.
 
 ## What the mod publishes
 
@@ -43,8 +50,8 @@ no machine, recipe or tier ever checks them.
 | `neroagriculture:greenhouse_keeper` | the player opens a Greenhouse Controller that is formed and running |
 | `neroagriculture:tower_grower` | the player opens a Crop Tower Controller whose tower is formed |
 
-The greenhouse and tower milestones are recorded on interaction so that neither controller needs to
-store an owner. The tier gates `refinement`, `synthesis`, `transmutation` and `ascension` are the real
+The greenhouse and tower milestones are recorded on interaction. The tower also records its placer for
+owner-bound automation; the greenhouse does not. The tier gates `refinement`, `synthesis`, `transmutation` and `ascension` are the real
 progression gates and are documented in [Resource-seed economy](Resource-Seed-Economy.md).
 
 ### Threshold channels (world milestones)

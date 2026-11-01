@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Field Generator: an early coal- or charcoal-powered source for adjacent machines.
+- Extraction, research and synthesis recipes for all built-in catalog materials; vanilla ore materials
+  also accept their ordinary mining drops as samples.
+- Conservative catalog-backed fabrication for explicit material definitions and selected common tagged
+  metals, with sample, discovery and research requirements and existing recipe precedence.
+- Optional catalog definitions for Nerosium, Nerosteel, Xertz Quartz, Cindrite and Glacite; the three
+  planet-specific resources require a visit and their corresponding growing world.
+- Optional Stalker Hide and Stalker Sinew material definitions for NeroCreatures.
+- Sample-based definitions for string, leather, slime balls, gunpowder, blaze rods and ender pearls.
+- Owner-aware progression for crop towers, including Core data erasure and migration of ownerless towers.
+- Distinct coal, iron, copper, gold, redstone, diamond and five planetary-material seed models on Minecraft 26.1.2 and newer;
+  matching fragments and existing seeds select them from their saved material component.
+- Metal, crystal and carbon crop model families, with a generic fallback and migration for existing crops.
+- Seed tooltips show catalog-defined base yield, conversion and world or gate requirements. The revised
+  catalog network packet requires the same overhaul build on clients and servers.
+
+### Changed
+
+- Fresh coal crops yield two fragments instead of one, reducing the wait for the first conversion.
+- The research bench uses a crafting table instead of a lectern, reducing the early book and leather cost.
+- A crop can roll for a bonus seed on its first harvest only, preventing repeated copying of its genetics.
+- Player-bound automation uses its recorded owner; it pauses when that owner is unavailable, and older
+  ownerless machines can be claimed by opening them with owner tracking enabled.
+
+### Fixed
+
+- Coal dropped by ordinary mining is accepted for extraction, research and seed synthesis; coal ore
+  blocks remain accepted where the common coal ore tag is available.
+- Alloy fusion now checks the target material's discovery and research when research is enabled.
+  Existing seeds and world data are unchanged; fusion recipes need a matching research recipe.
+- Harvest yield caps and catalog-defined material colours now apply consistently across farm paths.
+
 ## [0.6.1-beta.1] - 2026-10-31
 
 First NeroAgriculture builds for Minecraft 1.21.x, companion-client support, a two-way Nerospace

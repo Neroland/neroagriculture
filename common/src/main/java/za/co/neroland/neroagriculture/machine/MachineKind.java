@@ -6,10 +6,11 @@ import za.co.neroland.neroagriculture.registry.ModBlocks;
 
 /** Stable behavior selected from the finite machine block registry. */
 public enum MachineKind {
-    EXTRACTOR, INFUSER, SYNTHESIZER, RESEARCH_BENCH, OTHER;
+    EXTRACTOR, INFUSER, SYNTHESIZER, RESEARCH_BENCH, OTHER, GENERATOR;
 
     public static MachineKind of(Block block) {
         if (block == ModBlocks.FRAGMENT_EXTRACTOR.get()) return EXTRACTOR;
+        if (block == ModBlocks.FIELD_GENERATOR.get()) return GENERATOR;
         if (block == ModBlocks.FRAGMENT_INFUSER.get()) return INFUSER;
         if (block == ModBlocks.SEED_SYNTHESIZER.get()) return SYNTHESIZER;
         if (block == ModBlocks.SEED_RESEARCH_BENCH.get()) return RESEARCH_BENCH;

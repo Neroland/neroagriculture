@@ -8,11 +8,11 @@ and everything it does keep can be erased through Neroland Core.
 Only two kinds, both keyed by **UUID only** (never a username or display name):
 
 - **Machine ownership** — the Planter, Harvester, Fertiliser Applicator, Terraforming Controller,
-  fabrication machines (Extractor/Infuser/Synthesizer/Research Bench) and powered grow beds may record
+  fabrication machines (Extractor/Infuser/Synthesizer/Research Bench), crop towers and powered grow beds may record
   the placing player's UUID so a claims/protection mod can authorise their edits and so progression
   (gate unlocks, research checks) is credited to the machine's owner rather than whoever stands nearby.
-  This is opt-out via `automation.track_owner = false`, in which case no owner is stored at all and
-  progression falls back to the nearest player. The UUID is server-only — it is never sent to clients.
+  This is opt-out via `automation.track_owner = false`, in which case no owner is stored and
+  player-gated automation cannot resolve a player. The UUID is server-only — it is never sent to clients.
 - **Material milestones / research** — which materials and seeds a player has discovered or researched is
   tracked through Core's shared progression store, not by this mod directly.
 
@@ -23,7 +23,7 @@ erasure request. When Nerospace is installed, the same adapter also reads the jo
 Nerospace planet-visit list once per join to credit planet-bound research; nothing from it is kept
 beyond the resulting Core milestone.
 
-Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle phases — is
+Everything else — the material catalog, greenhouse state, tower crops and contents, terraformed regions, cycle phases — is
 **world data with no player attribution**.
 
 ## What is never stored
@@ -40,8 +40,7 @@ own farm. This is a data-processing surface, so it is worth stating exactly what
   milestone store. It adds no table, no log and no per-player record of its own.
 - **Own machines only.** Every section is scoped to the requesting player's UUID before anything leaves
   the mod — the machines that UUID owns, and nothing else. It does not widen for operators, and it never
-  falls back to "the nearest player", which is why crop towers (which have no owner field) are omitted
-  from it entirely.
+  falls back to "the nearest player". Crop towers are not yet included in the link schema.
 - **What leaves the mod:** your grow beds and machines with their positions and state, the greenhouses
   enclosing your beds, and your per-tier fragment-ladder progress. A shared greenhouse reports how many
   crops are inside, never whose.

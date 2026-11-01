@@ -47,6 +47,6 @@ class CatalogReloadSafetyTest {
         return new MaterialDefinition(id, new MaterialDefinition.InputSelector(
                 MaterialDefinition.InputSelector.Kind.ITEM, Identifier.parse("minecraft:iron_ingot")),
                 Identifier.parse("minecraft:iron_ingot"), tier, MaterialDefinitionParser.defaultGate(tier),
-                new MaterialDefinition.Yield(1, 4, 32), 8, "material.pack.osmium", color, true, null);
+                new MaterialDefinition.Yield(1, 4, 32), 8, "material.pack.osmium", color, true, null, 0);
     }
 }

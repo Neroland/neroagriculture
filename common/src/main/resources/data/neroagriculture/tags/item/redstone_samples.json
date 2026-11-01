@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:redstone",
+    {
+      "id": "#c:ores/redstone",
+      "required": false
+    }
+  ]
+}

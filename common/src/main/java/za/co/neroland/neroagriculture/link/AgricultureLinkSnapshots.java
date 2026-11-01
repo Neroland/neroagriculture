@@ -71,9 +71,8 @@ import za.co.neroland.neroagriculture.terraforming.TerraformingControllerBlockEn
  * player owns. The authorisation comes from the bed. Within such a greenhouse the crop count is an
  * aggregate: it counts crops, it does not say whose.
  *
- * <p><b>No crop tower section.</b> The tower controller has no owner field at all and its in-world gate
- * checks fall back to the nearest player, which is not a permission model. See
- * {@link AgricultureLinkModule} for the full reasoning.
+ * <p><b>No crop tower section.</b> The existing schema does not yet expose towers. See
+ * {@link AgricultureLinkModule}.
  *
  * <p><b>Read-only and bounded.</b> Nothing here mutates anything and no section loads a chunk: the
  * machine set is the loaded, tracked one, and the greenhouse lookup is an in-memory index consulted

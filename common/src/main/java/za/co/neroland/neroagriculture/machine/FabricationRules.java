@@ -37,6 +37,17 @@ public final class FabricationRules {
         return 2 + tier.ordinal();
     }
 
+    public static MachineBlockedReason researchBlock(boolean required, boolean discovered, boolean researched) {
+        if (!required) return null;
+        if (!discovered) return MachineBlockedReason.MILESTONE_REQUIRED;
+        if (!researched) return MachineBlockedReason.RESEARCH_REQUIRED;
+        return null;
+    }
+
+    public static boolean canGenerate(long stored, long capacity, int rate) {
+        return rate > 0 && stored >= 0 && capacity >= stored && capacity - stored >= rate;
+    }
+
     public static boolean mayComplete(boolean recipeValid, boolean outputFits, boolean hasPower,
             boolean gateStillOpen, boolean componentsStillValid) {
         return recipeValid && outputFits && hasPower && gateStillOpen && componentsStillValid;

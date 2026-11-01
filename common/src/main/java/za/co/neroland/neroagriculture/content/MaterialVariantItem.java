@@ -66,7 +66,15 @@ public class MaterialVariantItem extends Item {
     *///?}
         if (!appendVariantDetails(stack, tooltip)) return;
         tooltip.accept(Component.translatable("tooltip.neroagriculture.harvests",
-                stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0)).withStyle(ChatFormatting.DARK_GRAY));
+                stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0)).withStyle(ChatFormatting.GRAY));
+        if (this instanceof ResourceSeedItem || this instanceof SpeciesSeedItem) {
+            var genetics = stack.getOrDefault(ModDataComponents.GENETICS.get(),
+                    za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
+            tooltip.accept(Component.translatable("tooltip.neroagriculture.genetics_growth", genetics.yield(),
+                    genetics.speed(), genetics.hardiness()).withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("tooltip.neroagriculture.genetics_special", genetics.oxygenOutput(),
+                    genetics.foodPotency(), genetics.total()).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     /**
@@ -84,9 +92,23 @@ public class MaterialVariantItem extends Item {
                     .withStyle(ChatFormatting.RED));
         } else {
             tooltip.accept(Component.translatable("tooltip.neroagriculture.tier", metadata.tier().name())
-                    .withStyle(ChatFormatting.DARK_GRAY));
+                    .withStyle(ChatFormatting.GRAY));
             tooltip.accept(Component.translatable("tooltip.neroagriculture.bed", metadata.tier().name())
-                    .withStyle(ChatFormatting.DARK_GRAY));
+                    .withStyle(ChatFormatting.GRAY));
+            if (this instanceof ResourceSeedItem) {
+                tooltip.accept(Component.translatable("tooltip.neroagriculture.base_yield", metadata.minimumYield(),
+                        metadata.maximumYield(), metadata.rampHarvests()).withStyle(ChatFormatting.GRAY));
+                tooltip.accept(Component.translatable("tooltip.neroagriculture.conversion", metadata.conversion())
+                        .withStyle(ChatFormatting.GRAY));
+                if (!metadata.dimension().isEmpty()) {
+                    tooltip.accept(Component.translatable("tooltip.neroagriculture.world", metadata.dimension())
+                            .withStyle(ChatFormatting.GRAY));
+                }
+                if (!metadata.gate().isEmpty()) {
+                    tooltip.accept(Component.translatable("tooltip.neroagriculture.required_gate", metadata.gate())
+                            .withStyle(ChatFormatting.GRAY));
+                }
+            }
         }
         return true;
     }

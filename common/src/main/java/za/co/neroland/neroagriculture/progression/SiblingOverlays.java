@@ -39,11 +39,11 @@ public final class SiblingOverlays {
      * whenever the overlay does not apply (mode off, tier has no arc gate, or — in auto mode — the
      * opener mod is absent), so the native gate alone governs and standalone play is never blocked.
      */
-    public static boolean tierSatisfied(ServerPlayer player, FragmentTier tier) {
+    public static boolean tierSatisfied(@Nullable ServerPlayer player, FragmentTier tier) {
         if (!requiresArcGate(tier, AgricultureConfig.SIBLING_OVERLAYS.get(), isModLoaded(openerMod(tier)))) {
             return true;
         }
-        return ProgressionGates.isOpen(player, arcGate(tier));
+        return player != null && ProgressionGates.isOpen(player, arcGate(tier));
     }
 
     /**

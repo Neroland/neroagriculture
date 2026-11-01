@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","pattern":["ICI","IFI","IRI"],"key":{"I":"minecraft:iron_ingot","C":"minecraft:copper_ingot","F":"minecraft:furnace","R":"minecraft:redstone"},"result":{"id":"neroagriculture:field_generator","count":1}}

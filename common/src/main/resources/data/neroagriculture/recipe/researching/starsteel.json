@@ -1,0 +1,11 @@
+{
+  "material": "nerolandcore:starsteel",
+  "energy": 0,
+  "ingredient": "nerolandcore:starsteel_dust",
+  "input_count": 1,
+  "type": "neroagriculture:seed_researching",
+  "ticks": 1,
+  "result": {
+    "id": "neroagriculture:resource_seed"
+  }
+}

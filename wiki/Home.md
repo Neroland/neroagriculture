@@ -3,8 +3,9 @@
 Player- and contributor-facing documentation for **NeroAgriculture**, part of the
 Neroland ecosystem. Built on **Neroland Core**.
 
-> **Status:** resource-seed economy rework. NeroAgriculture is fully playable with **Neroland Core
-> alone**; every other Nero mod adds optional links that are dormant-safe when absent.
+> **Status:** resource-seed economy rework. The Field Generator provides starter power. The built-in
+> catalog has research and synthesis recipes; common tagged metals have a conservative fallback.
+> Other discovered materials may need a datapack definition or recipes.
 
 ## The core loop
 

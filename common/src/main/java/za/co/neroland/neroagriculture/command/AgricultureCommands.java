@@ -28,7 +28,7 @@ public final class AgricultureCommands {
                 .then(Commands.literal("catalog")
                         .then(Commands.literal("list").executes(context -> list(context.getSource())))
                         .then(Commands.literal("show")
-                                .then(Commands.argument("material", StringArgumentType.string())
+                                .then(Commands.argument("material", StringArgumentType.greedyString())
                                         .executes(context -> show(context.getSource(),
                                                 StringArgumentType.getString(context, "material")))))
                         .then(Commands.literal("errors").executes(context -> errors(context.getSource())))
@@ -79,7 +79,7 @@ public final class AgricultureCommands {
 
     private static int show(CommandSourceStack source, String raw) {
         final Identifier id;
-        try { id = Identifier.parse(raw); }
+        try { id = materialId(raw); }
         catch (RuntimeException e) { source.sendFailure(Component.literal("Invalid material id: " + raw)); return 0; }
         var lookup = MaterialCatalog.forServer(source.getServer()).lookup(id);
         if (lookup.material().isEmpty()) {
@@ -98,6 +98,14 @@ public final class AgricultureCommands {
         source.sendSuccess(() -> Component.literal("  dimension=" + (d.worldRestriction() == null ? "any"
                 : d.worldRestriction().dimension()) + " shadowed=" + resolved.shadowedSources()), false);
         return Command.SINGLE_SUCCESS;
+    }
+
+    static Identifier materialId(String raw) {
+        String value = raw.trim();
+        if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
+        }
+        return Identifier.parse(value);
     }
 
     private static int errors(CommandSourceStack source) {

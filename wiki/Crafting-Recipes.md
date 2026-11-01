@@ -10,10 +10,13 @@ fragments of that tier. Letters below are grid positions, read left to right, to
 
 | Result | Pattern | Key |
 | --- | --- | --- |
+| Field Generator | `ICI` / `IFI` / `IRI` | `C` Copper Ingot, `F` Furnace |
 | Fragment Extractor | `IPI` / `CFC` / `IRI` | `P` Piston, `C` Copper Ingot, `F` Furnace |
 | Territe Grow Bed | `ICI` / `DDD` / `III` | `C` Composter, `D` any dirt block |
 
-Feed the extractor coal, iron or another tier-1 ore and it yields Territe Fragments, the first rung.
+Feed the extractor coal to obtain Territe Fragments, the first rung. Coal obtained by ordinary mining
+works; a coal ore block also works when the common ore tag is available. The extractor needs an external
+NeroFlux source. Place a Field Generator next to it and fuel it with coal or charcoal.
 
 ## Territe tier
 
@@ -21,7 +24,7 @@ Feed the extractor coal, iron or another tier-1 ore and it yields Territe Fragme
 | --- | --- | --- |
 | Fragment Infuser | `TRT` / `IBI` / `TRT` | `B` Blast Furnace |
 | Seed Synthesizer | `TST` / `ICI` / `IRI` | `S` Wheat Seeds, `C` Crafting Table |
-| Seed Research Bench | `TBT` / `ILI` / `III` | `B` Book, `L` Lectern |
+| Seed Research Bench | `TBT` / `ICI` / `III` | `B` Book, `C` Crafting Table |
 | Planter | `ISI` / `IDI` / `TRT` | `S` Wheat Seeds, `D` Dispenser |
 | Harvester | `IHI` / `IDI` / `TRT` | `H` Iron Hoe, `D` Dispenser |
 | Fertiliser Applicator | `IFI` / `IDI` / `TRT` | `F` Fertiliser, `D` Dispenser |
