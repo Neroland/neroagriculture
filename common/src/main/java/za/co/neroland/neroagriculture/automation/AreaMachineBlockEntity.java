@@ -149,13 +149,13 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
             if (bed.getX() == worldPosition.getX() && bed.getZ() == worldPosition.getZ()) continue;
             if (!level.isLoaded(bed)) continue;
             if (!AutomationPolicy.mayEdit(level, bed, owner)) continue;
-            if (energyPerOp > 0 && getEnergy().extract(energyPerOp, true) < energyPerOp) break;
+            if (energyPerOp > 0 && !energyBuffer().has(energyPerOp)) break;
             boolean worked = switch (mode) {
                 case PLANT -> tryPlant(level, bed);
                 case HARVEST -> tryHarvest(level, bed);
                 case APPLY -> tryApply(level, bed);
             };
-            if (worked && energyPerOp > 0) getEnergy().extract(energyPerOp, false);
+            if (worked && energyPerOp > 0) energyBuffer().consume(energyPerOp);
         }
         cursor = AreaWork.advanceCursor(cursor, perPass, radius);
         setChanged();
@@ -183,8 +183,8 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
             za.co.neroland.neroagriculture.fertiliser.FertiliserType type = fertiliserType(stack);
             if (type == null) continue;
             long now = level.getGameTime();
-            target.applyFertiliser(type, 1, now, AgricultureConfig.FERTILISER_DURATION_TICKS.get(),
-                    AgricultureConfig.FERTILISER_MAX_DOSE.get());
+            if (!za.co.neroland.neroagriculture.fertiliser.Fertilisers.applyOne(target, type, now,
+                    AgricultureConfig.FERTILISER_DURATION_TICKS.get(), AgricultureConfig.FERTILISER_MAX_DOSE.get())) continue;
             stack.shrink(1);
             return true;
         }

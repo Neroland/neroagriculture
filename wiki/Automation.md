@@ -34,7 +34,7 @@ cost, exactly as on the fabrication machines.
 
 If owner tracking is enabled (config `automation.track_owner`, on by default), a machine records only the
 placing player's UUID — never a name — so a claims/protection mod can authorise its edits. Fabrication
-machines, powered grow beds and crop towers record their placer the same way. Progression checks use only
+machines, grow beds and crop towers record their placer the same way. Progression checks use only
 the recorded owner, never a nearby player. If the owner is offline or absent, player-gated work pauses;
 operations with no player-specific gate can continue. Opening an older ownerless machine or tower records
 the interacting player when tracking is enabled. With tracking disabled, player-gated automation cannot

@@ -162,7 +162,6 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         ServerPlayer player = gatePlayer(level);
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
         int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
-        boolean hasPower = energyCost <= 0 || getEnergy().extract(energyCost, true) >= energyCost;
         boolean hasNutrient = nutrientCost <= 0
                 || nutrient.getFluid() == ModFluids.NUTRIENT.get() && nutrient.drain(nutrientCost, true) >= nutrientCost;
 
@@ -173,12 +172,33 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             var lookup = catalog.lookup(slot.material());
             var definition = lookup.material().map(material -> material.definition()).orElse(null);
             boolean gate = gateOpen(definition, player);
-            GrowthRules.BlockedReason reason = slot.mature()
+            int requiredEnergy = definition == null ? energyCost
+                    : energyCost * environmentCostMultiplier(level, slot, definition.tier(), i);
+            boolean hasPower = TowerEnergy.has(energyBuffer(), requiredEnergy);
+            GrowthRules.BlockedReason reason = lookup.permitsGrowth() && definition != null && !worldAllowed(definition, level)
+                    && gate ? GrowthRules.BlockedReason.WRONG_DIMENSION : slot.mature()
                     ? GrowthRules.evaluateTowerHarvest(lookup.status(), gate, outputHasRoomFor(slot))
                     : GrowthRules.evaluateTower(lookup.status(), gate, hasPower, hasNutrient);
             aggregate = aggregate == null ? reason : GrowthRules.worst(aggregate, reason);
         }
+        if (aggregate == null) {
+            for (int i = SEED_START; i <= SEED_END; i++) {
+                MaterialVariant variant = items.get(i).get(ModDataComponents.MATERIAL_VARIANT.get());
+                if (!items.get(i).is(ModItems.RESOURCE_SEED.get()) || variant == null) continue;
+                var lookup = catalog.lookup(variant.material());
+                var definition = lookup.material().map(material -> material.definition()).orElse(null);
+                if (lookup.permitsGrowth() && definition != null && !worldAllowed(definition, level)) {
+                    return GrowthRules.BlockedReason.WRONG_DIMENSION.ordinal();
+                }
+            }
+        }
         return aggregate == null ? CropTowerMenu.NO_CROP : aggregate.ordinal();
+    }
+
+    private static boolean worldAllowed(za.co.neroland.neroagriculture.catalog.MaterialDefinition definition,
+            ServerLevel level) {
+        return za.co.neroland.neroagriculture.catalog.MaterialWorldRules.allows(definition.worldRestriction() == null ? null
+                : definition.worldRestriction().dimension(), level.dimension().identifier());
     }
 
     /** The gate half of {@link #tryGrow}/{@link #tryHarvest}, stated once so the status line cannot drift. */
@@ -290,6 +310,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
             if (!lookup.permitsGrowth()) continue;
             var definition = lookup.material().orElseThrow().definition();
+            if (!worldAllowed(definition, level)) continue;
             Genetics genetics = seed.getOrDefault(ModDataComponents.GENETICS.get(), Genetics.EMPTY);
             slot.plant(definition.id(), definition.tier(), seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0), genetics);
             seed.shrink(1);
@@ -301,13 +322,14 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(slot.material());
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
+        if (!worldAllowed(definition, level)) return;
         if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
                 || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) return;
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get() * environmentCostMultiplier(level, slot, definition.tier(), slotIndex);
         int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
-        if (energyCost > 0 && getEnergy().extract(energyCost, true) < energyCost) return;
+        if (!TowerEnergy.has(energyBuffer(), energyCost)) return;
         if (nutrientCost > 0 && (nutrient.getFluid() != ModFluids.NUTRIENT.get() || nutrient.drain(nutrientCost, true) < nutrientCost)) return;
-        if (energyCost > 0) getEnergy().extract(energyCost, false);
+        TowerEnergy.consume(energyBuffer(), energyCost);
         if (nutrientCost > 0) nutrient.drain(nutrientCost, false);
         slot.grow(GeneticEffects.growthStep(hasSpeedFertiliser() ? 2 : 1, slot.genetics()));
     }
@@ -343,6 +365,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(slot.material());
         if (!lookup.permitsGrowth()) return;
         var definition = lookup.material().orElseThrow().definition();
+        if (!worldAllowed(definition, level)) return;
         if ((definition.gate() != null && (player == null || !ProgressionGates.isOpen(player, definition.gate())))
                 || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier())) return;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),

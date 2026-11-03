@@ -395,9 +395,6 @@ public final class AgricultureGallery {
         fillFloor(level, bx - 2, bz - 1, bx + cols * 3 + 1, bz + 2 * 3, fy, floor);
         label(level, new BlockPos(bx + 3, fy + 4, bz - 1),
                 "Farm — beds auto-harvest into their own slots and replant from their seed slot");
-        // The Territe bed is a deliberately passive plain block (no block entity, no seed/output slots
-        // — see GrowBedBlock), so it cannot demonstrate the auto-harvest/replant loop this farm is
-        // labelled with; the Territe crop sits on a Forgite bed instead (beds accept lower-tier crops).
         Object[][] plots = {
             {ModBlocks.FORGITE_GROW_BED.get(), "c:coal", FragmentTier.TERRITE, "Coal — Territe (on a Forgite bed)"},
             {ModBlocks.FORGITE_GROW_BED.get(), "c:iron", FragmentTier.FORGITE, "Iron — Forgite"},

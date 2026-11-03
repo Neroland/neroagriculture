@@ -7,7 +7,8 @@ datapacks load. The precedence is:
 2. server blacklist and overrides
 3. Neroland Core meteor-material metadata
 4. explicit vanilla/Core defaults
-5. discovered `c:ores/*` tags; unknown third-party materials default to the configured
+5. discovered `c:ingots/*`, `c:gems/*`, `c:raw_materials/*`, `c:dusts/*` and `c:ores/*` tags;
+   unknown third-party materials default to the configured
    `discovery.default_tier` (Orbite unless changed; unknown gems are always Orbite)
 
 Core metadata is adapted read-only. Conflicts and validation failures are retained for operator
@@ -16,6 +17,13 @@ diagnostics rather than silently discarded.
 Sample-based definitions cover string, leather, slime balls, gunpowder, blaze rods and ender pearls.
 Each requires its real item for extraction, research and seed synthesis. The first four use Forgite;
 the latter two use Orbite. Pack authors can replace or disable these definitions.
+
+An entry in the catalog does not by itself guarantee a way to make a seed. Automatic extraction and
+synthesis fallback applies to explicit material definitions and selected common metals; other discovered
+tags need suitable recipes or an explicit definition. For example, NeroCreatures' ore slurry and refined
+crystal can be discovered through their common material tags, but those tags alone do not grant seed
+fabrication. Its stalker hide and sinew have explicit optional definitions. Event salvage is not given a
+default seed recipe. Pack authors can opt in to additional materials with a datapack definition.
 
 An optional `visual_family` field selects the planted crop's shape: `generic`, `metal`, `crystal` or
 `carbon`. On Minecraft 26.1.2 and newer, newly produced non-curated seeds and fragments also use that
@@ -43,8 +51,8 @@ The file path defines the material id. For example,
 }
 ```
 
-`input` contains exactly one `item` or `tag`. `gate` is optional and defaults from the tier; explicit
-`null` means no gate. `dimension`, `enabled`, and `gate` are optional. Invalid identifiers, missing
+`input` contains exactly one `item` or `tag`. `gate` is optional and defaults to no hard gate; explicit
+`null` also means no gate. `dimension`, `enabled`, and `gate` are optional. Invalid identifiers, missing
 items/tags, impossible yield ranges, conversion values, colors, and oversized display keys produce an
 actionable catalog error.
 

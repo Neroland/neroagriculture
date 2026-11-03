@@ -129,6 +129,24 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         }
         blockedReasonTick = now;
         var reason = ResourceCropBlock.plantedGrowthReason(serverLevel, worldPosition);
+        if (reason == null && !items.get(SEED_SLOT).isEmpty()) {
+            var variant = items.get(SEED_SLOT).get(za.co.neroland.neroagriculture.registry.ModDataComponents.MATERIAL_VARIANT.get());
+            if (variant == null) {
+                reason = GrowthRules.BlockedReason.UNKNOWN_MATERIAL;
+            } else {
+                var lookup = za.co.neroland.neroagriculture.catalog.MaterialCatalog.forServer(serverLevel.getServer())
+                        .lookup(variant.material());
+                var definition = lookup.material().map(material -> material.definition()).orElse(null);
+                var player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(serverLevel, owner);
+                boolean gateOpen = definition == null || ((definition.gate() == null || player != null
+                        && za.co.neroland.nerolandcore.progression.ProgressionGates.isOpen(player, definition.gate()))
+                        && za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(player, definition.tier()));
+                boolean worldAllowed = definition == null || definition.worldRestriction() == null
+                        || definition.worldRestriction().dimension().equals(serverLevel.dimension().identifier());
+                reason = GrowBedInteraction.waitingReason(lookup.status(),
+                        definition == null ? null : definition.tier(), tier(), gateOpen, worldAllowed);
+            }
+        }
         blockedReason = reason == null
                 ? za.co.neroland.neroagriculture.menu.GrowBedMenu.NO_CROP : reason.ordinal();
         return blockedReason;
@@ -222,10 +240,10 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
     public boolean hasGrowthResources() {
         int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
         int fluidCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
-        return GrowBedResources.has(getEnergy(), nutrient, ModFluids.NUTRIENT.get(), energyCost, fluidCost);
+        return GrowBedResources.has(energyBuffer(), nutrient, ModFluids.NUTRIENT.get(), energyCost, fluidCost);
     }
     public boolean consumeGrowthResources() {
-        if (!GrowBedResources.consume(getEnergy(), nutrient, ModFluids.NUTRIENT.get(),
+        if (!GrowBedResources.consume(energyBuffer(), nutrient, ModFluids.NUTRIENT.get(),
                 AgricultureConfig.GROW_BED_ENERGY_COST.get(), AgricultureConfig.GROW_BED_NUTRIENT_COST.get())) return false;
         setChanged();
         return true;

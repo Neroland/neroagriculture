@@ -118,10 +118,10 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
 
         // Research bench: a clickable "discover" pill on the right of the status/progress bands.
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH) {
-            g.fill(x + 118, y + 50, x + 168, y + 68, TROUGH);
-            g.fill(x + 118, y + 50, x + 168, y + 51, ACCENT_ORBITE);
+            g.fill(x + 118, y + 59, x + 168, y + 75, TROUGH);
+            g.fill(x + 118, y + 59, x + 168, y + 60, ACCENT_ORBITE);
             Component research = Component.translatable("screen.neroagriculture.research");
-            g.text(font, research, x + 143 - font.width(research) / 2, y + 56, ACCENT_ORBITE, false);
+            g.text(font, research, x + 143 - font.width(research) / 2, y + 63, ACCENT_ORBITE, false);
         }
 
         //? if >=26.1 {
@@ -142,7 +142,7 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
     *///?}
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH
                 && event.x() >= leftPos + 112 && event.x() < leftPos + 168
-                && event.y() >= topPos + 50 && event.y() < topPos + 68) {
+                && event.y() >= topPos + 59 && event.y() < topPos + 75) {
             BlockPos pos = machinePosition();
             if (pos != null) Services.NETWORK.sendToServer(new MachineActionPayload(pos.asLong(), 0, 0));
             return true;

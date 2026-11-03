@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import za.co.neroland.nerolandcore.registry.BlockCodecs;
 import za.co.neroland.neroagriculture.content.FragmentTier;
 
-/** Powered Forgite–Voidite bed. Territe remains a passive plain block. */
+/** Grow bed with a shared inventory; Territe crops grow without power or nutrient. */
 public final class GrowBedBlock extends BaseEntityBlock {
     public static final MapCodec<GrowBedBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             FragmentTier.CODEC.fieldOf("tier").forGetter(GrowBedBlock::tier),
@@ -21,7 +21,6 @@ public final class GrowBedBlock extends BaseEntityBlock {
 
     public GrowBedBlock(FragmentTier tier, Properties properties) {
         super(properties);
-        if (tier == FragmentTier.TERRITE) throw new IllegalArgumentException("Territe bed is passive");
         this.tier = tier;
     }
     public FragmentTier tier() { return tier; }
@@ -83,10 +82,29 @@ public final class GrowBedBlock extends BaseEntityBlock {
             net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
             net.minecraft.world.phys.BlockHitResult hit) {
     *///?}
+        boolean speed = stack.is(za.co.neroland.neroagriculture.registry.ModItems.SPEED_FERTILISER.get());
+        boolean yield = stack.is(za.co.neroland.neroagriculture.registry.ModItems.YIELD_FERTILISER.get());
+        if (speed || yield) {
+            if (level.isClientSide()) return net.minecraft.world.InteractionResult.SUCCESS;
+            if (!(level.getBlockEntity(pos) instanceof GrowBedBlockEntity bed)) return net.minecraft.world.InteractionResult.FAIL;
+            var type = speed ? za.co.neroland.neroagriculture.fertiliser.FertiliserType.SPEED
+                    : za.co.neroland.neroagriculture.fertiliser.FertiliserType.YIELD;
+            if (!za.co.neroland.neroagriculture.fertiliser.Fertilisers.applyOne(bed, type, level.getGameTime(),
+                    za.co.neroland.neroagriculture.config.AgricultureConfig.FERTILISER_DURATION_TICKS.get(),
+                    za.co.neroland.neroagriculture.config.AgricultureConfig.FERTILISER_MAX_DOSE.get())) {
+                return net.minecraft.world.InteractionResult.FAIL;
+            }
+            if (!player.getAbilities().instabuild) stack.shrink(1);
+            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(speed
+                    ? "message.neroagriculture.fertiliser.speed_applied"
+                    : "message.neroagriculture.fertiliser.yield_applied"));
+            return net.minecraft.world.InteractionResult.SUCCESS;
+        }
         // Seeds keep their hand-planting behaviour (the seed item's useOn plants above the bed).
-        if (stack.is(za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get())
+        boolean seed = stack.is(za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get())
                 || stack.is(za.co.neroland.neroagriculture.registry.ModItems.FOOD_SEED.get())
-                || stack.is(za.co.neroland.neroagriculture.registry.ModItems.ALIEN_SEED.get())) {
+                || stack.is(za.co.neroland.neroagriculture.registry.ModItems.ALIEN_SEED.get());
+        if (GrowBedInteraction.plantsFromFace(seed, hit.getDirection())) {
             return net.minecraft.world.InteractionResult.PASS;
         }
         return useWithoutItem(state, level, pos, player, hit);

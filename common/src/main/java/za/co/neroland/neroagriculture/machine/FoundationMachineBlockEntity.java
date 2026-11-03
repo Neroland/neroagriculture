@@ -378,6 +378,9 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
                 candidate.material().isPresent() && candidate.material().get().equals(definition.id()));
         boolean specific = recipe != null;
         if (recipe == null) {
+            if (!CatalogFabrication.genericConversionAllowed(lookup.material().orElseThrow().source(), definition)) {
+                return fail(MachineBlockedReason.NO_RECIPE);
+            }
             recipe = findRecipe(level, ModRecipeSerializers.CONVERSION.get(), candidate -> candidate.material().isEmpty());
         }
         if (recipe == null) return fail(MachineBlockedReason.NO_RECIPE);
@@ -488,7 +491,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         boolean explicit = FabricationRecipeCache.recipes(level, type).stream()
                 .anyMatch(recipe -> recipe.material().filter(material.definition().id()::equals).isPresent()
                         || recipe.material().isEmpty() && recipe.ingredient().test(items.get(PRIMARY)));
-        return CatalogFabrication.eligible(material.source(), material.definition().id(), explicit)
+        return CatalogFabrication.eligible(material.source(), material.definition(), explicit)
                 && MaterialCatalog.forServer(level.getServer()).lookup(material.definition().id()).permitsGrowth();
     }
 

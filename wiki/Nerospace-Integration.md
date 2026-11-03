@@ -12,12 +12,17 @@ Both are optional, both are individually switchable, and the mod runs unchanged 
 ## Resource seeds
 
 When their source items are installed, native catalog definitions support raw Nerosium (Forgite), raw
-Nerosteel and Xertz Quartz (Orbite), and Cindrite and Glacite (Colonite). The raw metals still require
+Nerosteel, Mars Hematite and Xertz Quartz (Orbite), Cindrite and Glacite (Colonite), and Nyxara
+Voidglass (Voidite). The raw metals still require
 their normal smelting chain. Xertz Quartz grows on Greenxertz, Cindrite on Cindara and Glacite on
-Glacira; their research requires a recorded visit and a physical sample. The other two ores occur on
+Glacira; Hematite grows on Mars and Voidglass on Nyxara. Their research requires a recorded visit and a
+physical sample. Nerosium and Nerosteel occur on
 more than one world, so they have no single-planet growing restriction. Complex rocket components and
 finished equipment remain crafted through their original recipes. These optional definitions are skipped
 when their source items are absent.
+
+Hematite and Voidglass have distinct seed and fragment models. Their planted crops use the reusable
+metal and crystal visual families respectively.
 
 ---
 

@@ -32,8 +32,12 @@ so a datapack cannot use forged components or an unrelated result to bypass the 
 
 The shipped baseline covers the 15 built-in materials, all four fragment-condensation transitions, and
 charging for all five tiers. When no material-specific recipe exists, catalog definitions supplied by a
-datapack or config override, and the common tagged metals tin, lead, silver,
-nickel, zinc and aluminum/aluminium receive conservative fallback extraction, research and synthesis.
+datapack, and the common tagged metals tin, lead, silver, nickel, zinc and aluminum/aluminium receive
+conservative fallback extraction, research and synthesis. Automatically discovered metals need an ingot,
+raw-material or dust tag; an ore-only tag is not enough, including when its tier is changed by config.
+Pack authors can deliberately define a different output in a datapack.
+Generic conversion also refuses ore-only discovered materials; existing fragments are retained and can
+be used after a pack supplies a material definition or a specific conversion recipe.
 Unknown tagged entries outside that list require a datapack definition or recipes. Fallback processing
 still consumes a real matching sample, checks research and gates, and does not replace an explicit recipe
 whose input or other requirements are unmet. It uses the tier's normal extraction energy and time;

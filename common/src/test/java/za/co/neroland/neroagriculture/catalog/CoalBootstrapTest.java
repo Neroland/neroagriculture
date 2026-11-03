@@ -27,6 +27,19 @@ class CoalBootstrapTest {
                     .contains("neroagriculture:"));
         }
     }
+
+    @Test void starterPowerUnlocksInTheRecipeBookFromOrdinaryIngredients() {
+        JsonObject advancement = resource("advancement/recipes/misc/field_generator.json");
+        var criterion = advancement.getAsJsonObject("criteria").getAsJsonObject("has_ingredient");
+        assertEquals("minecraft:inventory_changed", criterion.get("trigger").getAsString());
+        var ingredients = criterion.getAsJsonObject("conditions").getAsJsonArray("items")
+                .get(0).getAsJsonObject().getAsJsonArray("items");
+        assertTrue(ingredients.toString().contains("minecraft:iron_ingot"));
+        assertTrue(ingredients.toString().contains("minecraft:redstone"));
+        assertFalse(ingredients.toString().contains("neroagriculture:"));
+        assertEquals("neroagriculture:field_generator", advancement.getAsJsonObject("rewards")
+                .getAsJsonArray("recipes").get(0).getAsString());
+    }
     @Test void organicResourcesRequireTheRealSampleAndHaveValidDefinitions() {
         for (String name : new String[] {"string", "leather", "slime_ball", "gunpowder", "blaze_rod", "ender_pearl"}) {
             var stream = getClass().getClassLoader().getResourceAsStream(
@@ -41,7 +54,7 @@ class CoalBootstrapTest {
             assertEquals(id, parsed.definition().input().id());
             assertEquals(id, parsed.definition().output());
             assertTrue(za.co.neroland.neroagriculture.machine.CatalogFabrication.eligible(
-                    CatalogSource.DATAPACK, id, false));
+                    CatalogSource.DATAPACK, parsed.definition(), false));
         }
     }
     @Test void coalSamplesAreConsistentAcrossTheFirstSeedChain() {
@@ -86,17 +99,22 @@ class CoalBootstrapTest {
 
     @Test void optionalPlanetMaterialsRequireTheItemAndTheCorrectWorld() {
         for (String[] entry : new String[][] {{"cindrite", "cindara"}, {"glacite", "glacira"},
-                {"xertz_quartz", "greenxertz"}}) {
+                {"xertz_quartz", "greenxertz"}, {"raw_hematite", "mars"}, {"voidglass", "nyxara"}}) {
             var stream = getClass().getClassLoader().getResourceAsStream(
                     "data/nerospace/neroagriculture/materials/" + entry[0] + ".json");
             if (stream == null) throw new AssertionError("Missing material: " + entry[0]);
             var json = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             assertFalse(MaterialCatalog.requirementMet(json, id -> false));
-            assertTrue(MaterialCatalog.requirementMet(json, id -> true));
-            var parsed = MaterialDefinitionParser.parse(Identifier.parse("nerospace:" + entry[0]), json);
+            Identifier material = Identifier.parse("nerospace:" + entry[0]);
+            assertFalse(MaterialCatalog.requirementMet(json, Identifier.parse("minecraft:coal")::equals));
+            assertTrue(MaterialCatalog.requirementMet(json, material::equals));
+            var parsed = MaterialDefinitionParser.parse(material, json);
             assertTrue(parsed.valid());
             assertEquals(Identifier.parse("nerospace:" + entry[1]), parsed.definition().worldRestriction().dimension());
             assertTrue(parsed.definition().conversion() >= 16);
+            assertEquals(material, parsed.definition().output());
+            assertTrue(za.co.neroland.neroagriculture.machine.CatalogFabrication.eligible(
+                    CatalogSource.DATAPACK, parsed.definition(), false));
         }
     }
 
@@ -111,6 +129,26 @@ class CoalBootstrapTest {
             var result = MaterialDefinitionParser.parse(Identifier.parse("nerocreatures:" + name), json);
             assertTrue(result.valid());
             assertEquals(20, result.definition().conversion());
+        }
+    }
+
+    @Test void newPlanetMaterialsKeepTheirTierAppearanceAndWorldRestriction() {
+        for (String[] entry : new String[][] {
+                {"raw_hematite", "mars", "ORBITE", "metal"},
+                {"voidglass", "nyxara", "VOIDITE", "crystal"}}) {
+            var stream = getClass().getClassLoader().getResourceAsStream(
+                    "data/nerospace/neroagriculture/materials/" + entry[0] + ".json");
+            if (stream == null) throw new AssertionError("Missing material: " + entry[0]);
+            var json = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
+            var material = Identifier.parse("nerospace:" + entry[0]);
+            var result = MaterialDefinitionParser.parse(material, json);
+            assertTrue(result.valid());
+            var definition = result.definition();
+            assertEquals(entry[2], definition.tier().name());
+            assertEquals(entry[3], za.co.neroland.neroagriculture.crop.CropVisuals.name(definition.visualFamily()));
+            var requiredWorld = definition.worldRestriction().dimension();
+            assertTrue(MaterialWorldRules.allows(requiredWorld, Identifier.parse("nerospace:" + entry[1])));
+            assertFalse(MaterialWorldRules.allows(requiredWorld, Identifier.parse("minecraft:overworld")));
         }
     }
 

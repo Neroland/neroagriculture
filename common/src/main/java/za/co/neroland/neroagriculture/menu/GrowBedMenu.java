@@ -65,7 +65,7 @@ public final class GrowBedMenu extends AbstractContainerMenu {
     public int nutrient() { return data.get(1); }
     public int tier() { return data.get(2); }
 
-    /** Live growth blocker for the crop above the bed; {@code null} when nothing is planted there. */
+    /** Live blocker for the crop or a waiting input seed; {@code null} when there is no blocker. */
     @org.jetbrains.annotations.Nullable
     public za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason blockedReason() {
         var reasons = za.co.neroland.neroagriculture.crop.GrowthRules.BlockedReason.values();

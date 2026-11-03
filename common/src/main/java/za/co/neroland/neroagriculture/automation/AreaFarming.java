@@ -125,6 +125,9 @@ public final class AreaFarming {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
         if (!lookup.permitsGrowth()) return false;
         var definition = lookup.material().orElseThrow().definition();
+        if (!za.co.neroland.neroagriculture.catalog.MaterialWorldRules.allows(
+                definition.worldRestriction() == null ? null : definition.worldRestriction().dimension(),
+                level.dimension().identifier())) return false;
         if ((definition.gate() != null && (gatePlayer == null || !ProgressionGates.isOpen(gatePlayer, definition.gate())))
                 || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(gatePlayer, definition.tier())) return false;
         int cap = TierBalance.yieldCap(definition.tier(), AgricultureConfig.YIELD_TIER_CAP_BASE.get(),

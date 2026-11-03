@@ -13,6 +13,18 @@ import za.co.neroland.neroagriculture.genetics.Genetics;
 
 class TowerSlotTest {
     @Test
+    void hostileGrowthCanUseStoredPowerAboveExternalTransferRate() {
+        var energy = new za.co.neroland.nerolandcore.energy.EnergyBuffer(1000, 80, 80, () -> { });
+        energy.generate(160);
+        assertEquals(80, energy.extract(160, true));
+        assertTrue(TowerEnergy.has(energy, 160));
+        TowerEnergy.consume(energy, 160);
+        assertEquals(0, energy.getAmount());
+        assertFalse(TowerEnergy.has(energy, 160));
+        assertTrue(TowerEnergy.has(energy, 0));
+    }
+
+    @Test
     void aFreshSlotIsEmpty() {
         assertTrue(new TowerSlot().isEmpty());
     }

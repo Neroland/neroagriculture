@@ -142,9 +142,9 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
         int nfCost = Math.max(0, baseNf - leftoverOxygen * AgricultureConfig.GREENHOUSE_OXYGEN_NF_FACTOR.get());
         boolean nutrientOk = nutrientCost == 0
                 || nutrient.getFluid() == ModFluids.NUTRIENT.get() && nutrient.drain(nutrientCost, true) >= nutrientCost;
-        boolean powerOk = nfCost == 0 || getEnergy().extract(nfCost, true) >= nfCost;
+        boolean powerOk = nfCost == 0 || energyBuffer().has(nfCost);
         if (powerOk && nutrientOk) {
-            if (nfCost > 0) getEnergy().extract(nfCost, false);
+            if (nfCost > 0) energyBuffer().consume(nfCost);
             if (nutrientCost > 0) nutrient.drain(nutrientCost, false);
             setStructuralState(GreenhouseState.FORMED);
             GreenhouseIndex.publish(level, worldPosition, interior);

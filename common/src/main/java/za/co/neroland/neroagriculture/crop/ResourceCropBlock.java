@@ -80,8 +80,10 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (state.getValue(AGE) >= MAX_AGE) return;
         double cycleGrowth = za.co.neroland.neroagriculture.cycle.Cycles.current(level.getServer(),
                 level.dimension().identifier(), level.getGameTime()).growth();
-        if (random.nextDouble() >= Math.min(1.0, 0.25 * AgricultureConfig.GROWTH_MULTIPLIER.get() * cycleGrowth)) return;
         if (!(level.getBlockEntity(pos) instanceof ResourceCropBlockEntity crop)) return;
+        FragmentTier resolvedTier = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
+                .material().map(material -> material.definition().tier()).orElse(crop.variant().family());
+        if (random.nextDouble() >= GrowthPacing.chance(AgricultureConfig.GROWTH_MULTIPLIER.get(), cycleGrowth)) return;
         int visual = CropVisuals.resolve(level, crop.variant().material());
         if (state.getValue(VISUAL) != visual) {
             state = state.setValue(VISUAL, visual);
@@ -89,13 +91,12 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         }
         GrowthRules.BlockedReason reason = growthReason(level, pos, crop, null);
         if (reason != GrowthRules.BlockedReason.NONE) return;
-        FragmentTier resolvedTier = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
-                .material().map(material -> material.definition().tier()).orElse(crop.variant().family());
         if (resolvedTier != FragmentTier.TERRITE
                 && (!(level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed)
                         || !bed.consumeGrowthResources())) return;
         int step = za.co.neroland.neroagriculture.genetics.GeneticEffects.growthStep(
                 za.co.neroland.neroagriculture.fertiliser.Fertilisers.speedStep(level, pos.below()), crop.genetics());
+        step = GrowthPacing.ageStep(step);
         level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
@@ -123,6 +124,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                     crop.variant().material(), definition == null ? null : definition.displayKey());
             Component status = state.getValue(AGE) == MAX_AGE && lookup.permitsGrowth()
                     && reason != GrowthRules.BlockedReason.GATE_CLOSED
+                    && (definition == null || za.co.neroland.neroagriculture.catalog.MaterialWorldRules.allows(
+                            definition.worldRestriction() == null ? null : definition.worldRestriction().dimension(),
+                            level.dimension().identifier()))
                     ? Component.translatable("message.neroagriculture.crop.mature")
                     : Component.translatable("machine.neroagriculture.status."
                             + reason.name().toLowerCase(java.util.Locale.ROOT));
@@ -135,6 +139,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (state.getValue(AGE) < MAX_AGE) return InteractionResult.PASS;
         if (!lookup.permitsGrowth()) return fail(serverPlayer, lookup.warningKey());
         var definition = lookup.material().orElseThrow().definition();
+        if (!za.co.neroland.neroagriculture.catalog.MaterialWorldRules.allows(
+                definition.worldRestriction() == null ? null : definition.worldRestriction().dimension(),
+                level.dimension().identifier())) return fail(serverPlayer, "warning.neroagriculture.harvest_wrong_dimension");
         if ((definition.gate() != null && !ProgressionGates.isOpen(serverPlayer, definition.gate()))
                 || !za.co.neroland.neroagriculture.progression.SiblingOverlays.tierSatisfied(serverPlayer, definition.tier())) {
             return fail(serverPlayer, "warning.neroagriculture.gate_closed");
@@ -175,6 +182,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material());
         if (!lookup.permitsGrowth()) return java.util.List.of();
         var definition = lookup.material().orElseThrow().definition();
+        if (!za.co.neroland.neroagriculture.catalog.MaterialWorldRules.allows(
+                definition.worldRestriction() == null ? null : definition.worldRestriction().dimension(),
+                level.dimension().identifier())) return java.util.List.of();
         java.util.UUID owner = level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed
                 ? bed.automationOwner() : null;
         ServerPlayer player = za.co.neroland.neroagriculture.automation.AutomationOwner.gatePlayer(level, owner);
@@ -257,7 +267,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (level.getBlockEntity(pos.below()) instanceof GrowBedBlockEntity bed) {
             int energyCost = AgricultureConfig.GROW_BED_ENERGY_COST.get();
             int nutrientCost = AgricultureConfig.GROW_BED_NUTRIENT_COST.get();
-            power = energyCost == 0 || bed.getEnergy().extract(energyCost, true) >= energyCost;
+            power = energyCost == 0 || bed.getEnergy().getAmount() >= energyCost;
             nutrient = nutrientCost == 0 || bed.getFluid().getFluid() == za.co.neroland.neroagriculture.fluid.ModFluids.NUTRIENT.get()
                     && bed.getFluid().drain(nutrientCost, true) >= nutrientCost;
         }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.mojang.serialization.JsonOps;
+import com.google.gson.JsonParser;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.RegistryAccess;
@@ -35,5 +36,18 @@ class MaterialVariantTest {
         String oversized = "test:" + "a".repeat(MaterialVariant.MAX_ID_LENGTH);
         assertThrows(IllegalStateException.class,
                 () -> MaterialVariant.of(Identifier.parse(oversized), FragmentTier.TERRITE));
+    }
+
+    @Test
+    void optionalAndUnknownMaterialsKeepTheirLiteralIdentityAcrossReloads() {
+        for (String id : new String[] {"nerospace:raw_hematite", "nerospace:voidglass", "missingmod:ancient_seed"}) {
+            for (FragmentTier tier : FragmentTier.values()) {
+                var original = MaterialVariant.of(Identifier.parse(id), tier);
+                var encoded = MaterialVariant.CODEC.encodeStart(JsonOps.INSTANCE, original).getOrThrow();
+                assertEquals(original, MaterialVariant.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow());
+            }
+        }
+        var future = JsonParser.parseString("{\"version\":2,\"material\":\"nerospace:voidglass\",\"family\":\"voidite\"}");
+        assertThrows(IllegalStateException.class, () -> MaterialVariant.CODEC.parse(JsonOps.INSTANCE, future).getOrThrow());
     }
 }

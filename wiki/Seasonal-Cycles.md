@@ -44,4 +44,8 @@ Space weather and events can layer on through the `CycleApi` provider seam — N
 register a provider whose modifier multiplies the profile's. When no provider is registered the external
 contribution is exactly 1.0, so cycles work fully standalone.
 
+A positive cycle yield multiplier cannot round an otherwise productive resource harvest below one
+fragment. A zero base yield, zero global yield setting, or zero yield multiplier can still produce no
+fragments, and the per-tier cap still applies.
+
 See also: [Growth Conditions](Growth-Conditions.md), [Resource Crops](Resource-Crops.md).

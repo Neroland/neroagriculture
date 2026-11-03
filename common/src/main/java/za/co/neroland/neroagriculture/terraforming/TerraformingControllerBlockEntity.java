@@ -117,9 +117,9 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
         }
         int energy = AgricultureConfig.TERRAFORM_ENERGY_PER_TICK.get();
         int nutrientCost = AgricultureConfig.TERRAFORM_NUTRIENT_PER_TICK.get();
-        if (energy > 0 && getEnergy().extract(energy, true) < energy) return;
+        if (energy > 0 && !energyBuffer().has(energy)) return;
         if (nutrientCost > 0 && (nutrient.getFluid() != ModFluids.NUTRIENT.get() || nutrient.drain(nutrientCost, true) < nutrientCost)) return;
-        if (energy > 0) getEnergy().extract(energy, false);
+        if (energy > 0) energyBuffer().consume(energy);
         if (nutrientCost > 0) nutrient.drain(nutrientCost, false);
         int perTick = AgricultureConfig.TERRAFORM_PROGRESS_PER_TICK.get();
         if (droneAssisted(level)) perTick *= 2; // bounded optional assistance

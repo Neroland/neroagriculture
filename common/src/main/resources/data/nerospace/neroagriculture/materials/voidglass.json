@@ -1,0 +1,13 @@
+{
+  "requires_item": "nerospace:voidglass",
+  "input": { "item": "nerospace:voidglass" },
+  "output": "nerospace:voidglass",
+  "tier": "voidite",
+  "yield": { "minimum": 1, "maximum": 4, "ramp_harvests": 160 },
+  "conversion": 24,
+  "display_key": "material.nerospace.voidglass",
+  "color": "#806AA4",
+  "visual_family": "crystal",
+  "enabled": true,
+  "dimension": "nerospace:nyxara"
+}

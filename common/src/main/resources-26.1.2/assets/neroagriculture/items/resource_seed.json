@@ -608,6 +608,116 @@
           "model": "neroagriculture:item/seed/glacite",
           "type": "minecraft:model"
         }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_hematite",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/raw_hematite"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_hematite",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/raw_hematite"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_hematite",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/raw_hematite"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_hematite",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/raw_hematite"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:raw_hematite",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/raw_hematite"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:voidglass",
+          "family": "territe"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/voidglass"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:voidglass",
+          "family": "forgite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/voidglass"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:voidglass",
+          "family": "orbite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/voidglass"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:voidglass",
+          "family": "colonite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/voidglass"
+        }
+      },
+      {
+        "when": {
+          "version": 1,
+          "material": "nerospace:voidglass",
+          "family": "voidite"
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "neroagriculture:item/seed/voidglass"
+        }
       }
     ],
     "fallback": {

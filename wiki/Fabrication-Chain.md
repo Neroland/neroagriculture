@@ -5,12 +5,13 @@ All three processing machines use Neroland Core energy storage, upgrades, and it
 Their five-slot inventory is exposed through the native automation capability on every loader.
 The starter generator, extractor, research bench, synthesizer and grow beds also show short instructions
 when hovered in an inventory or recipe viewer. NeroQuests adds an optional guided Field Ledger chapter.
-To plant by hand, aim at the visible top of a grow bed and use the resource seed. Powered beds also
+To plant by hand, aim at the visible top of a grow bed and use the resource seed. Grow beds also
 accept resource seeds in their seed slot and can plant and harvest them automatically.
 
 ## Field Generator
 
-Craft the Field Generator from iron, copper, a furnace and redstone. Place it next to a processing
+The Field Generator recipe unlocks in the vanilla recipe book when you acquire an ingredient such as
+iron or redstone. Craft it from iron, copper, a furnace and redstone. Place it next to a processing
 machine and insert coal or charcoal into its first slot. Each fuel produces 3,200 NF at 8 NF per tick;
 the generator pauses when its buffer is full and resumes without consuming another fuel. Energy output
 uses Core's side configuration, and its fuel and remaining burn time persist across reloads.

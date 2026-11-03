@@ -25,6 +25,8 @@ geometry and familiar material textures:
 | Xertz Quartz | Violet crystal with side spurs |
 | Cindrite | Warm fractured shell with a crest |
 | Glacite | Broad icy base and pointed tip |
+| Hematite | Rust-red layered casing with iron braces |
+| Voidglass | Dark core with an asymmetric violet crystal crown |
 
 The same materials have matching fragment models based on the seed's mineral shape. Other materials can
 use the tintable metal, crystal or carbon item families through their datapack `visual_family`; generic
@@ -36,6 +38,9 @@ plants keep their saved material and history and adopt their family's shape when
 harvested. Resource packs can extend the component selector in
 `assets/neroagriculture/items/resource_seed.json` and add models under `models/item/seed/`; include a case
 for each tier that should use the design, and retain the fallback for unrecognised materials.
+
+Mars Hematite and Nyxara Voidglass use the metal and crystal planted-crop families respectively.
+Resource crop sprites use neutral shading so their catalog colours remain visible when tinted.
 
 ## Texture pipeline
 
@@ -124,7 +129,7 @@ per loader.
 
 `/neroagriculture gallery` builds a working farm: a 3×2 grid of tier grow beds, each powered
 (Creative Battery) and nutrient-filled, with a fully grown ore crop on top (Coal — a Territe crop — on a
-Forgite bed, because the Territe bed is deliberately a passive plain block with no seed/output slots;
+Forgite bed;
 Iron, Copper, Gold on Forgite; Diamond, Emerald on Orbite), flanked by a Planter and Harvester. Every
 crop is at max age, so **right-clicking a grown crop harvests its fragment and leaves the crop planted**
 (age resets to 0). Higher-tier ores still need their Core progression gate open to harvest — intended

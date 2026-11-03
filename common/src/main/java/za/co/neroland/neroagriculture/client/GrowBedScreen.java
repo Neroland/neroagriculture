@@ -102,8 +102,13 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
             g.fill(sx, sy, sx + 16, sy + 16, WELL);
         }
 
-        // labelled energy gauge above the slot row (synced as a fraction of the live capacity)
-        Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
+        FragmentTier bedTier = bedTier();
+        boolean passive = bedTier == FragmentTier.TERRITE;
+        if (passive) {
+            g.text(font, Component.translatable("screen.neroagriculture.bed.passive"), x + 8, y + 19, MUTED, false);
+        } else {
+            Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
+        }
 
         // seed → harvest arrow
         g.fill(x + 48, y + 37, x + 74, y + 39, DIVIDER);
@@ -112,7 +117,9 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
         // labelled nutrient + growth gauges side by side below the slot row (the tower screen's
         // paired-bar idiom): nutrient is a capacity fraction, growth is the planted crop's age as a
         // permille of max age with the percentage in the label — an em-dash label on a bare bed.
-        Gauges.bar(g, font, x + 8, y + 50, x + 84, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        if (!passive) {
+            Gauges.bar(g, font, x + 8, y + 50, x + 84, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        }
         int growth = menu.growth();
         String growthLabel = (growth < 0
                 ? Component.translatable("screen.neroagriculture.growth.none")
@@ -120,7 +127,6 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
                 .getString();
         Gauges.bar(g, font, x + 88, y + 50, x + 168, growthLabel, Math.max(0, growth), GaugeData.SCALE, Gauges.PROGRESS);
 
-        FragmentTier bedTier = bedTier();
         String tier = bedTier == null ? "?" : bedTier.name();
         g.text(font, Component.literal("Tier: " + tier + " · auto-farms"), x + 8, y + 62, MUTED, false);
 

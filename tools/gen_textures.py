@@ -774,6 +774,13 @@ def gen_crop(name, family):
                             px[xx, yy] = flesh if d > r - 1.4 else glow
             if age >= 6:
                 px[main, top - 1] = glow
+        if family == "resource":
+            for y in range(S):
+                for x in range(S):
+                    r, g, b, a = px[x, y]
+                    if a:
+                        value = max(r, g, b)
+                        px[x, y] = (value, value, value, a)
         save_tex(img, "block", f"{name}_stage{age}")
         write_json("block_model", f"{name}_stage{age}", {
             "parent": "neroagriculture:block/tinted_crop" if family == "resource" else "neroagriculture:block/bed_crop",

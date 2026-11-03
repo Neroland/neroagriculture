@@ -23,9 +23,8 @@ import za.co.neroland.nerolandcore.registry.RegistrationProvider.RegistryEntry;
 public final class ModBlocks {
     public static final RegistrationProvider<Block> BLOCKS = RegistrationProvider.get(Registries.BLOCK, NeroAgricultureCommon.MOD_ID);
 
-    public static final RegistryEntry<Block> TERRITE_GROW_BED = BLOCKS.register("territe_grow_bed",
-            key -> new Block(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.PLANT)
-                    .strength(2.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion()));
+    public static final RegistryEntry<GrowBedBlock> TERRITE_GROW_BED = bed("territe_grow_bed",
+            za.co.neroland.neroagriculture.content.FragmentTier.TERRITE, MapColor.PLANT);
     public static final RegistryEntry<GrowBedBlock> FORGITE_GROW_BED = bed("forgite_grow_bed", za.co.neroland.neroagriculture.content.FragmentTier.FORGITE, MapColor.METAL);
     public static final RegistryEntry<GrowBedBlock> ORBITE_GROW_BED = bed("orbite_grow_bed", za.co.neroland.neroagriculture.content.FragmentTier.ORBITE, MapColor.COLOR_LIGHT_BLUE);
     public static final RegistryEntry<GrowBedBlock> COLONITE_GROW_BED = bed("colonite_grow_bed", za.co.neroland.neroagriculture.content.FragmentTier.COLONITE, MapColor.COLOR_GREEN);

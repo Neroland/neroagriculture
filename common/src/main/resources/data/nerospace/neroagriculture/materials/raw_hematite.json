@@ -1,0 +1,13 @@
+{
+  "requires_item": "nerospace:raw_hematite",
+  "input": { "item": "nerospace:raw_hematite" },
+  "output": "nerospace:raw_hematite",
+  "tier": "orbite",
+  "yield": { "minimum": 1, "maximum": 4, "ramp_harvests": 96 },
+  "conversion": 16,
+  "display_key": "material.nerospace.hematite",
+  "color": "#A75848",
+  "visual_family": "metal",
+  "enabled": true,
+  "dimension": "nerospace:mars"
+}

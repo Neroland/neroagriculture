@@ -21,6 +21,8 @@ the game.
 Feed the controller through Core [side configuration](Side-Configuration.md):
 
 - **Resource seeds** into the seed slots — the tower plants empty slots from them.
+- A resource with a required world can only be planted, grown and harvested in that world. The tower
+  reports a wrong-dimension blocker and leaves an ineligible seed in its input slot.
 - **Nero Flux and Nutrient** — each growth step costs the same NF and nutrient as a powered grow bed.
 - An optional **Speed or Yield Fertiliser** in the fertiliser slot boosts growth or harvest within the same
   caps as field fertiliser. A Yield Fertiliser dose is only consumed when a harvest actually banks its

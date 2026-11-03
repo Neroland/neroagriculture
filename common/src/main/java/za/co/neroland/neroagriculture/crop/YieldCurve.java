@@ -24,8 +24,11 @@ public final class YieldCurve {
     public static int harvest(MaterialDefinition.Yield yield, int harvestCount, double multiplier,
             double cycleMultiplier, int bonus, int tierCap) {
         int cap = Math.max(0, tierCap);
-        double amount = Math.floor(scaled(yield, harvestCount, multiplier) * Math.max(0.0, cycleMultiplier))
-                + Math.max(0, bonus);
+        int scaled = scaled(yield, harvestCount, multiplier);
+        double cycle = Math.max(0.0, cycleMultiplier);
+        double seasonal = Math.floor(scaled * cycle);
+        if (scaled > 0 && cycle > 0.0) seasonal = Math.max(1.0, seasonal);
+        double amount = seasonal + Math.max(0, bonus);
         return (int) Math.max(0, Math.min(cap, amount));
     }
 

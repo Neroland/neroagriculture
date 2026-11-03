@@ -41,4 +41,25 @@ class FertiliserDoseTest {
         FertiliserDose renewed = FertiliserDose.applied(expired, FertiliserType.SPEED, 3, DURATION + 1, DURATION, MAX);
         assertEquals(3, renewed.amount(), "an expired dose does not stack onto the new one");
     }
+
+    @Test
+    void oneApplicationHonoursTheBedsAcceptance() {
+        class TestBed implements FertilisableBed {
+            boolean accepts = true;
+            FertiliserDose dose;
+            public boolean applyFertiliser(FertiliserType type, int amount, long now, int duration, int cap) {
+                if (!accepts) return false;
+                dose = FertiliserDose.applied(dose, type, amount, now, duration, cap);
+                return true;
+            }
+            public FertiliserDose activeDose(FertiliserType type, long now) { return dose; }
+        }
+        TestBed bed = new TestBed();
+        assertTrue(Fertilisers.applyOne(bed, FertiliserType.SPEED, 10, DURATION, MAX));
+        assertEquals(1, bed.dose.amount());
+        bed.accepts = false;
+        assertFalse(Fertilisers.applyOne(bed, FertiliserType.SPEED, 20, DURATION, MAX));
+        assertEquals(1, bed.dose.amount());
+        assertEquals(110, bed.dose.expiryTick());
+    }
 }

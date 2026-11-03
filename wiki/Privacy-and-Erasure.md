@@ -8,7 +8,7 @@ and everything it does keep can be erased through Neroland Core.
 Only two kinds, both keyed by **UUID only** (never a username or display name):
 
 - **Machine ownership** — the Planter, Harvester, Fertiliser Applicator, Terraforming Controller,
-  fabrication machines (Extractor/Infuser/Synthesizer/Research Bench), crop towers and powered grow beds may record
+  fabrication machines (Extractor/Infuser/Synthesizer/Research Bench), crop towers and grow beds may record
   the placing player's UUID so a claims/protection mod can authorise their edits and so progression
   (gate unlocks, research checks) is credited to the machine's owner rather than whoever stands nearby.
   This is opt-out via `automation.track_owner = false`, in which case no owner is stored and

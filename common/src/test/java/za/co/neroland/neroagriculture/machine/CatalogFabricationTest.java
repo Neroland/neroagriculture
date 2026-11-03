@@ -13,12 +13,17 @@ import za.co.neroland.neroagriculture.content.FragmentTier;
 
 class CatalogFabricationTest {
     @Test void fallbackRequiresAnEligibleSourceAndNeverOverridesAnExplicitRecipe() {
-        assertTrue(CatalogFabrication.eligible(CatalogSource.ORE_TAG, Identifier.parse("c:tin"), false));
-        assertTrue(CatalogFabrication.eligible(CatalogSource.DATAPACK, Identifier.parse("example:crystal"), false));
-        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, Identifier.parse("c:unknown_relic"), false));
-        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, Identifier.parse("c:tin"), true));
-        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, Identifier.parse("other:tin"), false));
-        assertFalse(CatalogFabrication.eligible(CatalogSource.METEOR, Identifier.parse("nerospace:alien_core"), false));
+        var tin = tagged("c:tin", "c:ingots/tin");
+        var oreOnly = tagged("c:tin", "c:ores/tin");
+        assertTrue(CatalogFabrication.eligible(CatalogSource.ORE_TAG, tin, false));
+        assertTrue(CatalogFabrication.eligible(CatalogSource.CONFIG, tin, false));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, oreOnly, false));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.CONFIG, oreOnly, false));
+        assertTrue(CatalogFabrication.eligible(CatalogSource.DATAPACK, oreOnly, false));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, tagged("c:unknown_relic", "c:ingots/unknown_relic"), false));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, tin, true));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, tagged("other:tin", "c:ingots/tin"), false));
+        assertFalse(CatalogFabrication.eligible(CatalogSource.METEOR, tin, false));
     }
 
     @Test void fallbackCostsRiseByTier() {
@@ -28,6 +33,25 @@ class CatalogFabricationTest {
             assertTrue(CatalogFabrication.extractionEnergy(FragmentTier.values()[i])
                     > CatalogFabrication.extractionEnergy(FragmentTier.values()[i - 1]));
         }
+    }
+
+    @Test void creatureMaterialTagsDoNotImplicitlyCreateFabricationRecipes() {
+        for (var material : java.util.List.of(
+                tagged("c:ore_slurry", "c:dusts/ore_slurry"),
+                tagged("c:refined_crystal", "c:gems/refined_crystal"))) {
+            assertFalse(CatalogFabrication.eligible(CatalogSource.ORE_TAG, material, false));
+            assertTrue(CatalogFabrication.eligible(CatalogSource.DATAPACK, material, false));
+            assertFalse(CatalogFabrication.eligible(CatalogSource.DATAPACK, material, true));
+        }
+    }
+
+    @Test void genericConversionRejectsAutomaticallyDiscoveredOreBlocks() {
+        var ore = tagged("c:tin", "c:ores/tin");
+        var ingot = tagged("c:tin", "c:ingots/tin");
+        assertFalse(CatalogFabrication.genericConversionAllowed(CatalogSource.ORE_TAG, ore));
+        assertFalse(CatalogFabrication.genericConversionAllowed(CatalogSource.CONFIG, ore));
+        assertTrue(CatalogFabrication.genericConversionAllowed(CatalogSource.ORE_TAG, ingot));
+        assertTrue(CatalogFabrication.genericConversionAllowed(CatalogSource.DATAPACK, ore));
     }
 
     @Test void explicitMaterialIsMatchedBeforeACompetingGenericTag() {
@@ -46,5 +70,10 @@ class CatalogFabricationTest {
         return new MaterialDefinition(Identifier.parse(id), input, Identifier.parse("example:sample"),
                 FragmentTier.ORBITE, null, new MaterialDefinition.Yield(1, 3, 32), 16,
                 "material.example.sample", 0x777777, true, null, 0);
+    }
+
+    private static MaterialDefinition tagged(String id, String tag) {
+        return definition(id, new MaterialDefinition.InputSelector(MaterialDefinition.InputSelector.Kind.TAG,
+                Identifier.parse(tag)));
     }
 }

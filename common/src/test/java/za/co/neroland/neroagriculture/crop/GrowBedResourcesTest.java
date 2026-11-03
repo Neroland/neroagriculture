@@ -8,13 +8,14 @@ import net.minecraft.world.level.material.Fluid;
 
 import org.junit.jupiter.api.Test;
 
-import za.co.neroland.nerolandcore.energy.NeroEnergyStorage;
+import za.co.neroland.nerolandcore.energy.EnergyBuffer;
 import za.co.neroland.nerolandcore.fluid.NeroFluidStorage;
 
 class GrowBedResourcesTest {
     @Test
     void transactionConsumesBothOrNeither() {
-        MutableEnergy energy = new MutableEnergy(100);
+        EnergyBuffer energy = new EnergyBuffer(1000, 80, 80, () -> { });
+        energy.generate(100);
         MutableFluid fluid = new MutableFluid(100);
         assertTrue(GrowBedResources.consume(energy, fluid, null, 40, 25));
         assertEquals(60, energy.getAmount());
@@ -28,17 +29,16 @@ class GrowBedResourcesTest {
         assertEquals(75, fluid.getAmount());
     }
 
-    private static final class MutableEnergy implements NeroEnergyStorage {
-        private long amount;
-        private MutableEnergy(long amount) { this.amount = amount; }
-        @Override public long getAmount() { return amount; }
-        @Override public long getCapacity() { return 1000; }
-        @Override public long insert(long requested, boolean simulate) { return 0; }
-        @Override public long extract(long requested, boolean simulate) {
-            long extracted = Math.min(requested, amount);
-            if (!simulate) amount -= extracted;
-            return extracted;
-        }
+    @Test
+    void growthCanUseStoredEnergyAboveTheExternalTransferRate() {
+        EnergyBuffer energy = new EnergyBuffer(1000, 80, 80, () -> { });
+        energy.generate(160);
+        MutableFluid fluid = new MutableFluid(100);
+        assertTrue(GrowBedResources.consume(energy, fluid, null, 160, 25));
+        assertEquals(0, energy.getAmount());
+        assertEquals(75, fluid.getAmount());
+        assertFalse(GrowBedResources.consume(energy, fluid, null, 160, 25));
+        assertEquals(75, fluid.getAmount());
     }
 
     private static final class MutableFluid implements NeroFluidStorage {

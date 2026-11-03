@@ -41,7 +41,7 @@ public final class ModBlockEntities {
 
     public static final RegistryEntry<BlockEntityType<GrowBedBlockEntity>> GROW_BED =
             BLOCK_ENTITIES.register("grow_bed", key -> type(GrowBedBlockEntity::new,
-                    java.util.Set.of(ModBlocks.FORGITE_GROW_BED.get(), ModBlocks.ORBITE_GROW_BED.get(),
+                    java.util.Set.of(ModBlocks.TERRITE_GROW_BED.get(), ModBlocks.FORGITE_GROW_BED.get(), ModBlocks.ORBITE_GROW_BED.get(),
                             ModBlocks.COLONITE_GROW_BED.get(), ModBlocks.VOIDITE_GROW_BED.get())));
 
     public static final RegistryEntry<BlockEntityType<za.co.neroland.neroagriculture.automation.AreaMachineBlockEntity>> AREA_MACHINE =

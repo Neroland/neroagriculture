@@ -3,9 +3,13 @@ package za.co.neroland.neroagriculture.fertiliser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-/** Reads a powered bed's active fertiliser doses to boost growth speed or harvest yield, bounded by caps. */
+/** Reads a bed's active fertiliser doses to boost growth speed or harvest yield, bounded by caps. */
 public final class Fertilisers {
     private Fertilisers() { }
+
+    public static boolean applyOne(FertilisableBed bed, FertiliserType type, long now, int duration, int cap) {
+        return bed.applyFertiliser(type, 1, now, duration, cap);
+    }
 
     /** Age steps per growth tick: 2 when a bed carries an active SPEED dose, otherwise 1. */
     public static int speedStep(Level level, BlockPos bedPos) {

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0-beta.1] - 2026-11-03
+
+Resource-farming overhaul beta.
+
 ### Added
 
 - Field Generator: an early coal- or charcoal-powered source for adjacent machines.
@@ -16,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   metals, with sample, discovery and research requirements and existing recipe precedence.
 - Optional catalog definitions for Nerosium, Nerosteel, Xertz Quartz, Cindrite and Glacite; the three
   planet-specific resources require a visit and their corresponding growing world.
+- Optional Mars Hematite and Nyxara Voidglass seeds require their actual items, planet visits and
+  matching growing worlds; each has distinct seed and fragment models.
 - Optional Stalker Hide and Stalker Sinew material definitions for NeroCreatures.
 - Sample-based definitions for string, leather, slime balls, gunpowder, blaze rods and ender pearls.
 - Owner-aware progression for crop towers, including Core data erasure and migration of ownerless towers.
@@ -27,7 +33,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Territe grow beds now open a passive farming screen with seed and output slots. Seed use on a bed's
+  side opens its screen; seed use on top still plants by hand.
+- Automatic common-metal recipes and generic conversion exclude ore-only discoveries, including config
+  overrides, to avoid farming ore blocks. Explicit datapack definitions and conversion recipes remain available.
+- The Field Generator recipe unlocks in the vanilla recipe book from its ordinary crafting ingredients.
+- Speed and yield fertiliser can be applied directly to grow beds by hand.
+- Positive seasonal yield modifiers no longer round a productive resource harvest down to zero.
+- Crop towers respect material world restrictions and report a wrong-world seed without consuming it;
+  manual and automated harvests also leave existing crops intact when their required world changes.
 - Fresh coal crops yield two fragments instead of one, reducing the wait for the first conversion.
+- Resource crops grow faster on random ticks, shortening the wait for starter and higher-tier harvests.
 - The research bench uses a crafting table instead of a lectern, reducing the early book and leather cost.
 - A crop can roll for a bonus seed on its first harvest only, preventing repeated copying of its genetics.
 - Player-bound automation uses its recorded owner; it pauses when that owner is unavailable, and older
@@ -35,6 +51,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Crop towers can use stored power for hostile-environment growth even when the cost exceeds their
+  external transfer rate; the low-power status accounts for the environment surcharge.
+- Grow beds, greenhouses, area machines and terraforming controllers use their stored energy for internal
+  work instead of limiting each operation to the machine's external transfer rate.
+- Resource crop textures now use neutral shading so material tints remain visible instead of darkening
+  red and purple crops against green pixels.
 - Coal dropped by ordinary mining is accepted for extraction, research and seed synthesis; coal ore
   blocks remain accepted where the common coal ore tag is available.
 - Alloy fusion now checks the target material's discovery and research when research is enabled.

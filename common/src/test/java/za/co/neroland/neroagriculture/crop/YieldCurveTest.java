@@ -62,6 +62,15 @@ class YieldCurveTest {
     }
 
     @Test
+    void positiveSeasonDoesNotEraseAProductiveFirstHarvest() {
+        MaterialDefinition.Yield yield = new MaterialDefinition.Yield(1, 4, 64);
+        assertEquals(1, YieldCurve.harvest(yield, 0, 1.0, 0.75, 0, 4));
+        assertEquals(0, YieldCurve.harvest(yield, 0, 1.0, 0.0, 0, 4));
+        assertEquals(0, YieldCurve.harvest(yield, 0, 0.0, 0.75, 0, 4));
+        assertEquals(0, YieldCurve.harvest(yield, 0, 1.0, 0.75, 0, 0));
+    }
+
+    @Test
     void nextAndMaxAreMonotonicAcrossTheRamp() {
         MaterialDefinition.Yield yield = new MaterialDefinition.Yield(1, 6, 10);
         int cap = 100;

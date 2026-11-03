@@ -75,11 +75,15 @@ Colonite and Voidite also need a sealed, powered greenhouse by default. Hostile 
 greenhouse at any tier, and a material may specify a particular dimension. Native hard gates and sibling
 overlays are optional rather than prerequisites in the default configuration.
 
-At the neutral cycle multiplier and default growth setting, each eligible random tick has a 25% chance
-of advancing one of seven growth stages: an average of 28 eligible random ticks from planting to mature.
+At the neutral cycle multiplier and default growth setting, a resource crop advances two of its seven
+growth stages per random tick, reaching maturity after four eligible ticks.
 Actual elapsed time depends on Minecraft's random-tick rules, chunk activity, cycles and growing
-conditions. At the default cost and without growth bonuses, a powered crop's seven advances consume
-280 NF and 175 mB of nutrient, in addition to any greenhouse upkeep. A fresh coal crop yields two fragments per harvest, so four harvests return one coal after
+conditions. As a mathematical estimate, with a continuously ticking chunk, 20 game ticks per second,
+`random_tick_speed` 3 and a neutral cycle, one crop is selected about once per 4,096/3 game ticks. That
+implies roughly 4.6 minutes to mature for each tier, on average. These
+are expectations, not guarantees or measured play times; fertiliser, genetics and cycles change them.
+At the default cost and without growth bonuses, a powered crop's four advances consume
+160 NF and 100 mB of nutrient, in addition to any greenhouse upkeep. A fresh coal crop yields two fragments per harvest, so four harvests return one coal after
 conversion; fragments left over from extraction can contribute as well. These are current code values
 and still need survival playtesting, not final
 balance targets. Datapack definitions, including planet-specific materials, may set different yields,
