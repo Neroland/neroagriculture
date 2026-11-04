@@ -95,9 +95,11 @@ public final class GrowBedBlock extends BaseEntityBlock {
                 return net.minecraft.world.InteractionResult.FAIL;
             }
             if (!player.getAbilities().instabuild) stack.shrink(1);
-            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(speed
-                    ? "message.neroagriculture.fertiliser.speed_applied"
-                    : "message.neroagriculture.fertiliser.yield_applied"));
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                serverPlayer.sendSystemMessage(net.minecraft.network.chat.Component.translatable(speed
+                        ? "message.neroagriculture.fertiliser.speed_applied"
+                        : "message.neroagriculture.fertiliser.yield_applied"));
+            }
             return net.minecraft.world.InteractionResult.SUCCESS;
         }
         // Seeds keep their hand-planting behaviour (the seed item's useOn plants above the bed).

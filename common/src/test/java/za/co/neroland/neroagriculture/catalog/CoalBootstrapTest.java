@@ -20,7 +20,7 @@ class CoalBootstrapTest {
             assertEquals("neroagriculture:" + name, recipe.getAsJsonObject("result").get("id").getAsString());
         }
         JsonObject bench = resource("recipe/seed_research_bench.json");
-        assertEquals("minecraft:crafting_table", bench.getAsJsonObject("key").get("C").getAsString());
+        assertEquals("minecraft:crafting_table", ingredient(bench.getAsJsonObject("key").get("C")));
         assertFalse(bench.toString().contains("minecraft:lectern"));
         for (String name : new String[] {"field_generator", "fragment_extractor"}) {
             assertFalse(resource("recipe/" + name + ".json").getAsJsonObject("key").toString()
@@ -71,9 +71,9 @@ class CoalBootstrapTest {
         assertTrue(tag.getAsJsonArray("values").toString().contains("#c:ores/coal"));
         for (String operation : new String[] {"extracting", "researching", "synthesizing"}) {
             JsonObject recipe = resource("recipe/" + operation + "/coal.json");
-            assertEquals("#neroagriculture:coal_samples", ingredient(recipe));
+            assertEquals("#neroagriculture:coal_samples", ingredient(recipe.get("ingredient")));
             assertEquals("c:coal", recipe.get("material").getAsString());
-            assertFalse(ingredient(recipe).contains("iron"));
+            assertFalse(ingredient(recipe.get("ingredient")).contains("iron"));
         }
     }
 
@@ -86,7 +86,7 @@ class CoalBootstrapTest {
             for (String operation : new String[] {"extracting", "researching", "synthesizing"}) {
                 JsonObject recipe = resource("recipe/" + operation + "/" + name + ".json");
                 assertEquals(definition.id().toString(), recipe.get("material").getAsString());
-                assertEquals(ingredient, ingredient(recipe));
+                assertEquals(ingredient, ingredient(recipe.get("ingredient")));
                 if (recipe.has("family")) {
                     assertEquals(definition.tier().name().toLowerCase(java.util.Locale.ROOT),
                             recipe.get("family").getAsString());
@@ -152,8 +152,7 @@ class CoalBootstrapTest {
         }
     }
 
-    private static String ingredient(JsonObject recipe) {
-        var value = recipe.get("ingredient");
+    private static String ingredient(com.google.gson.JsonElement value) {
         if (value.isJsonPrimitive()) return value.getAsString();
         var object = value.getAsJsonObject();
         return object.has("tag") ? "#" + object.get("tag").getAsString() : object.get("item").getAsString();
