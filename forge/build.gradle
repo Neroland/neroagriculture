@@ -121,7 +121,7 @@ dependencies {
     // behind a lazily loaded holder so the mod runs unchanged when Nerospace is absent.
     compileOnly "za.co.neroland.nerospace:nerospace-forge-${mc}:${nerospaceVersion}"
 
-    implementation 'io.sentry:sentry:8.60.0'
+    implementation 'io.sentry:sentry:8.64.0'
 
     jarJar(group: 'io.sentry', name: 'sentry', version: '8.45.0')
 
