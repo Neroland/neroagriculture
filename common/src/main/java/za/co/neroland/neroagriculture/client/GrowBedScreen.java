@@ -51,6 +51,13 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
     @Nullable private FragmentTier cachedBedTier;
     private boolean cachedAny;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow nutrientWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow growthWindow = new GaugeMath.RateWindow(300);
+
     public GrowBedScreen(GrowBedMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, WIDTH, HEIGHT);
@@ -72,6 +79,7 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -84,6 +92,11 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
+        nutrientWindow.sample(tick, menu.nutrientAmount());
+        if (menu.growth() >= 0) growthWindow.sample(tick, menu.growth()); else growthWindow.reset();
 
         g.fill(x - 1, y - 1, x + w + 1, y + h + 1, EDGE);
         g.fill(x, y, x + w, y + h, HULL);
@@ -108,6 +121,8 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
             g.text(font, Component.translatable("screen.neroagriculture.bed.passive"), x + 8, y + 19, MUTED, false);
         } else {
             Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
+            hover.add(x + 8, y + 18, x + 168, y + 28, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
         }
 
         // seed → harvest arrow
@@ -119,6 +134,8 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
         // permille of max age with the percentage in the label — an em-dash label on a bare bed.
         if (!passive) {
             Gauges.bar(g, font, x + 8, y + 50, x + 84, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+            hover.add(x + 8, y + 50, x + 84, y + 60, lines -> GaugeTooltips.tank(lines, GaugeTooltips.title("nutrient"), menu.nutrientAmount(),
+                menu.nutrientCapacity(), nutrientWindow.perTick()));
         }
         int growth = menu.growth();
         String growthLabel = (growth < 0
@@ -126,6 +143,12 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
                 : Component.translatable("screen.neroagriculture.growth", growth * 100 / GaugeData.SCALE))
                 .getString();
         Gauges.bar(g, font, x + 88, y + 50, x + 168, growthLabel, Math.max(0, growth), GaugeData.SCALE, Gauges.PROGRESS);
+        GrowthRules.BlockedReason growthBlock = menu.blockedReason();
+        Component growthCause = growth < 0 ? Component.translatable("screen.neroagriculture.bed.empty")
+                : growthBlock == null || growthBlock == GrowthRules.BlockedReason.NONE ? null
+                : Component.translatable("machine.neroagriculture.status." + growthBlock.name().toLowerCase(Locale.ROOT));
+        hover.add(x + 88, y + 50, x + 168, y + 60, lines -> GaugeTooltips.progress(lines, GaugeTooltips.title("growth"), growth >= 0,
+                Math.max(0, growth), growthWindow.perTick(), growthCause));
 
         String tier = bedTier == null ? "?" : bedTier.name();
         g.text(font, Component.literal("Tier: " + tier + " · auto-farms"), x + 8, y + 62, MUTED, false);
@@ -143,6 +166,7 @@ public final class GrowBedScreen extends AbstractContainerScreen<GrowBedMenu> {
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

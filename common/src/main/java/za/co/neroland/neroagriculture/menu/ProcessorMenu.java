@@ -20,6 +20,8 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
  */
 public final class ProcessorMenu extends AbstractContainerMenu {
     public static final int DATA_COUNT = 3;
+    /** The fraction slots plus exact energy stored / capacity as split pairs (gauge tooltips). */
+    public static final int SYNCED_COUNT = DATA_COUNT + GaugeData.splitSlots(2);
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
@@ -28,20 +30,20 @@ public final class ProcessorMenu extends AbstractContainerMenu {
     /** Client factory: Bioreactor / Biofuel Converter (input + output). */
     public static ProcessorMenu converter(int id, Inventory inventory) {
         return new ProcessorMenu(ModMenuTypes.CONVERTER.get(), id, inventory, new SimpleContainer(2),
-                new SimpleContainerData(DATA_COUNT), BlockPos.ZERO, 1);
+                new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO, 1);
     }
 
     /** Client factory: Fertiliser Processor (two inputs + output). */
     public static ProcessorMenu processor(int id, Inventory inventory) {
         return new ProcessorMenu(ModMenuTypes.PROCESSOR.get(), id, inventory, new SimpleContainer(3),
-                new SimpleContainerData(DATA_COUNT), BlockPos.ZERO, 2);
+                new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO, 2);
     }
 
     public ProcessorMenu(MenuType<?> type, int id, Inventory inventory, Container machine, ContainerData data,
             BlockPos blockPos, int inputCount) {
         super(type, id);
         checkContainerSize(machine, inputCount + 1);
-        checkContainerDataCount(data, DATA_COUNT);
+        checkContainerDataCount(data, SYNCED_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
@@ -69,6 +71,10 @@ public final class ProcessorMenu extends AbstractContainerMenu {
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }
+    /** Exact energy stored, from the split pair after the fraction slots (see GaugeData#withRaw). */
+    public long energyStored() { return GaugeData.join(data.get(DATA_COUNT), data.get(DATA_COUNT + 1)); }
+    /** Exact energy capacity. */
+    public long energyCapacity() { return GaugeData.join(data.get(DATA_COUNT + 2), data.get(DATA_COUNT + 3)); }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         int machineSlots = inputCount + 1;

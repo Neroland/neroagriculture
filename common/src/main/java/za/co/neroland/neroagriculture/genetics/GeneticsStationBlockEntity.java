@@ -139,7 +139,8 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
 
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new GeneticsStationMenu(id, inventory, this, menuData, worldPosition);
+        return new GeneticsStationMenu(id, inventory, this, za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition);
     }
 
     @Override public int getContainerSize() { return items.size(); }

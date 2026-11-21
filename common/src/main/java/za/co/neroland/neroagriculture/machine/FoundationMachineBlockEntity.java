@@ -679,7 +679,8 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         if (player instanceof ServerPlayer serverPlayer) {
             AgricultureNetwork.sendToPlayer(serverPlayer, new MachineMenuPositionPayload(id, worldPosition.asLong()));
         }
-        return new FoundationMachineMenu(id, inventory, this, menuData, worldPosition);
+        return new FoundationMachineMenu(id, inventory, this, za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition);
     }
     @Override public int[] getSlotsForFace(net.minecraft.core.Direction side) { return SLOTS.clone(); }
     @Override public boolean canPlaceItemThroughFace(int slot, ItemStack stack,

@@ -77,7 +77,8 @@ public final class BiofuelConverterBlockEntity extends AbstractMachineBlockEntit
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
         return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
                 za.co.neroland.neroagriculture.registry.ModMenuTypes.CONVERTER.get(), id, inventory, this,
-                menuData, worldPosition, 1);
+                za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition, 1);
     }
     private int cycles;
 

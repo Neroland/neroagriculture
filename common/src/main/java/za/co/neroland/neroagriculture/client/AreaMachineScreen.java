@@ -29,6 +29,11 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
 
     @org.jetbrains.annotations.Nullable private net.minecraft.core.BlockPos machinePos;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+
     public AreaMachineScreen(AreaMachineMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, 176, 166);
@@ -50,6 +55,7 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -62,6 +68,9 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
 
         g.fill(x - 1, y - 1, x + w + 1, y + h + 1, EDGE);
         g.fill(x, y, x + w, y + h, HULL);
@@ -96,9 +105,12 @@ public final class AreaMachineScreen extends AbstractContainerScreen<AreaMachine
         // Energy is synced as a fraction of the live capacity (see menu.GaugeData).
         Gauges.bar(g, font, x + 84, y + 58, x + 148, "Energy", menu.energy(),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
+        hover.add(x + 84, y + 58, x + 148, y + 68, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

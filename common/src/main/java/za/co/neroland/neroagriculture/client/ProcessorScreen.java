@@ -25,6 +25,12 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow progressWindow = new GaugeMath.RateWindow(300);
+
     public ProcessorScreen(ProcessorMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, 176, 166);
@@ -46,6 +52,7 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -58,6 +65,11 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
+        int permille = menu.maxProgress() <= 0 ? 0 : menu.progress() * 1000 / menu.maxProgress();
+        if (permille > 0) progressWindow.sample(tick, permille); else progressWindow.reset();
 
         g.fill(x - 1, y - 1, x + w + 1, y + h + 1, EDGE);
         g.fill(x, y, x + w, y + h, HULL);
@@ -77,18 +89,25 @@ public final class ProcessorScreen extends AbstractContainerScreen<ProcessorMenu
         // labelled energy gauge (synced as a fraction of the live capacity — see menu.GaugeData)
         Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
+        hover.add(x + 8, y + 18, x + 168, y + 28, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
 
         // progress arrow between inputs and output
         g.fill(x + 88, y + 37, x + 112, y + 39, TROUGH);
         int progressWidth = menu.maxProgress() <= 0 ? 0 : Math.min(24, menu.progress() * 24 / menu.maxProgress());
         if (progressWidth > 0) g.fill(x + 88, y + 37, x + 88 + progressWidth, y + 39, PROGRESS);
+        hover.add(x + 88, y + 34, x + 112, y + 42, lines -> GaugeTooltips.progress(lines, GaugeTooltips.progressTitle(), permille > 0, permille,
+                progressWindow.perTick(), null));
 
         // labelled work bar under the machine row
         Gauges.bar(g, font, x + 8, y + 56, x + 168, "Progress", menu.progress(),
                 Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
+        hover.add(x + 8, y + 56, x + 168, y + 66, lines -> GaugeTooltips.progress(lines, GaugeTooltips.progressTitle(), permille > 0, permille,
+                progressWindow.perTick(), null));
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

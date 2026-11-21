@@ -27,6 +27,8 @@ public final class CropTowerMenu extends AbstractContainerMenu {
     private static final int MACHINE_SLOTS = 10;
     private static final int OUTPUT_START = 4;
     public static final int DATA_COUNT = 8;
+    /** The base slots plus exact energy stored / capacity and nutrient amount / capacity as split pairs. */
+    public static final int SYNCED_COUNT = DATA_COUNT + GaugeData.splitSlots(4);
     /** Blocked-reason data value used when no tower slot is planted yet. */
     public static final int NO_CROP = -1;
     private final Container machine;
@@ -34,13 +36,13 @@ public final class CropTowerMenu extends AbstractContainerMenu {
     private final BlockPos blockPos;
 
     public CropTowerMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO);
     }
 
     public CropTowerMenu(int id, Inventory inventory, Container machine, ContainerData data, BlockPos blockPos) {
         super(ModMenuTypes.CROP_TOWER_CONTROLLER.get(), id);
         checkContainerSize(machine, MACHINE_SLOTS);
-        checkContainerDataCount(data, DATA_COUNT);
+        checkContainerDataCount(data, SYNCED_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
@@ -72,6 +74,14 @@ public final class CropTowerMenu extends AbstractContainerMenu {
     public int energy() { return data.get(2); }
     /** Permille fraction of the live nutrient capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
     public int nutrient() { return data.get(3); }
+    /** Exact energy stored, from the split pair after the fraction slots (see GaugeData#withRaw). */
+    public long energyStored() { return GaugeData.join(data.get(DATA_COUNT), data.get(DATA_COUNT + 1)); }
+    /** Exact energy capacity. */
+    public long energyCapacity() { return GaugeData.join(data.get(DATA_COUNT + 2), data.get(DATA_COUNT + 3)); }
+    /** Exact nutrient solution in mB. */
+    public long nutrientAmount() { return GaugeData.join(data.get(DATA_COUNT + 4), data.get(DATA_COUNT + 5)); }
+    /** Exact nutrient capacity in mB. */
+    public long nutrientCapacity() { return GaugeData.join(data.get(DATA_COUNT + 6), data.get(DATA_COUNT + 7)); }
 
     /** Aggregate growth blocker across the tower's planted slots; {@code null} when nothing is planted. */
     @org.jetbrains.annotations.Nullable

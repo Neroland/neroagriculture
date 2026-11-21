@@ -64,7 +64,8 @@ public final class FertiliserProcessorBlockEntity extends AbstractMachineBlockEn
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, net.minecraft.world.entity.player.Player player) {
         return new za.co.neroland.neroagriculture.menu.ProcessorMenu(
                 za.co.neroland.neroagriculture.registry.ModMenuTypes.PROCESSOR.get(), id, inventory, this,
-                menuData, worldPosition, 2);
+                za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition, 2);
     }
 
     public FertiliserProcessorBlockEntity(BlockPos pos, BlockState state) {

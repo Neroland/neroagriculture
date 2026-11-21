@@ -19,19 +19,23 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
 /** Five-slot fabrication menu with bounded progress, energy, status, and machine-kind sync. */
 public final class FoundationMachineMenu extends AbstractContainerMenu {
     private static final int MACHINE_SLOTS = FoundationMachineBlockEntity.TOTAL_MENU_SLOTS;
+    /** Server-side base slots: progress, max, energy, status, kind. */
+    public static final int BASE_COUNT = 5;
+    /** The base slots plus exact energy stored / capacity as split pairs (gauge tooltips). */
+    public static final int SYNCED_COUNT = BASE_COUNT + GaugeData.splitSlots(2);
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
 
     public FoundationMachineMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(5), BlockPos.ZERO);
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO);
     }
 
     public FoundationMachineMenu(int id, Inventory inventory, Container machine, ContainerData data,
             BlockPos blockPos) {
         super(ModMenuTypes.FOUNDATION_MACHINE.get(), id);
         checkContainerSize(machine, MACHINE_SLOTS);
-        checkContainerDataCount(data, 5);
+        checkContainerDataCount(data, SYNCED_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
@@ -74,6 +78,10 @@ public final class FoundationMachineMenu extends AbstractContainerMenu {
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }
+    /** Exact energy stored, from the split pair after the fraction slots (see GaugeData#withRaw). */
+    public long energyStored() { return GaugeData.join(data.get(BASE_COUNT), data.get(BASE_COUNT + 1)); }
+    /** Exact energy capacity. */
+    public long energyCapacity() { return GaugeData.join(data.get(BASE_COUNT + 2), data.get(BASE_COUNT + 3)); }
     public MachineBlockedReason blockedReason() { return MachineBlockedReason.byOrdinal(data.get(3)); }
     public MachineKind machineKind() {
         int value = data.get(4);

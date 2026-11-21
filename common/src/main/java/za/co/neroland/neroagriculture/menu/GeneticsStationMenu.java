@@ -18,18 +18,20 @@ import za.co.neroland.neroagriculture.registry.ModMenuTypes;
 public final class GeneticsStationMenu extends AbstractContainerMenu {
     private static final int MACHINE_SLOTS = 3;
     private static final int DATA_COUNT = 3;
+    /** The base slots plus exact energy stored / capacity as split pairs (gauge tooltips). */
+    public static final int SYNCED_COUNT = DATA_COUNT + GaugeData.splitSlots(2);
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
 
     public GeneticsStationMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO);
     }
 
     public GeneticsStationMenu(int id, Inventory inventory, Container machine, ContainerData data, BlockPos blockPos) {
         super(ModMenuTypes.GENETICS_STATION.get(), id);
         checkContainerSize(machine, MACHINE_SLOTS);
-        checkContainerDataCount(data, DATA_COUNT);
+        checkContainerDataCount(data, SYNCED_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
@@ -56,6 +58,10 @@ public final class GeneticsStationMenu extends AbstractContainerMenu {
     public int progress() { return data.get(0); }
     public int maxProgress() { return data.get(1); }
     public int energy() { return data.get(2); }
+    /** Exact energy stored, from the split pair after the fraction slots (see GaugeData#withRaw). */
+    public long energyStored() { return GaugeData.join(data.get(DATA_COUNT), data.get(DATA_COUNT + 1)); }
+    /** Exact energy capacity. */
+    public long energyCapacity() { return GaugeData.join(data.get(DATA_COUNT + 2), data.get(DATA_COUNT + 3)); }
 
     @Override public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);

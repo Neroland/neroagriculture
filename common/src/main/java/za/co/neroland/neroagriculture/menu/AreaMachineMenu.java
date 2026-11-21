@@ -19,18 +19,20 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
     private static final int UPGRADE_START = 9;
     private static final int MACHINE_SLOTS = 12;
     private static final int DATA_COUNT = 4;
+    /** The base slots plus exact energy stored / capacity as split pairs (gauge tooltips). */
+    public static final int SYNCED_COUNT = DATA_COUNT + GaugeData.splitSlots(2);
     private final Container machine;
     private final ContainerData data;
     private final BlockPos blockPos;
 
     public AreaMachineMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(DATA_COUNT), BlockPos.ZERO);
+        this(id, inventory, new SimpleContainer(MACHINE_SLOTS), new SimpleContainerData(SYNCED_COUNT), BlockPos.ZERO);
     }
 
     public AreaMachineMenu(int id, Inventory inventory, Container machine, ContainerData data, BlockPos blockPos) {
         super(ModMenuTypes.AREA_MACHINE.get(), id);
         checkContainerSize(machine, MACHINE_SLOTS);
-        checkContainerDataCount(data, DATA_COUNT);
+        checkContainerDataCount(data, SYNCED_COUNT);
         this.machine = machine;
         this.data = data;
         this.blockPos = blockPos;
@@ -58,6 +60,10 @@ public final class AreaMachineMenu extends AbstractContainerMenu {
     public int mode() { return data.get(0); }
     /** Permille fraction of the live energy capacity, 0..{@link GaugeData#SCALE} (see GaugeData). */
     public int energy() { return data.get(1); }
+    /** Exact energy stored, from the split pair after the fraction slots (see GaugeData#withRaw). */
+    public long energyStored() { return GaugeData.join(data.get(DATA_COUNT), data.get(DATA_COUNT + 1)); }
+    /** Exact energy capacity. */
+    public long energyCapacity() { return GaugeData.join(data.get(DATA_COUNT + 2), data.get(DATA_COUNT + 3)); }
     public int range() { return data.get(2); }
     public boolean showArea() { return data.get(3) != 0; }
 

@@ -103,7 +103,8 @@ public final class AreaMachineBlockEntity extends AbstractMachineBlockEntity
             za.co.neroland.neroagriculture.network.AgricultureNetwork.sendToPlayer(serverPlayer,
                     new za.co.neroland.neroagriculture.network.MachineMenuPositionPayload(id, worldPosition.asLong()));
         }
-        return new AreaMachineMenu(id, inventory, this, menuData, worldPosition);
+        return new AreaMachineMenu(id, inventory, this, za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition);
     }
 
     @Override public @Nullable UUID automationOwner() { return owner; }

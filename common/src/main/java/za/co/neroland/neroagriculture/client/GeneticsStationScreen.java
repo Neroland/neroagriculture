@@ -28,6 +28,12 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
     private static final int TEXT = 0xFF1E2C34;
     private static final int MUTED = 0xFF5E707C;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow progressWindow = new GaugeMath.RateWindow(300);
+
     public GeneticsStationScreen(GeneticsStationMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, 176, 166);
@@ -49,6 +55,7 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -61,6 +68,11 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
+        int permille = menu.maxProgress() <= 0 ? 0 : menu.progress() * 1000 / menu.maxProgress();
+        if (permille > 0) progressWindow.sample(tick, permille); else progressWindow.reset();
 
         g.fill(x - 1, y - 1, x + w + 1, y + h + 1, EDGE);
         g.fill(x, y, x + w, y + h, HULL);
@@ -85,10 +97,14 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
         // labelled energy gauge above the slot row (synced as a fraction of the live capacity)
         Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
+        hover.add(x + 8, y + 18, x + 168, y + 28, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
 
         // labelled splice-progress bar under the trait readout
         Gauges.bar(g, font, x + 8, y + 60, x + 168, "Splicing", menu.progress(),
                 Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
+        hover.add(x + 8, y + 60, x + 168, y + 70, lines -> GaugeTooltips.progress(lines, GaugeTooltips.title("splicing"), permille > 0, permille,
+                progressWindow.perTick(), null));
 
         // live trait readout for the input seed (slot 0), between the slots and the progress bar
         ItemStack input = menu.slots.get(0).getItem();
@@ -102,6 +118,7 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

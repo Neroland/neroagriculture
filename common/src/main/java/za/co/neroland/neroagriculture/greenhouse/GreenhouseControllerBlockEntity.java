@@ -85,7 +85,8 @@ public final class GreenhouseControllerBlockEntity extends AbstractMachineBlockE
 
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new StatusMenu(id, inventory, menuData, worldPosition, this);
+        return new StatusMenu(id, inventory, za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity()), worldPosition, this);
     }
     public int oxygen() { return oxygenOffset; }
     @Nullable public BlockPos leak() { return leak; }

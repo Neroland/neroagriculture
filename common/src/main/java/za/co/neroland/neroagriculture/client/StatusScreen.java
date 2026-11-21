@@ -49,6 +49,11 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
     /** Whether the last frame drew the guide — gates the wheel so a stale panel never eats scrolls. */
     private boolean guideDrawn;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+
     public StatusScreen(StatusMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, 176, 108);
@@ -69,6 +74,7 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -81,6 +87,9 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
 
         // Greenhouse build guide as a joined hull to the left; the main hull's 1px edge at x-1 doubles
         // as the divider between the two.
@@ -105,6 +114,8 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
         // labelled energy gauge (synced as a fraction of the live capacity — see menu.GaugeData)
         Gauges.bar(g, font, x + 8, y + 20, x + 168, "Energy", menu.value(StatusMenu.ENERGY),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
+        hover.add(x + 8, y + 20, x + 168, y + 30, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
 
         // per-machine labelled readouts
         String[] labels = labels(menu.value(StatusMenu.MACHINE_ID));
@@ -119,6 +130,7 @@ public final class StatusScreen extends AbstractContainerScreen<StatusMenu> {
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

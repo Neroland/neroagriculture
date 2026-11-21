@@ -64,6 +64,13 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
     private int cachedGeneration = -1;
     private boolean cachedAny;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow nutrientWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow growthWindow = new GaugeMath.RateWindow(300);
+
     public CropTowerScreen(CropTowerMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, WIDTH, HEIGHT);
@@ -85,6 +92,7 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -97,6 +105,11 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
+        nutrientWindow.sample(tick, menu.nutrientAmount());
+        if (menu.growthAvg() >= 0) growthWindow.sample(tick, menu.growthAvg()); else growthWindow.reset();
 
         g.fill(x - 1, y - 1, x + w + 1, y + h + 1, EDGE);
         g.fill(x, y, x + w, y + h, HULL);
@@ -124,6 +137,10 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
         // labelled energy + nutrient gauges, side by side under the slots (synced as capacity fractions)
         Gauges.bar(g, font, x + MACHINE_X + 8, y + 59, x + MACHINE_X + 84, "Energy", menu.energy(), GaugeData.SCALE, Gauges.ENERGY);
         Gauges.bar(g, font, x + MACHINE_X + 88, y + 59, x + MACHINE_X + 168, "Nutrient", menu.nutrient(), GaugeData.SCALE, Gauges.NUTRIENT);
+        hover.add(x + MACHINE_X + 8, y + 59, x + MACHINE_X + 84, y + 69, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
+        hover.add(x + MACHINE_X + 88, y + 59, x + MACHINE_X + 168, y + 69, lines -> GaugeTooltips.tank(lines, GaugeTooltips.title("nutrient"), menu.nutrientAmount(),
+                menu.nutrientCapacity(), nutrientWindow.perTick()));
 
         // Average growth across the planted slots as a mini labelled bar (fill = average age, label =
         // ripe count), always drawn on its own row: an empty tower shows the bare bar with the em-dash
@@ -135,6 +152,18 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
                 .getString();
         Gauges.bar(g, font, x + MACHINE_X + 8, y + 71, x + MACHINE_X + 84, growthLabel,
                 Math.max(0, growthAvg), GaugeData.SCALE, Gauges.PROGRESS);
+        GrowthRules.BlockedReason towerBlock = menu.blockedReason();
+        Component towerCause = growthAvg < 0 ? Component.translatable("screen.neroagriculture.tower.idle")
+                : towerBlock == null || towerBlock == GrowthRules.BlockedReason.NONE ? null
+                : Component.translatable("machine.neroagriculture.status." + towerBlock.name().toLowerCase(Locale.ROOT));
+        hover.add(x + MACHINE_X + 8, y + 71, x + MACHINE_X + 84, y + 81, lines -> {
+            GaugeTooltips.progress(lines, GaugeTooltips.title("growth.average"), growthAvg >= 0,
+                    Math.max(0, growthAvg), growthWindow.perTick(), towerCause);
+            if (growthAvg >= 0) {
+                lines.add(Component.translatable("screen.neroagriculture.tower.ripe", menu.matureSlots(),
+                        menu.plantedSlots()));
+            }
+        });
 
         // Tower readout beside the growth bar, aligned with its label text.
         Component tower = menu.height() <= 0
@@ -158,6 +187,7 @@ public final class CropTowerScreen extends AbstractContainerScreen<CropTowerMenu
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 

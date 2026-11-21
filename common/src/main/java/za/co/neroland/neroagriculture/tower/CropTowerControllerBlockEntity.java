@@ -493,7 +493,9 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
     // --- container ---------------------------------------------------------
     @Override public Component getDisplayName() { return getBlockState().getBlock().getName(); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new CropTowerMenu(id, inventory, this, menuData, worldPosition);
+        return new CropTowerMenu(id, inventory, this, za.co.neroland.neroagriculture.menu.GaugeData.withRaw(menuData,
+                () -> getEnergy().getAmount(), () -> getEnergy().getCapacity(),
+                nutrient::getAmount, nutrient::getCapacity), worldPosition);
     }
 
     @Override public int getContainerSize() { return SLOT_COUNT; }

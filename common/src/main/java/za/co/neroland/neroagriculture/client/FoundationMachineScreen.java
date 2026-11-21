@@ -44,6 +44,12 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
 
     @Nullable private BlockPos machinePos;
 
+    // Gauge hover tooltips: areas registered as the bars draw, rates measured from the synced values
+    // over the last ~20 client ticks (no packet needed).
+    private final GaugeTooltips.Hover hover = new GaugeTooltips.Hover();
+    private final GaugeMath.RateWindow energyWindow = new GaugeMath.RateWindow();
+    private final GaugeMath.RateWindow progressWindow = new GaugeMath.RateWindow(300);
+
     public FoundationMachineScreen(FoundationMachineMenu menu, Inventory inventory, Component title) {
         //? if >=26.1 {
         super(menu, inventory, title, 176, 172);
@@ -70,6 +76,7 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
 
     @Override public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         this.renderTooltip(g, mouseX, mouseY);
     }
 
@@ -82,6 +89,19 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         int y = topPos;
         int w = imageWidth;
         int h = imageHeight;
+        long tick = GaugeTooltips.gameTick();
+        hover.clear();
+        energyWindow.sample(tick, menu.energyStored());
+        int permille = menu.maxProgress() <= 0 ? 0 : menu.progress() * 1000 / menu.maxProgress();
+        if (permille > 0) progressWindow.sample(tick, permille); else progressWindow.reset();
+        za.co.neroland.neroagriculture.machine.MachineBlockedReason blocked = menu.blockedReason();
+        boolean working = permille > 0
+                || blocked == za.co.neroland.neroagriculture.machine.MachineBlockedReason.RUNNING;
+        Component stall = switch (blocked) {
+            case RUNNING, IDLE, COMPLETE -> null;
+            default -> Component.translatable("machine.neroagriculture.status."
+                    + blocked.name().toLowerCase(java.util.Locale.ROOT));
+        };
         int accent = accent();
 
         // Hull panel: light composite with a soft top sheen and a 1px border.
@@ -106,6 +126,8 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         // Values are synced as fractions of the live capacity (see menu.GaugeData).
         Gauges.bar(g, font, x + 8, y + 18, x + 168, "Energy", menu.energy(),
                 za.co.neroland.neroagriculture.menu.GaugeData.SCALE, Gauges.ENERGY);
+        hover.add(x + 8, y + 18, x + 168, y + 28, lines -> GaugeTooltips.energy(lines, menu.energyStored(), menu.energyCapacity(),
+                energyWindow.perTick()));
 
         // Blocked/idle status, left-aligned in its own band under the slots.
         Component status = Component.translatable("machine.neroagriculture.status."
@@ -115,6 +137,10 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
         // Labelled work-progress bar (left half; the pill owns the right).
         Gauges.bar(g, font, x + 8, y + 58, x + 112, "Progress", menu.progress(),
                 Math.max(1, menu.maxProgress()), Gauges.PROGRESS);
+        hover.add(x + 8, y + 58, x + 112, y + 68, lines -> GaugeTooltips.progress(lines, GaugeTooltips.progressTitle(), working, permille,
+                progressWindow.perTick(), stall != null ? stall : working ? null
+                        : Component.translatable("machine.neroagriculture.status."
+                                + blocked.name().toLowerCase(java.util.Locale.ROOT))));
 
         // Research bench: a clickable "discover" pill on the right of the status/progress bands.
         if (menu.machineKind() == MachineKind.RESEARCH_BENCH) {
@@ -126,6 +152,7 @@ public final class FoundationMachineScreen extends AbstractContainerScreen<Found
 
         //? if >=26.1 {
         super.extractContents(g, mouseX, mouseY, partialTick);
+        hover.emit(g, font, mouseX, mouseY, hoveredSlot, width);
         //?}
     }
 
