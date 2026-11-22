@@ -30,6 +30,9 @@ When an error **caused by NeroAgriculture code** occurs, a report is sent to
 Reports are de-duplicated per session and hard-capped at **10 events per game session**. Nothing is
 stored on disk locally.
 
+NeroAgriculture sends reports through its own Sentry client, never the shared global one, so other
+mods' errors cannot reach its project and its errors cannot reach theirs.
+
 ## What is NOT collected
 
 - **No IP address** is stored (`sendDefaultPii` is disabled; Sentry discards the sender IP).
@@ -98,6 +101,13 @@ holds the same UUIDs, so it is kept in step deliberately — a new tombstone rea
 request that creates it, and an expired one leaves it in the same pass that prunes it, under the same
 retention window. See [`wiki/Privacy-and-Erasure.md`](wiki/Privacy-and-Erasure.md) for the
 operational detail.
+
+**Access and portability.** NeroAgriculture also registers with Neroland Core's player data export
+(`/neroland data exportme`; operators: `/neroland data export <uuid>`). Its section lists the
+requesting player's own automation machines that are loaded at that moment (block, dimension and
+position), the same set the eraser and the companion link can reach; machines in unloaded areas are
+not listed. The export holds no UUID, is built on request and handed over in chat, and is never
+logged or written to disk.
 
 ## Companion clients (the NeroLink module)
 

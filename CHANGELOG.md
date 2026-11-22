@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-22
+
+### Added
+
+- NeroAgriculture's data now appears in Neroland Core's player data export (`/neroland data exportme`): the
+  player's own loaded automation machines (block, dimension, position). Needs Neroland Core 1.20.1.
+
+### Fixed
+
+- Error reports now go through NeroAgriculture's own Sentry client instead of the shared global one, so another
+  mod starting Sentry can no longer silence NeroAgriculture's reports or have its own dropped. Handled-error
+  reports now carry their `handled` and `source` tags.
+
 ## [0.7.1] - 2026-11-26
 
 ### Added

@@ -35,6 +35,7 @@ public final class NeroAgricultureCommon {
         AgricultureNetwork.init();
         za.co.neroland.neroagriculture.food.FoodProviders.register();
         za.co.neroland.neroagriculture.automation.AutomationOwner.register();
+        za.co.neroland.neroagriculture.automation.AgricultureDataExport.register();
         za.co.neroland.neroagriculture.compat.nerospace.NerospaceVisitBridge.register();
         za.co.neroland.neroagriculture.terraforming.TerraformingRegions.register();
         // Registered AFTER TerraformingRegions on purpose: EnvironmentApi returns the first provider that

@@ -10,9 +10,14 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 
 import io.sentry.Breadcrumb;
-import io.sentry.Sentry;
+import io.sentry.IScopes;
+import io.sentry.Scope;
+import io.sentry.Scopes;
+import io.sentry.SentryClient;
 import io.sentry.SentryEvent;
 import io.sentry.SentryLevel;
+import io.sentry.SentryOptions;
+import io.sentry.UncaughtExceptionHandlerIntegration;
 import io.sentry.protocol.Message;
 import io.sentry.protocol.SentryException;
 import io.sentry.protocol.SentryStackFrame;
@@ -40,6 +45,10 @@ import za.co.neroland.neroagriculture.platform.Services;
  *
  * <p>{@link #init()} is called once per loader at bootstrap and reads loader facts through
  * {@link Services#PLATFORM}.
+ *
+ * <p>Reports go through NeroAgriculture's own isolated client and scopes, never the static {@code Sentry}
+ * API: every Nero mod embeds the same un-relocated Sentry jar, so a global {@code Sentry.init} would
+ * replace the previous mod's hub and its package filter would drop everyone else's events.
  */
 public final class NeroAgricultureTelemetry {
 
@@ -61,6 +70,10 @@ public final class NeroAgricultureTelemetry {
     private static final AtomicInteger eventsSent = new AtomicInteger();
     private static final Set<String> seenFingerprints = ConcurrentHashMap.newKeySet();
     private static SentryLogAppender appender;
+    /** NeroAgriculture's own scopes; null until {@link #start()} succeeds. */
+    private static volatile IScopes scopes;
+    /** Process lifetime, never closed (a field so ecj does not flag a resource leak). */
+    private static UncaughtExceptionHandlerIntegration uncaughtHandler;
 
     private NeroAgricultureTelemetry() {
     }
@@ -85,17 +98,11 @@ public final class NeroAgricultureTelemetry {
         }
         String modVersion = Services.PLATFORM.getModVersion();
         boolean dev = Services.PLATFORM.isDevelopmentEnvironment();
-        Sentry.init(options -> {
-            options.setDsn(DSN);
-            options.setRelease("neroagriculture@" + modVersion);
-            options.setEnvironment(dev ? "development" : environmentOf(modVersion));
-            options.setSendDefaultPii(false);          // POPIA/GDPR: never the sender's IP/identity
-            options.setAttachServerName(false);        // hostname is identifying
-            options.setEnableUncaughtExceptionHandler(true);
-            options.setEnableAutoSessionTracking(false);
-            options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
-        });
-        Sentry.configureScope(scope -> {
+        SentryOptions options = baseOptions(modVersion, dev ? "development" : environmentOf(modVersion));
+        options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
+        IScopes own = isolatedScopes(options, "neroagriculture");
+        scopes = own;
+        own.configureScope(scope -> {
             scope.setTag("loader", Services.PLATFORM.getPlatformName().toLowerCase(Locale.ROOT));
             scope.setTag("dist", Services.PLATFORM.isClient() ? "client" : "dedicated_server");
             scope.setTag("runtime", dev ? "development" : "production");
@@ -117,11 +124,11 @@ public final class NeroAgricultureTelemetry {
                 // mod list not available this early — skip it
             }
         });
-        Sentry.startSession();
+        own.startSession();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                Sentry.endSession();
-                Sentry.flush(2000L);
+                own.endSession();
+                own.flush(2000L);
             } catch (RuntimeException ignored) {
                 // best-effort flush on shutdown
             }
@@ -136,9 +143,40 @@ public final class NeroAgricultureTelemetry {
                 + "servers; opt out via telemetryEnabled=false in config/neroagriculture.properties).");
     }
 
+    /** The options every NeroAgriculture client starts from; package-private for the isolation test. */
+    static SentryOptions baseOptions(String modVersion, String environment) {
+        SentryOptions options = new SentryOptions();
+        options.setDsn(DSN);
+        options.setRelease("neroagriculture@" + modVersion);
+        options.setEnvironment(environment);
+        options.setSendDefaultPii(false);          // POPIA/GDPR: never the sender's IP/identity
+        options.setAttachServerName(false);        // hostname is identifying
+        options.setEnableUncaughtExceptionHandler(true);
+        options.setEnableShutdownHook(false);      // flushed by our own hook in start()
+        options.setEnableAutoSessionTracking(false);
+        return options;
+    }
+
+    /**
+     * Activates {@code options} (what {@code Sentry.init} would otherwise do), binds a client to a fresh
+     * set of scopes and chains the uncaught-exception handler to the previous one. Never touches the
+     * global hub.
+     */
+    static IScopes isolatedScopes(SentryOptions options, String creator) {
+        options.activate();
+        Scopes own = new Scopes(new Scope(options), new Scope(options), new Scope(options), creator);
+        own.bindClient(new SentryClient(options));
+        if (options.isEnableUncaughtExceptionHandler()) {
+            uncaughtHandler = new UncaughtExceptionHandlerIntegration();
+            uncaughtHandler.register(own, options);
+        }
+        return own;
+    }
+
     /** A non-identifying breadcrumb that rides along with the next error report. No-op when off. */
     public static void breadcrumb(String category, String message) {
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return;
         }
         Breadcrumb crumb = new Breadcrumb();
@@ -146,7 +184,7 @@ public final class NeroAgricultureTelemetry {
         crumb.setCategory(category);
         crumb.setLevel(SentryLevel.INFO);
         crumb.setMessage(scrub(message));
-        Sentry.addBreadcrumb(crumb);
+        s.addBreadcrumb(crumb);
     }
 
     private static String environmentOf(String version) {
@@ -197,10 +235,11 @@ public final class NeroAgricultureTelemetry {
     }
 
     static void capture(Throwable t) {
-        if (!active || t == null) {
+        IScopes s = scopes;
+        if (!active || s == null || t == null) {
             return;
         }
-        Sentry.captureException(t);
+        s.captureException(t);
     }
 
     /** Capture a handled exception if it is still clearly from NeroAgriculture code. */
@@ -212,19 +251,21 @@ public final class NeroAgricultureTelemetry {
 
     /** Capture a handled exception with a non-identifying source label for triage. */
     public static void captureHandledException(Throwable t, String source, String operation) {
-        if (!active || t == null || !touchesNeroAgriculture(t)) {
+        IScopes s = scopes;
+        if (!active || s == null || t == null || !touchesNeroAgriculture(t)) {
             return;
         }
-        Sentry.withScope(scope -> {
+        // Tags set inside withScope never reach the event in Sentry 8.x: use the ScopeCallback overload.
+        s.captureException(t, scope -> {
             scope.setTag("handled", "true");
             scope.setTag("source", source);
             scope.setExtra("operation", operation);
-            Sentry.captureException(t);
         });
     }
 
     static void captureMessage(String message) {
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return;
         }
         String scrubbed = scrub(message);
@@ -236,7 +277,7 @@ public final class NeroAgricultureTelemetry {
         Message msg = new Message();
         msg.setFormatted(scrubbed);
         event.setMessage(msg);
-        Sentry.captureEvent(event);
+        s.captureEvent(event);
     }
 
     private static SentryEvent filterAndScrub(SentryEvent event) {
