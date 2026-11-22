@@ -44,7 +44,7 @@ public final class ProsporaCropBlock extends CropBlock {
     //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (player instanceof ServerPlayer serverPlayer && isMaxAge(state)) {
-            AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+            AgricultureMilestones.harvested(serverPlayer);
         }
     }
 }

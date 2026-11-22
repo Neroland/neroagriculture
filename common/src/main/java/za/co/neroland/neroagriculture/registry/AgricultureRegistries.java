@@ -8,6 +8,7 @@ public final class AgricultureRegistries {
         za.co.neroland.neroagriculture.fluid.ModFluids.init();
         ModDataComponents.init();
         ModMobEffects.init();
+        ModStats.init();
         ModBlocks.init();
         ModItems.init();
         ModBlockEntities.init();

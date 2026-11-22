@@ -273,5 +273,6 @@
   "quest.neroagriculture.field_ledger.vertical_farm.title": "Vertical Farm",
   "quest.neroagriculture.field_ledger.vertical_farm.desc": "Stack crop tower frames on a Crop Tower Controller until the tower forms, then open the controller.",
   "quest.neroagriculture.field_ledger.green_world.title": "Green World",
-  "quest.neroagriculture.field_ledger.green_world.desc": "Somewhere on this server a terraforming project reached Complete. A whole region now grows in the open air."
+  "quest.neroagriculture.field_ledger.green_world.desc": "Somewhere on this server a terraforming project reached Complete. A whole region now grows in the open air.",
+  "stat.neroagriculture.crops_harvested": "Crops Harvested"
 }

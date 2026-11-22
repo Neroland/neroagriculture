@@ -131,6 +131,8 @@ public final class TerraformingControllerBlockEntity extends AbstractMachineBloc
             publishLink(level, previous);
             if (stage.complete()) {
                 TerraformingRegions.complete(level, worldPosition, AgricultureConfig.TERRAFORM_RADIUS.get());
+                za.co.neroland.neroagriculture.progression.AgricultureMilestones.recordFor(level.getServer(), owner,
+                        za.co.neroland.neroagriculture.progression.AgricultureMilestones.TERRAFORM_COMPLETE);
             }
         }
         setChanged();

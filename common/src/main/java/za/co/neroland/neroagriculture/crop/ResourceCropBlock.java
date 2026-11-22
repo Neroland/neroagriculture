@@ -157,7 +157,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
                 crop.variant().harvestCount()).harvested());
         level.setBlock(pos, level.getBlockState(pos).setValue(AGE, 0), 3);
         giveFragment(serverPlayer, pos, definition.id(), definition.tier(), definition.color(), definition.visualFamily(), amount);
-        AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+        AgricultureMilestones.harvested(serverPlayer);
         if (SeedReturns.awards(crop.variant().harvestCount() - 1, AgricultureConfig.SEED_RETURN_PERCENT.get(),
                 level.getRandom().nextInt(100))) {
             ItemStack returned = new ItemStack(ModItems.RESOURCE_SEED.get());
@@ -302,7 +302,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
     //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (player instanceof ServerPlayer serverPlayer && state.getValue(AGE) >= MAX_AGE) {
-            AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+            AgricultureMilestones.harvested(serverPlayer);
         }
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof ResourceCropBlockEntity crop) {
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());

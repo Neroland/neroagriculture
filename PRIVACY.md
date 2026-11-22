@@ -64,11 +64,17 @@ keyed by **UUID only** (never a username or display name):
   case no owner is stored at all. The UUID is server-only and never sent to clients.
 - **Material milestones / research** — which materials and seeds a player has discovered or
   researched is tracked through Neroland Core's shared progression store, not by this mod directly.
-- **Milestone gates** — the mod opens four player-scope Neroland Core progression gates
-  (`neroagriculture:first_research`, `first_harvest`, `greenhouse_keeper`, `tower_grower`) the first
-  time a player reaches that milestone. Only the gate id is recorded, in Core's progression store
+- **Milestone gates** — the mod opens five player-scope Neroland Core progression gates
+  (`neroagriculture:first_research`, `first_harvest`, `greenhouse_keeper`, `tower_grower`,
+  `terraform_complete`) the first time a player reaches that milestone. `terraform_complete` is
+  opened for a Terraforming Controller's stored owner when its project completes, and only when an
+  owner is stored (see above). Only the gate id is recorded, in Core's progression store
   (UUID-keyed, covered by Core's privacy disclosure and erased by Core's erasure hook); nothing is
   logged or broadcast, and the gates grant no access.
+- **Crops-harvested statistic** — harvesting a mature crop adds one to the vanilla custom statistic
+  `neroagriculture:crops_harvested`. It is a plain counter kept in the player's vanilla statistics
+  file alongside every other vanilla stat (the mod keeps no copy, and it is deleted with that file);
+  it holds no positions or crop types.
 
 Everything else — the material catalog, greenhouse and tower state, terraformed regions, cycle
 phases, and the per-dimension crop-tower output count behind the `neroagriculture:tower_output`

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-26
+
+### Added
+
+- New statistic **Crops Harvested** (`neroagriculture:crops_harvested`): one for every mature crop you harvest, by hand or by breaking it. NeroTrophies uses it for the harvest trophies.
+- New milestone `neroagriculture:terraform_complete`, opened for a Terraforming Controller's owner when its project completes (needs `automation.track_owner`, which is on by default).
+
 ## [0.7.0] - 2026-11-21
 
 ### Changed

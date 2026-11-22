@@ -123,7 +123,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
         if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
         if (!serverPlayer.getInventory().add(produce)) popResource(level, pos, produce);
-        AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+        AgricultureMilestones.harvested(serverPlayer);
         return InteractionResult.SUCCESS;
     }
 
@@ -136,7 +136,7 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
     //?}
         super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
         if (player instanceof ServerPlayer serverPlayer && state.getValue(AGE) >= MAX_AGE) {
-            AgricultureMilestones.record(serverPlayer, AgricultureMilestones.FIRST_HARVEST);
+            AgricultureMilestones.harvested(serverPlayer);
         }
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof SpeciesCropBlockEntity crop) {
             ItemStack seed = new ItemStack(kind == FoodDefinition.Kind.ALIEN
