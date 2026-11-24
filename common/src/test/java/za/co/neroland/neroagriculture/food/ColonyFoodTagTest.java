@@ -12,7 +12,11 @@ import org.junit.jupiter.api.Test;
 
 class ColonyFoodTagTest {
     @Test void commonFoodTagContainsEdibleProduceWithoutReplacingOtherMods() {
+        //? if >=1.21 {
         var stream = getClass().getClassLoader().getResourceAsStream("data/c/tags/item/foods.json");
+        //?} else {
+        /*var stream = getClass().getClassLoader().getResourceAsStream("data/c/tags/items/foods.json");
+        *///?}
         assertNotNull(stream);
         var tag = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
         assertFalse(tag.get("replace").getAsBoolean());

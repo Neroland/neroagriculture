@@ -19,7 +19,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
+//? if >=1.21 {
 import net.minecraft.world.item.crafting.SingleRecipeInput;
+//?} else {
+/*import net.minecraft.world.SimpleContainer;
+*///?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;

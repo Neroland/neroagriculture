@@ -159,6 +159,11 @@ class CoalBootstrapTest {
     }
 
     private static JsonObject resource(String path) {
+        //? if <1.21 {
+        /*path = path.replaceFirst("^recipe/", "recipes/")
+                .replaceFirst("^advancement/", "advancements/")
+                .replaceFirst("^tags/item/", "tags/items/");
+        *///?}
         var stream = CoalBootstrapTest.class.getClassLoader().getResourceAsStream("data/neroagriculture/" + path);
         if (stream == null) throw new AssertionError("Missing resource: " + path);
         return JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();

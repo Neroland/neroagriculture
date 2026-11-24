@@ -13,6 +13,7 @@ plugins {
 
 // MC version comes from the Stonecutter node (e.g. :fabric:26.1.2), not a global property.
 def mc = stonecutter.current.version
+def spaceApiMc = mc.startsWith('1.20.') ? '1.21.1' : mc
 // Minecraft before 26.1 ships obfuscated, so those cells need mappings and a remapped jar.
 def obfuscated = mc.startsWith('1.')
 apply plugin: obfuscated ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
@@ -83,7 +84,7 @@ dependencies {
             modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
         }
         modImplementation "za.co.neroland.nerolandcore:nerolandcore-fabric-${mc}:${nerolandcoreVersion}"
-        modCompileOnly "za.co.neroland.nerospace:nerospace-fabric-${mc}:${nerospaceVersion}"
+        modCompileOnly "za.co.neroland.nerospace:nerospace-fabric-${spaceApiMc}:${nerospaceVersion}"
     } else {
     // NOTE: no `mappings` — de-obfuscated 26.x needs none (Fabric Loom 1.17+).
     implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
@@ -97,7 +98,7 @@ dependencies {
     // Nerospace — OPTIONAL sibling. compileOnly: we compile against its public api package but never
     // ship or require it, and compat/nerospace/NerospaceEnvironmentBridge keeps every Nerospace type
     // behind a lazily loaded holder so the mod runs unchanged when Nerospace is absent.
-    compileOnly "za.co.neroland.nerospace:nerospace-fabric-${mc}:${nerospaceVersion}"
+    compileOnly "za.co.neroland.nerospace:nerospace-fabric-${spaceApiMc}:${nerospaceVersion}"
     }
 
     // Sentry SDK (telemetry/NeroAgricultureTelemetry): compile against it + embed it as a jar-in-jar so the
@@ -145,6 +146,9 @@ dependencies {
 
 // compat/emi compiles only where an EMI API exists for this Minecraft line (the 26.x port or official EMI on
 // 1.21.1). Elsewhere EMI itself does not exist, so the plugin is left out of the jar.
+if (!jeiVersion) {
+    sourceSets.main.java.exclude('za/co/neroland/neroagriculture/compat/jei/**')
+}
 if (!emiFile && !emiVersion) {
     sourceSets.main.java.exclude('za/co/neroland/neroagriculture/compat/emi/**')
 }
@@ -162,6 +166,10 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_authors          : rootProject.mod_authors,
         mod_license          : rootProject.mod_license,
         fabric_loader_version: rootProject.fabric_loader_version,
+        recipe_viewer_entrypoints: (jeiVersion ? ''',
+    "jei_mod_plugin": ["za.co.neroland.neroagriculture.compat.jei.NeroAgricultureJeiPlugin"]''' : '') +
+            ((emiFile || emiVersion) ? ''',
+    "emi": ["za.co.neroland.neroagriculture.compat.emi.NeroAgricultureEmiPlugin"]''' : ''),
         minecraft_version    : mc,
         minecraft_requirement: minecraftRequirement,
         // 1.21.x jars run on Java 21, 26.x on Java 25.

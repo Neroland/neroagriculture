@@ -10,9 +10,7 @@
   "environment": "*",
   "entrypoints": {
     "main": ["za.co.neroland.neroagriculture.fabric.NeroAgricultureFabric"],
-    "client": ["za.co.neroland.neroagriculture.fabric.NeroAgricultureFabricClient"],
-    "jei_mod_plugin": ["za.co.neroland.neroagriculture.compat.jei.NeroAgricultureJeiPlugin"],
-    "emi": ["za.co.neroland.neroagriculture.compat.emi.NeroAgricultureEmiPlugin"]
+    "client": ["za.co.neroland.neroagriculture.fabric.NeroAgricultureFabricClient"]${recipe_viewer_entrypoints}
   },
   "mixins": [
     "neroagriculture-common.mixins.json",

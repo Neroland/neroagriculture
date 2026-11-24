@@ -3,6 +3,10 @@ package za.co.neroland.neroagriculture.platform;
 import java.util.EnumMap;
 import java.util.Map;
 
+//? if <26.1 {
+/*import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+*///?}
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
@@ -28,10 +32,35 @@ public final class NeoForgeFluidFactory implements FluidFactory {
 
     static {
         for (FluidKind kind : FluidKind.values()) {
-            TYPE_BY_KIND.put(kind, TYPES.register(kind.id(), () -> new FluidType(FluidType.Properties.create()
-                    .density(kind.density()).viscosity(kind.viscosity()).canConvertToSource(false))));
+            TYPE_BY_KIND.put(kind, TYPES.register(kind.id(), () -> fluidType(kind)));
         }
     }
+
+    private static FluidType fluidType(FluidKind kind) {
+        FluidType.Properties properties = FluidType.Properties.create()
+                .density(kind.density()).viscosity(kind.viscosity()).canConvertToSource(false);
+        //? if >=1.21 {
+        return new FluidType(properties);
+        //?} else {
+        /*return new FluidType(properties) {
+            @Override
+            public void initializeClient(java.util.function.Consumer<IClientFluidTypeExtensions> consumer) {
+                consumer.accept(textures(kind));
+            }
+        };
+        *///?}
+    }
+
+    //? if <26.1 {
+    /*public static IClientFluidTypeExtensions textures(FluidKind kind) {
+        Identifier still = Identifier.fromNamespaceAndPath(NeroAgricultureCommon.MOD_ID, "block/" + kind.id() + "_still");
+        Identifier flowing = Identifier.fromNamespaceAndPath(NeroAgricultureCommon.MOD_ID, "block/" + kind.id() + "_flow");
+        return new IClientFluidTypeExtensions() {
+            @Override public Identifier getStillTexture() { return still; }
+            @Override public Identifier getFlowingTexture() { return flowing; }
+        };
+    }
+    *///?}
 
     /** The registered fluid type for {@code kind} (client extensions before 26.1 attach to it). */
     public static FluidType type(FluidKind kind) {

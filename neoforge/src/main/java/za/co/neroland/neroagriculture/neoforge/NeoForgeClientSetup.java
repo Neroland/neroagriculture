@@ -20,7 +20,9 @@ public final class NeoForgeClientSetup {
     public static void init(IEventBus bus) {
         bus.addListener(NeoForgeClientSetup::screens);
         bus.addListener(NeoForgeClientSetup::blockTints);
+        //? if >=1.21 {
         bus.addListener(NeoForgeClientSetup::fluidExtensions);
+        //?}
         //? if <1.21.4 {
         /*// 1.21.1 tints item stacks through colour handlers (1.21.4+ item models read the custom model data).
         bus.addListener(NeoForgeClientSetup::itemTints);
@@ -60,21 +62,19 @@ public final class NeoForgeClientSetup {
     private static void blockTints(RegisterColorHandlersEvent.BlockTintSources event) {
         event.register(List.of(new CropTintSource()), ModBlocks.RESOURCE_CROP.get());
     }
-    //?} else {
+    //?} elif >=1.21 {
     /*// Before 26.1 the still/flow sprites come from each fluid type's client extensions.
     private static void fluidExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
         for (FluidKind kind : FluidKind.values()) {
-            net.minecraft.resources.Identifier still =
-                    net.minecraft.resources.Identifier.fromNamespaceAndPath("neroagriculture", "block/" + kind.id() + "_still");
-            net.minecraft.resources.Identifier flowing =
-                    net.minecraft.resources.Identifier.fromNamespaceAndPath("neroagriculture", "block/" + kind.id() + "_flow");
-            event.registerFluidType(new net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions() {
-                @Override public net.minecraft.resources.Identifier getStillTexture() { return still; }
-                @Override public net.minecraft.resources.Identifier getFlowingTexture() { return flowing; }
-            }, za.co.neroland.neroagriculture.platform.NeoForgeFluidFactory.type(kind));
+            event.registerFluidType(za.co.neroland.neroagriculture.platform.NeoForgeFluidFactory.textures(kind),
+                    za.co.neroland.neroagriculture.platform.NeoForgeFluidFactory.type(kind));
         }
     }
     private static void blockTints(RegisterColorHandlersEvent.Block event) {
+        event.register(new CropTintSource(), ModBlocks.RESOURCE_CROP.get());
+    }
+    *///?} else {
+    /*private static void blockTints(RegisterColorHandlersEvent.Block event) {
         event.register(new CropTintSource(), ModBlocks.RESOURCE_CROP.get());
     }
     *///?}

@@ -10,9 +10,11 @@ greenhouses, crop towers, genetics, automation and terraforming.
 
 ## Build targets
 
-- **Minecraft:** 26.1.2, 26.2 and 26.3
-- **Loaders:** NeoForge, MinecraftForge/Forge, Fabric (the "9 cells")
-- **Java:** 25
+- **Minecraft:** 1.20.5 (Fabric), 1.20.6 (Fabric, Forge and NeoForge), and the 1.21.x and
+  26.x targets listed in the [release workflow](.github/workflows/publish.yml)
+- **Java:** 21 for 1.20.5 and 1.20.6, 25 for 26.x
+- **Neroland Core:** 1.23.0
+- **Recipe viewers:** JEI and EMI integration begin with Minecraft 1.21.1
 - Mod id: `neroagriculture` · package `za.co.neroland.neroagriculture`
 
 ## Layout

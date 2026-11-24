@@ -24,7 +24,11 @@ import net.minecraft.world.item.crafting.RecipeBookCategory;
 //?}
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+//? if >=1.21 {
 import net.minecraft.world.item.crafting.SingleRecipeInput;
+//?} else {
+/*import net.minecraft.world.Container;
+*///?}
 import net.minecraft.world.level.Level;
 
 import za.co.neroland.neroagriculture.content.FragmentTier;
@@ -40,7 +44,11 @@ import za.co.neroland.neroagriculture.content.FragmentTier;
  * {@code secondary} the second input (item or tag), and {@code result_material} the alloy resource whose
  * seed is produced. They are empty for the ordinary single-input steps.
  */
+//? if >=1.21 {
 public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
+//?} else {
+/*public final class FabricationRecipe implements Recipe<Container> {
+*///?}
     private final Supplier<RecipeType<FabricationRecipe>> type;
     private final Supplier<RecipeSerializer<FabricationRecipe>> serializer;
     private final CommonInfo commonInfo;
@@ -126,17 +134,32 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
                 ByteBufCodecs.optional(Identifier.STREAM_CODEC).decode(buffer)));
     }
 
+    //? if >=1.21 {
     @Override public boolean matches(SingleRecipeInput input, Level level) {
         return input.item().getCount() >= inputCount && ingredient.test(input.item());
     }
+    //?} else {
+    /*@Override public boolean matches(Container input, Level level) {
+        ItemStack stack = input.getItem(0);
+        return stack.getCount() >= inputCount && ingredient.test(stack);
+    }
+    *///?}
     //? if >=26.1 {
     @Override public ItemStack assemble(SingleRecipeInput input) { return result.create(); }
-    //?} else {
+    //?} else if >=1.21 {
     /*@Override public ItemStack assemble(SingleRecipeInput input, net.minecraft.core.HolderLookup.Provider registries) {
         return result.create();
     }
     // 26.x's one-argument form, kept so the machines call it the same way on every line.
     public ItemStack assemble(SingleRecipeInput input) { return result.create(); }
+    *///?} else {
+    /*@Override public ItemStack assemble(Container input, net.minecraft.core.HolderLookup.Provider registries) {
+        return assemble(input);
+    }
+
+    public ItemStack assemble(Container input) {
+        return result.create();
+    }
     *///?}
     @Override public boolean showNotification() { return commonInfo.showNotification(); }
     @Override public RecipeSerializer<FabricationRecipe> getSerializer() { return serializer.get(); }

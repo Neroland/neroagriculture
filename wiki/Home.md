@@ -7,6 +7,12 @@ Neroland ecosystem. Built on **Neroland Core**.
 > catalog has research and synthesis recipes; common tagged metals have a conservative fallback.
 > Other discovered materials may need a datapack definition or recipes.
 
+## Minecraft versions
+
+The Minecraft 1.20.5 build supports Fabric. The 1.20.6 builds support Fabric, Forge
+and NeoForge. These builds use Java 21 and require Neroland Core 1.23.0. The optional JEI and
+EMI integration begins with Minecraft 1.21.1.
+
 ## The core loop
 
 NeroAgriculture is a *resource farm*: **craft a resource seed → grow it → harvest the resource**.

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-26
+
+### Added
+
+- Builds for Minecraft 1.20.5 on Fabric and 1.20.6 on Fabric, Forge and NeoForge, with
+  Neroland Core 1.23.0. These builds include the resource-seed economy and vanilla recipes.
+  The optional JEI and EMI integration begins with Minecraft 1.21.1.
+
 ## [0.8.0] - 2026-11-22
 
 ### Added
