@@ -34,8 +34,8 @@ import za.co.neroland.neroagriculture.recipe.FabricationRecipe;
  * not show them twice.
  *
  * <p>Recipes: EMI syncs every recipe type itself and hands the result to plugins, reloading only after it
- * arrives, so that copy is read first. {@link ViewerRecipes} (filled by NeroAgriculture's own loader wiring)
- * is the fallback.
+ * arrives, so that copy is read first on supported EMI versions. {@link ViewerRecipes} holds the
+ * fabrication recipes synced by NeroAgriculture's own loader wiring.
  */
 @EmiEntrypoint
 public final class NeroAgricultureEmiPlugin implements EmiPlugin {
@@ -67,9 +67,9 @@ public final class NeroAgricultureEmiPlugin implements EmiPlugin {
     /** EMI's copy of the synced fabrication recipes, else NeroAgriculture's own copy of the same packet. */
     private static List<RecipeHolder<FabricationRecipe>> syncedRecipes(EmiRegistry registry) {
         //? if >=26.3 {
-        /*Collection<RecipeHolder<?>> fromEmi = registry.getRecipes();
-        *///?}
-        //? if >=1.21.2 && <26.3 {
+        /*return ViewerRecipes.all();
+        *///?} else {
+        //? if >=1.21.2 {
         net.minecraft.world.item.crafting.RecipeMap recipeMap = registry.getRecipeMap();
         Collection<RecipeHolder<?>> fromEmi = recipeMap == null ? null : recipeMap.values();
         //?}
@@ -79,5 +79,6 @@ public final class NeroAgricultureEmiPlugin implements EmiPlugin {
         *///?}
         List<RecipeHolder<FabricationRecipe>> fabrication = fromEmi == null ? List.of() : ViewerRecipes.fabrication(fromEmi);
         return fabrication.isEmpty() ? ViewerRecipes.all() : fabrication;
+        //?}
     }
 }
