@@ -7,6 +7,8 @@ Neroland ecosystem. Built on **Neroland Core**.
 > catalog has research and synthesis recipes; common tagged metals have a conservative fallback.
 > Other discovered materials may need a datapack definition or recipes.
 
+Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
+
 ## Minecraft versions
 
 The Minecraft 1.20.5 build supports Fabric. The 1.20.6 builds support Fabric, Forge

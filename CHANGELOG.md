@@ -11,9 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Minecraft 1.20.5 on NeoForge 20.5.21-beta, with Neroland Core 1.24.0 or newer.
+
 - Builds for Minecraft 1.20.5 on Fabric and 1.20.6 on Fabric, Forge and NeoForge, with
   Neroland Core 1.23.0. These builds include the resource-seed economy and vanilla recipes.
   The optional JEI and EMI integration begins with Minecraft 1.21.1.
+
+### Fixed
+
+- Fixed a crash when EMI loads fabrication recipes on Minecraft 26.3. The integration uses
+  NeroAgriculture's synced recipe list on that version.
 
 ## [0.8.0] - 2026-11-22
 

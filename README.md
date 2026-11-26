@@ -8,12 +8,14 @@ Orbite → Colonite → Voidite — with the Fragment Extractor, Fragment Infuse
 Seed Research Bench driving the datapack-driven resource-fragment conversion chain, plus grow beds,
 greenhouses, crop towers, genetics, automation and terraforming.
 
+Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
+
 ## Build targets
 
 - **Minecraft:** 1.20.5 (Fabric), 1.20.6 (Fabric, Forge and NeoForge), and the 1.21.x and
   26.x targets listed in the [release workflow](.github/workflows/publish.yml)
 - **Java:** 21 for 1.20.5 and 1.20.6, 25 for 26.x
-- **Neroland Core:** 1.23.0
+- **Neroland Core:** 1.24.0 or newer (below 2.0)
 - **Recipe viewers:** JEI and EMI integration begin with Minecraft 1.21.1
 - Mod id: `neroagriculture` · package `za.co.neroland.neroagriculture`
 
@@ -29,7 +31,7 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 
 ## Building
 
-Neroland Core `1.15.0` is a required dependency. Local builds prefer artifacts published by the
+Neroland Core `1.24.0` is a required dependency. Local builds prefer artifacts published by the
 sibling `../neroland-core` checkout; CI and fresh clones use GitHub Packages. See
 [`USING-CORE.md`](USING-CORE.md) for setup and authentication details.
 
