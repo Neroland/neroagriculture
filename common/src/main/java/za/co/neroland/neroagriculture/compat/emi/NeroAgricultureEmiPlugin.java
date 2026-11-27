@@ -69,14 +69,22 @@ public final class NeroAgricultureEmiPlugin implements EmiPlugin {
         //? if >=26.3 {
         /*return ViewerRecipes.all();
         *///?} else {
-        //? if >=1.21.2 {
-        net.minecraft.world.item.crafting.RecipeMap recipeMap = registry.getRecipeMap();
-        Collection<RecipeHolder<?>> fromEmi = recipeMap == null ? null : recipeMap.values();
-        //?}
-        //? if <1.21.2 {
-        /*// EMI for 1.21.1 hands out the client's full recipe manager (every recipe still syncs there).
-        Collection<RecipeHolder<?>> fromEmi = registry.getRecipeManager().getRecipes();
-        *///?}
+        Collection<RecipeHolder<?>> fromEmi;
+        try {
+            //? if >=1.21.2 {
+            net.minecraft.world.item.crafting.RecipeMap recipeMap = registry.getRecipeMap();
+            fromEmi = recipeMap == null ? null : recipeMap.values();
+            //?}
+            //? if <1.21.2 {
+            /*// EMI for 1.21.1 hands out the client's full recipe manager (every recipe still syncs there).
+            fromEmi = registry.getRecipeManager().getRecipes();
+            *///?}
+        } catch (LinkageError e) {
+            // The EMI build installed changed its registry API (MC-NEROAGRICULTURE-4: a missing
+            // EmiRegistry method crashed EMI's reload). Fall back to our own synced copy instead.
+            NeroAgricultureCommon.LOGGER.warn("[NeroAgriculture] EMI registry API mismatch ({}); using own recipe sync", e.toString());
+            fromEmi = null;
+        }
         List<RecipeHolder<FabricationRecipe>> fabrication = fromEmi == null ? List.of() : ViewerRecipes.fabrication(fromEmi);
         return fabrication.isEmpty() ? ViewerRecipes.all() : fabrication;
         //?}
