@@ -1,9 +1,9 @@
 {
-  "requires_item": "nerospace:glacite",
+  "requires_item": "nerospace:nerosium_ingot",
   "input": {
-    "item": "nerospace:glacite"
+    "item": "nerolandcore:glacite"
   },
-  "output": "nerospace:glacite",
+  "output": "nerolandcore:glacite",
   "tier": "colonite",
   "yield": {
     "ramp_harvests": 128,

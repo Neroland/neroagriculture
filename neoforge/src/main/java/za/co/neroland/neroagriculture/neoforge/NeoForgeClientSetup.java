@@ -7,7 +7,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+//? if >=1.20.4 {
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+//?}
 
 import za.co.neroland.neroagriculture.client.CropTintSource;
 import za.co.neroland.neroagriculture.client.ScreenBindings;
@@ -18,7 +20,12 @@ import za.co.neroland.neroagriculture.registry.ModBlocks;
 public final class NeoForgeClientSetup {
     private NeoForgeClientSetup() { }
     public static void init(IEventBus bus) {
+        //? if >=1.20.4 {
         bus.addListener(NeoForgeClientSetup::screens);
+        //?} else {
+        /*bus.addListener((net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) ->
+                event.enqueueWork(NeoForgeClientSetup::legacyScreens));
+        *///?}
         bus.addListener(NeoForgeClientSetup::blockTints);
         //? if >=1.21 {
         bus.addListener(NeoForgeClientSetup::fluidExtensions);
@@ -34,8 +41,9 @@ public final class NeoForgeClientSetup {
                         za.co.neroland.neroagriculture.lifecycle.ClientStateReset.disconnected());
         // Keep the client's copy of the server's synced fabrication recipes for recipe viewers
         // (compat.jei / compat.emi); 26.x clients hold no full recipe list of their own.
-        // (1.21.1 still receives every recipe; ViewerRecipes reads the client level there.)
-        //? if >=1.21.2 {
+        // (1.21.1 still receives every recipe; ViewerRecipes reads the client level there. NeoForge 21.3 has
+        // no RecipesReceivedEvent, and no recipe viewer is pinned for 1.21.3.)
+        //? if >=1.21.4 {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.client.event.RecipesReceivedEvent event) ->
                         za.co.neroland.neroagriculture.compat.viewer.ViewerRecipes.accept(event.getRecipeMap()));
@@ -85,6 +93,18 @@ public final class NeoForgeClientSetup {
                 za.co.neroland.neroagriculture.registry.ModItems.RESOURCE_SEED.get());
     }
     *///?}
+    //? if <1.20.4 {
+    /*// NeoForge 20.2 / 20.3 have no RegisterMenuScreensEvent: screens go through vanilla MenuScreens in client setup.
+    private static void legacyScreens() {
+        ScreenBindings.registerAll(new ScreenBindings.Registrar() {
+            @Override
+            public <M extends AbstractContainerMenu, U extends AbstractContainerScreen<M>> void register(
+                    MenuType<M> type, ScreenBindings.ScreenFactory<M, U> factory) {
+                net.minecraft.client.gui.screens.MenuScreens.register(type, factory::create);
+            }
+        });
+    }
+    *///?} else {
     private static void screens(RegisterMenuScreensEvent event) {
         // One canonical menu->screen table in common; adapted onto the NeoForge event here.
         ScreenBindings.registerAll(new ScreenBindings.Registrar() {
@@ -95,4 +115,5 @@ public final class NeoForgeClientSetup {
             }
         });
     }
+    //?}
 }

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-27
+
+### Added
+
+- Builds for Minecraft 1.21.3, 26.1 and 26.1.1 on Fabric, Forge and NeoForge, and for NeoForge 1.20.2 and 1.20.3,
+  matching Neroland Core's cells. Nerospace has no build for these lines yet, so the planet features stay off there
+  until it does. No JEI or EMI build exists for them, so recipe viewers show no NeroAgriculture pages there. On
+  NeoForge 1.20.2 machines expose energy, fluid and items through the older capability system.
+
+### Changed
+
+- The Nerospace resource-seed materials take and give the Neroland Core items (`nerolandcore:`), since every
+  Nero ore and its raw material moved to Core 1.25.0. Material ids stay `nerospace:`, and these seeds still
+  appear only while Nerospace is installed.
+- Requires Neroland Core 1.25.0 or newer.
+
 ## [0.9.1]
 
 ### Added

@@ -50,8 +50,9 @@ public final class NeroAgricultureNeoForge {
         // Recipe sync is opt-in on NeoForge (26.x clients hold no full recipe list): send the fabrication
         // recipes so recipe viewers (compat.jei / compat.emi) can list them. Recipe definitions only; no
         // player data crosses the wire.
-        // Before 1.21.2 vanilla still syncs every recipe, and the event has no sendRecipes.
-        //? if >=1.21.2 {
+        // Before 1.21.2 vanilla still syncs every recipe, and the event has no sendRecipes. NeoForge 21.3 (1.21.3)
+        // has neither the recipe sync nor sendRecipes, so recipe viewers there see no fabrication recipes.
+        //? if >=1.21.4 {
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> event.sendRecipes(
                 ModRecipeSerializers.EXTRACTION.get(),
                 ModRecipeSerializers.INFUSING.get(),

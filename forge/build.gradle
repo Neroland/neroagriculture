@@ -20,6 +20,8 @@ def jeiVersion = project.findProperty("jei_version_${mc}")
 def emiFile = project.findProperty("emi_file_neoforge_${mc}")
 def nerolandcoreVersion = project.findProperty('nerolandcore_version')
 def nerospaceVersion = rootProject.property('nerospace_version')
+// A cell nerospace has no build for compiles against a neighbouring line (nerospace_mc_* in gradle.properties).
+def nerospaceMc = (rootProject.findProperty("nerospace_mc_forge_${mc}") ?: rootProject.findProperty("nerospace_mc_${mc}") ?: mc).toString()
 // Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
 def mcCeiling = project.findProperty("mc_ceiling_${mc}")
 def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
@@ -124,7 +126,7 @@ dependencies {
     // Nerospace — OPTIONAL sibling. compileOnly: we compile against its public api package but never
     // ship or require it, and compat/nerospace/NerospaceEnvironmentBridge keeps every Nerospace type
     // behind a lazily loaded holder so the mod runs unchanged when Nerospace is absent.
-    compileOnly "za.co.neroland.nerospace:nerospace-forge-${mc}:${nerospaceVersion}"
+    compileOnly "za.co.neroland.nerospace:nerospace-forge-${nerospaceMc}:${nerospaceVersion}"
 
     implementation 'io.sentry:sentry:8.64.0'
 

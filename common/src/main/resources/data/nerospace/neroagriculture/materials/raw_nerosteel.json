@@ -1,9 +1,9 @@
 {
-  "requires_item": "nerospace:raw_nerosteel",
+  "requires_item": "nerospace:nerosium_ingot",
   "input": {
-    "item": "nerospace:raw_nerosteel"
+    "item": "nerolandcore:raw_nerosteel"
   },
-  "output": "nerospace:raw_nerosteel",
+  "output": "nerolandcore:raw_nerosteel",
   "tier": "orbite",
   "yield": {
     "ramp_harvests": 128,

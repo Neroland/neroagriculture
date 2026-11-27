@@ -1,9 +1,9 @@
 {
-  "requires_item": "nerospace:xertz_quartz",
+  "requires_item": "nerospace:nerosium_ingot",
   "input": {
-    "item": "nerospace:xertz_quartz"
+    "item": "nerolandcore:xertz_quartz"
   },
-  "output": "nerospace:xertz_quartz",
+  "output": "nerolandcore:xertz_quartz",
   "tier": "orbite",
   "yield": {
     "ramp_harvests": 128,

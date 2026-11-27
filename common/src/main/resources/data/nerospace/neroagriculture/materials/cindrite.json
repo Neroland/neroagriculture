@@ -1,9 +1,9 @@
 {
-  "requires_item": "nerospace:cindrite",
+  "requires_item": "nerospace:nerosium_ingot",
   "input": {
-    "item": "nerospace:cindrite"
+    "item": "nerolandcore:cindrite"
   },
-  "output": "nerospace:cindrite",
+  "output": "nerolandcore:cindrite",
   "tier": "colonite",
   "yield": {
     "ramp_harvests": 128,

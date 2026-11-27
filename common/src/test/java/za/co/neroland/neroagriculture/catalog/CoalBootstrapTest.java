@@ -112,12 +112,13 @@ class CoalBootstrapTest {
             assertFalse(MaterialCatalog.requirementMet(json, id -> false));
             Identifier material = Identifier.parse("nerospace:" + entry[0]);
             assertFalse(MaterialCatalog.requirementMet(json, Identifier.parse("minecraft:coal")::equals));
-            assertTrue(MaterialCatalog.requirementMet(json, material::equals));
+            // Gated on Nerospace being installed; the ores themselves are Neroland Core items since Core 1.25.0.
+            assertTrue(MaterialCatalog.requirementMet(json, Identifier.parse("nerospace:nerosium_ingot")::equals));
             var parsed = MaterialDefinitionParser.parse(material, json);
             assertTrue(parsed.valid());
             assertEquals(Identifier.parse("nerospace:" + entry[1]), parsed.definition().worldRestriction().dimension());
             assertTrue(parsed.definition().conversion() >= 16);
-            assertEquals(material, parsed.definition().output());
+            assertEquals(Identifier.parse("nerolandcore:" + entry[0]), parsed.definition().output());
             assertTrue(za.co.neroland.neroagriculture.machine.CatalogFabrication.eligible(
                     CatalogSource.DATAPACK, parsed.definition(), false));
         }

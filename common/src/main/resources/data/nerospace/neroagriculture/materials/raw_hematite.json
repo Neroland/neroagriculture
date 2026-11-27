@@ -1,7 +1,7 @@
 {
-  "requires_item": "nerospace:raw_hematite",
-  "input": { "item": "nerospace:raw_hematite" },
-  "output": "nerospace:raw_hematite",
+  "requires_item": "nerospace:nerosium_ingot",
+  "input": { "item": "nerolandcore:raw_hematite" },
+  "output": "nerolandcore:raw_hematite",
   "tier": "orbite",
   "yield": { "minimum": 1, "maximum": 4, "ramp_harvests": 96 },
   "conversion": 16,
