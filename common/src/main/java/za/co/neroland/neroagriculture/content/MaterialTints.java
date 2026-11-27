@@ -2,10 +2,12 @@ package za.co.neroland.neroagriculture.content;
 
 import java.util.List;
 
+//? if >=1.20.5 {
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomModelData;
+//?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomModelData;
 
 import za.co.neroland.neroagriculture.catalog.MaterialColors;
 
@@ -38,7 +40,7 @@ public final class MaterialTints {
     }
 
     public static void apply(ItemStack stack, int rgb) {
-        MaterialVariant variant = stack.get(za.co.neroland.neroagriculture.registry.ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = za.co.neroland.neroagriculture.registry.ModDataComponents.MATERIAL_VARIANT.get(stack);
         int family = variant == null ? za.co.neroland.neroagriculture.crop.CropVisuals.GENERIC
                 : za.co.neroland.neroagriculture.crop.CropVisuals.family(variant.material());
         apply(stack, rgb, family);
@@ -49,9 +51,11 @@ public final class MaterialTints {
         stack.set(DataComponents.CUSTOM_MODEL_DATA,
                 new CustomModelData(List.of(), List.of(),
                         List.of(za.co.neroland.neroagriculture.crop.CropVisuals.name(visualFamily)), List.of(rgb & 0xFFFFFF)));
-        //?} else {
+        //?} else if >=1.20.5 {
         /*// 1.21.1's custom model data is a single int; the client's item colour handler reads it as the tint.
         stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(rgb & 0xFFFFFF));
+        *///?} else {
+        /*stack.getOrCreateTag().putInt("CustomModelData", rgb & 0xFFFFFF);
         *///?}
     }
 }

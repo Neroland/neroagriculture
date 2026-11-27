@@ -62,17 +62,21 @@ public final class ForgeCapabilities {
 
     /** True when the machine declares the channel at all (any face, or the ungated null-side view). */
     private static boolean hasEnergyChannel(AbstractMachineBlockEntity machine) {
-        if (machine.sideConfig().energyView(null) != null) return true;
+        var config = machine.sideConfig();
+        if (config == null) return false;
+        if (config.energyView(null) != null) return true;
         for (Direction side : Direction.values()) {
-            if (machine.sideConfig().energyView(side) != null) return true;
+            if (config.energyView(side) != null) return true;
         }
         return false;
     }
 
     private static boolean hasFluidChannel(AbstractMachineBlockEntity machine) {
-        if (machine.sideConfig().fluidView(null) != null) return true;
+        var config = machine.sideConfig();
+        if (config == null) return false;
+        if (config.fluidView(null) != null) return true;
         for (Direction side : Direction.values()) {
-            if (machine.sideConfig().fluidView(side) != null) return true;
+            if (config.fluidView(side) != null) return true;
         }
         return false;
     }
@@ -80,7 +84,10 @@ public final class ForgeCapabilities {
     /** Energy view that re-resolves the side-config gate per call; no-ops when the face is disabled. */
     private record SideEnergyView(AbstractMachineBlockEntity machine, @Nullable Direction side)
             implements NeroEnergyStorage {
-        @Nullable private NeroEnergyStorage view() { return machine.sideConfig().energyView(side); }
+        @Nullable private NeroEnergyStorage view() {
+            var config = machine.sideConfig();
+            return config == null ? null : config.energyView(side);
+        }
         @Override public long getAmount() { NeroEnergyStorage view = view(); return view == null ? 0 : view.getAmount(); }
         @Override public long getCapacity() { NeroEnergyStorage view = view(); return view == null ? 0 : view.getCapacity(); }
         @Override public long insert(long maxAmount, boolean simulate) {
@@ -96,7 +103,10 @@ public final class ForgeCapabilities {
     /** Fluid view that re-resolves the side-config gate per call; no-ops when the face is disabled. */
     private record SideFluidView(AbstractMachineBlockEntity machine, @Nullable Direction side)
             implements NeroFluidStorage {
-        @Nullable private NeroFluidStorage view() { return machine.sideConfig().fluidView(side); }
+        @Nullable private NeroFluidStorage view() {
+            var config = machine.sideConfig();
+            return config == null ? null : config.fluidView(side);
+        }
         @Override public Fluid getFluid() { NeroFluidStorage view = view(); return view == null ? Fluids.EMPTY : view.getFluid(); }
         @Override public long getAmount() { NeroFluidStorage view = view(); return view == null ? 0 : view.getAmount(); }
         @Override public long getCapacity() { NeroFluidStorage view = view(); return view == null ? 0 : view.getCapacity(); }
@@ -112,8 +122,6 @@ public final class ForgeCapabilities {
 
     private static final class MachineCaps implements ICapabilityProvider {
         private final AbstractMachineBlockEntity machine;
-        private final boolean hasEnergy;
-        private final boolean hasFluid;
         private final LazyOptional<NeroEnergyStorage> unsidedEnergy;
         private final LazyOptional<NeroFluidStorage> unsidedFluid;
         private final LazyOptional<IItemHandler> unsided;
@@ -123,8 +131,6 @@ public final class ForgeCapabilities {
 
         MachineCaps(AbstractMachineBlockEntity machine) {
             this.machine = machine;
-            this.hasEnergy = hasEnergyChannel(machine);
-            this.hasFluid = hasFluidChannel(machine);
             this.unsidedEnergy = LazyOptional.of(() -> new SideEnergyView(machine, null));
             this.unsidedFluid = LazyOptional.of(() -> new SideFluidView(machine, null));
             this.unsided = machine instanceof WorldlyContainer container
@@ -133,12 +139,12 @@ public final class ForgeCapabilities {
 
         @Override public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction side) {
             if (capability == ForgeEnergyLookup.ENERGY) {
-                if (!hasEnergy) return LazyOptional.empty();
+                if (!hasEnergyChannel(machine)) return LazyOptional.empty();
                 return (side == null ? unsidedEnergy : sidedEnergy.computeIfAbsent(side,
                         direction -> LazyOptional.of(() -> new SideEnergyView(machine, direction)))).cast();
             }
             if (capability == ForgeFluidLookup.FLUID) {
-                if (!hasFluid) return LazyOptional.empty();
+                if (!hasFluidChannel(machine)) return LazyOptional.empty();
                 return (side == null ? unsidedFluid : sidedFluid.computeIfAbsent(side,
                         direction -> LazyOptional.of(() -> new SideFluidView(machine, direction)))).cast();
             }

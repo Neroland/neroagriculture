@@ -100,8 +100,19 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
+    //? if >=1.20.5 {
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
             Player player, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    private InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+            Player player, BlockHitResult hit) {
+    *///?}
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(player instanceof ServerPlayer serverPlayer)
                 || !(level.getBlockEntity(pos) instanceof ResourceCropBlockEntity crop)) return InteractionResult.FAIL;
@@ -161,9 +172,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (SeedReturns.awards(crop.variant().harvestCount() - 1, AgricultureConfig.SEED_RETURN_PERCENT.get(),
                 level.getRandom().nextInt(100))) {
             ItemStack returned = new ItemStack(ModItems.RESOURCE_SEED.get());
-            returned.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+            ModDataComponents.MATERIAL_VARIANT.set(returned, MaterialVariant.of(definition.id(), definition.tier()));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(returned, definition.color(), definition.visualFamily());
-            if (!crop.genetics().isEmpty()) returned.set(ModDataComponents.GENETICS.get(), crop.genetics());
+            if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(returned, crop.genetics());
             if (!serverPlayer.getInventory().add(returned)) popResource(level, pos, returned);
         }
         return InteractionResult.SUCCESS;
@@ -211,7 +222,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         int remaining = amount;
         while (remaining > 0) {
             ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
-            stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+            ModDataComponents.MATERIAL_VARIANT.set(stack, MaterialVariant.of(definition.id(), definition.tier()));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, definition.color(), definition.visualFamily());
             remaining -= stack.getCount();
             drops.add(stack);
@@ -219,9 +230,9 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         if (SeedReturns.awards(crop.variant().harvestCount(), AgricultureConfig.SEED_RETURN_PERCENT.get(),
                 level.getRandom().nextInt(100))) {
             ItemStack returned = new ItemStack(ModItems.RESOURCE_SEED.get());
-            returned.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+            ModDataComponents.MATERIAL_VARIANT.set(returned, MaterialVariant.of(definition.id(), definition.tier()));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(returned, definition.color(), definition.visualFamily());
-            if (!crop.genetics().isEmpty()) returned.set(ModDataComponents.GENETICS.get(), crop.genetics());
+            if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(returned, crop.genetics());
             drops.add(returned);
         }
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(),
@@ -286,7 +297,7 @@ public final class ResourceCropBlock extends BaseEntityBlock {
         int remaining = amount;
         while (remaining > 0) {
             ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
-            stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
+            ModDataComponents.MATERIAL_VARIANT.set(stack, MaterialVariant.of(material, family));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, color, visualFamily);
             remaining -= stack.getCount();
             if (!player.getInventory().add(stack)) popResource(player.level(), pos, stack);
@@ -311,14 +322,14 @@ public final class ResourceCropBlock extends BaseEntityBlock {
             FragmentTier family = level.getServer() == null ? crop.variant().family()
                     : MaterialCatalog.forServer(level.getServer()).lookup(crop.variant().material())
                             .material().map(material -> material.definition().tier()).orElse(crop.variant().family());
-            seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(crop.variant().material(), family));
+            ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(crop.variant().material(), family));
             if (level.getServer() != null) {
                 za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, crop.variant().material(), level.getServer());
             } else {
                 za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, crop.variant().material());
             }
-            seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.variant().harvestCount());
-            if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
+            ModDataComponents.HARVEST_COUNT.set(seed, crop.variant().harvestCount());
+            if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(seed, crop.genetics());
             popResource(level, pos, seed);
         }
     }

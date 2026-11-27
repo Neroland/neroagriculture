@@ -50,9 +50,24 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
         }
     }
 
+    //? if >=1.20.5 {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
             BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    public InteractionResult use(BlockState state, net.minecraft.world.level.Level level,
+            BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        var stack = player.getItemInHand(hand);
+        if (!stack.isEmpty()) {
+            return useItemOnLegacy(stack, state, level, pos, player, hand, hit);
+        }
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    private InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
+            BlockPos pos, Player player, BlockHitResult hit) {
+    *///?}
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FoundationMachineBlockEntity machine) {
             if (za.co.neroland.neroagriculture.automation.AutomationOwner.canClaim(machine.automationOwner())) machine.setOwner(player.getUUID());
             player.openMenu(machine);
@@ -66,13 +81,15 @@ public final class FoundationMachineBlock extends BaseEntityBlock {
             net.minecraft.world.level.Level level, BlockPos pos, Player player,
             net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
     //?} else {
-    /*@Override
+    /*//? if >=1.20.5 {
+@Override
     protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state,
             net.minecraft.world.level.Level level, BlockPos pos, Player player,
             net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
                 useItemOnLegacy(stack, state, level, pos, player, hand, hit));
     }
+//?}
 
     // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
     private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack, BlockState state,

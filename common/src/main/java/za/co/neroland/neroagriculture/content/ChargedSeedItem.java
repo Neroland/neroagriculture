@@ -26,7 +26,7 @@ public final class ChargedSeedItem extends Item {
         super.appendHoverText(stack, context, lines, flag);
         Consumer<Component> tooltip = lines::add;
     *///?}
-        FragmentCharge charge = stack.get(ModDataComponents.FRAGMENT_CHARGE.get());
+        FragmentCharge charge = ModDataComponents.FRAGMENT_CHARGE.get(stack);
         if (charge == null) {
             tooltip.accept(Component.translatable("warning.neroagriculture.invalid_charge")
                     .withStyle(ChatFormatting.RED));

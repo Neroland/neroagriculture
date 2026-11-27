@@ -4,7 +4,7 @@ package za.co.neroland.neroagriculture.platform;
 // ItemInteractionResult; 1.21.2 folded it into InteractionResult. The blocks keep their logic in
 // InteractionResult terms and translate here.
 
-//? if <1.21.2 {
+//? if >=1.20.5 && <1.21.2 {
 /*import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 

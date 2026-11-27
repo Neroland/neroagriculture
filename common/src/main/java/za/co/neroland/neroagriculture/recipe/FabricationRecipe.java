@@ -8,7 +8,14 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
+//? if >=1.20.5 {
 import net.minecraft.network.codec.ByteBufCodecs;
+//?} else {
+/*import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import com.google.gson.JsonSyntaxException;
+*///?}
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -49,6 +56,19 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
 //?} else {
 /*public final class FabricationRecipe implements Recipe<Container> {
 *///?}
+    //? if <1.20.2 {
+    /*private Identifier id;
+
+    @Override
+    public Identifier getId() {
+        return id;
+    }
+
+    public void bindId(Identifier id) {
+        this.id = id;
+    }
+    *///?}
+
     private final Supplier<RecipeType<FabricationRecipe>> type;
     private final Supplier<RecipeSerializer<FabricationRecipe>> serializer;
     private final CommonInfo commonInfo;
@@ -87,18 +107,30 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
         this.resultMaterial = resultMaterial;
     }
 
+    //? if >=1.20.2 {
+    private static final Codec<Ingredient> INGREDIENT_CODEC = Ingredient.CODEC;
+    //?} else {
+    /*private static final Codec<Ingredient> INGREDIENT_CODEC = Codec.PASSTHROUGH.comapFlatMap(data -> {
+        try {
+            return DataResult.success(Ingredient.fromJson(data.convert(JsonOps.INSTANCE).getValue()));
+        } catch (JsonSyntaxException invalid) {
+            return DataResult.error(invalid::getMessage);
+        }
+    }, ingredient -> new Dynamic<>(JsonOps.INSTANCE, ingredient.toJson()));
+    *///?}
+
     public static MapCodec<FabricationRecipe> mapCodec(Supplier<RecipeType<FabricationRecipe>> type,
             Supplier<RecipeSerializer<FabricationRecipe>> serializer) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CommonInfo.MAP_CODEC.forGetter(FabricationRecipe::commonInfo),
-                Ingredient.CODEC.fieldOf("ingredient").forGetter(FabricationRecipe::ingredient),
+                INGREDIENT_CODEC.fieldOf("ingredient").forGetter(FabricationRecipe::ingredient),
                 ItemStackTemplate.CODEC.fieldOf("result").forGetter(FabricationRecipe::resultTemplate),
                 Codec.intRange(1, 64).optionalFieldOf("input_count", 1).forGetter(FabricationRecipe::inputCount),
                 Codec.intRange(0, 1_000_000).optionalFieldOf("energy", 800).forGetter(FabricationRecipe::energy),
                 Codec.intRange(1, 72_000).optionalFieldOf("ticks", 100).forGetter(FabricationRecipe::ticks),
                 FragmentTier.CODEC.optionalFieldOf("family").forGetter(FabricationRecipe::family),
                 Identifier.CODEC.optionalFieldOf("material").forGetter(FabricationRecipe::material),
-                Ingredient.CODEC.optionalFieldOf("secondary").forGetter(FabricationRecipe::secondary),
+                INGREDIENT_CODEC.optionalFieldOf("secondary").forGetter(FabricationRecipe::secondary),
                 Codec.intRange(1, 64).optionalFieldOf("secondary_count", 1).forGetter(FabricationRecipe::secondaryCount),
                 Identifier.CODEC.optionalFieldOf("result_material").forGetter(FabricationRecipe::resultMaterial)
         ).apply(instance, (common, ingredient, result, count, energy, ticks, family, material,
@@ -110,6 +142,7 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
     public static StreamCodec<RegistryFriendlyByteBuf, FabricationRecipe> streamCodec(
             Supplier<RecipeType<FabricationRecipe>> type,
             Supplier<RecipeSerializer<FabricationRecipe>> serializer) {
+        //? if >=1.20.5 {
         return StreamCodec.of((buffer, recipe) -> {
             CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredient);
@@ -132,6 +165,25 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
                 ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC).decode(buffer),
                 buffer.readVarInt(),
                 ByteBufCodecs.optional(Identifier.STREAM_CODEC).decode(buffer)));
+        //?} else {
+        /*return StreamCodec.of((buffer, recipe) -> {
+            CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo);
+            recipe.ingredient.toNetwork(buffer);
+            buffer.writeItem(recipe.result.create());
+            buffer.writeVarInt(recipe.inputCount);
+            buffer.writeVarInt(recipe.energy);
+            buffer.writeVarInt(recipe.ticks);
+            buffer.writeOptional(recipe.family, (buf, value) -> buf.writeEnum(value));
+            buffer.writeOptional(recipe.material, (buf, value) -> buf.writeResourceLocation(value));
+            buffer.writeOptional(recipe.secondary, (buf, value) -> value.toNetwork(buf));
+            buffer.writeVarInt(recipe.secondaryCount);
+            buffer.writeOptional(recipe.resultMaterial, (buf, value) -> buf.writeResourceLocation(value));
+        }, buffer -> new FabricationRecipe(type, serializer, CommonInfo.STREAM_CODEC.decode(buffer),
+                Ingredient.fromNetwork(buffer), new ItemStackTemplate(buffer.readItem()), buffer.readVarInt(),
+                buffer.readVarInt(), buffer.readVarInt(), buffer.readOptional(buf -> buf.readEnum(FragmentTier.class)),
+                buffer.readOptional(buf -> buf.readResourceLocation()), buffer.readOptional(Ingredient::fromNetwork),
+                buffer.readVarInt(), buffer.readOptional(buf -> buf.readResourceLocation())));
+        *///?}
     }
 
     //? if >=1.21 {
@@ -161,7 +213,10 @@ public final class FabricationRecipe implements Recipe<SingleRecipeInput> {
         return result.create();
     }
     *///?}
-    @Override public boolean showNotification() { return commonInfo.showNotification(); }
+    //? if >=1.20.5 {
+    @Override
+    //?}
+    public boolean showNotification() { return commonInfo.showNotification(); }
     @Override public RecipeSerializer<FabricationRecipe> getSerializer() { return serializer.get(); }
     @Override public RecipeType<FabricationRecipe> getType() { return type.get(); }
     //? if >=1.21.2 {

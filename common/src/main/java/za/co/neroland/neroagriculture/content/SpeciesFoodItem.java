@@ -25,10 +25,9 @@ public final class SpeciesFoodItem extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         ItemStack result = super.finishUsingItem(stack, level, entity);
         if (!level.isClientSide() && entity instanceof ServerPlayer player) {
-            SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+            SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(stack);
             if (variant != null) {
-                za.co.neroland.neroagriculture.genetics.Genetics genetics = stack.getOrDefault(
-                        ModDataComponents.GENETICS.get(), za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
+                za.co.neroland.neroagriculture.genetics.Genetics genetics = ModDataComponents.GENETICS.getOrDefault(stack, za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
                 FoodCatalog.lookup(player.level().getServer(), variant.species())
                         .ifPresent(definition -> FoodEffects.applyTo(player, definition, genetics));
             }
@@ -45,7 +44,7 @@ public final class SpeciesFoodItem extends Item {
      */
     @Override
     public Component getName(ItemStack stack) {
-        SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+        SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(stack);
         if (variant != null) {
             return Component.translatable("item.neroagriculture.engineered_food.named",
                     MaterialVariantItem.materialName(variant.species()));

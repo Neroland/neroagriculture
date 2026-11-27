@@ -130,7 +130,7 @@ public final class GrowBedBlockEntity extends AbstractMachineBlockEntity
         blockedReasonTick = now;
         var reason = ResourceCropBlock.plantedGrowthReason(serverLevel, worldPosition);
         if (reason == null && !items.get(SEED_SLOT).isEmpty()) {
-            var variant = items.get(SEED_SLOT).get(za.co.neroland.neroagriculture.registry.ModDataComponents.MATERIAL_VARIANT.get());
+            var variant = za.co.neroland.neroagriculture.registry.ModDataComponents.MATERIAL_VARIANT.get(items.get(SEED_SLOT));
             if (variant == null) {
                 reason = GrowthRules.BlockedReason.UNKNOWN_MATERIAL;
             } else {

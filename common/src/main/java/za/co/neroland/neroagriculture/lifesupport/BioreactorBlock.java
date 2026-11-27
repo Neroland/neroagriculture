@@ -37,13 +37,15 @@ public final class BioreactorBlock extends BaseEntityBlock {
             BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
     //?} else {
-    /*@Override
+    /*//? if >=1.20.5 {
+@Override
     protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
             BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
             net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
         return za.co.neroland.neroagriculture.platform.InteractionCompat.itemResult(
                 useItemOnLegacy(stack, state, level, pos, player, hand, hit));
     }
+//?}
 
     // 1.21.1 splits item-use results into ItemInteractionResult; the shared logic stays in InteractionResult.
     private net.minecraft.world.InteractionResult useItemOnLegacy(net.minecraft.world.item.ItemStack stack,
@@ -53,9 +55,24 @@ public final class BioreactorBlock extends BaseEntityBlock {
         return useWithoutItem(state, level, pos, player, hit);
     }
 
+    //? if >=1.20.5 {
     @Override
     protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
             BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    public net.minecraft.world.InteractionResult use(BlockState state, Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        var stack = player.getItemInHand(hand);
+        if (!stack.isEmpty()) {
+            return useItemOnLegacy(stack, state, level, pos, player, hand, hit);
+        }
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    private net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+    *///?}
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof BioreactorBlockEntity machine) {
             player.openMenu(machine);
         }

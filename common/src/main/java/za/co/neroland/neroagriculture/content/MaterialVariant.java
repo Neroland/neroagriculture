@@ -22,7 +22,7 @@ public record MaterialVariant(int version, Identifier material, FragmentTier fam
     public static final Codec<MaterialVariant> CODEC = RAW_CODEC.validate(MaterialVariant::validate);
     public static final StreamCodec<RegistryFriendlyByteBuf, MaterialVariant> STREAM_CODEC = StreamCodec.of(
             (buffer, value) -> {
-                validate(value).getOrThrow();
+                requireValid(value);
                 buffer.writeVarInt(value.version());
                 buffer.writeUtf(value.material().toString(), MAX_ID_LENGTH);
                 buffer.writeEnum(value.family());
@@ -36,7 +36,13 @@ public record MaterialVariant(int version, Identifier material, FragmentTier fam
 
     private static MaterialVariant checked(int version, Identifier material, FragmentTier family) {
         MaterialVariant value = new MaterialVariant(version, material, family);
-        return validate(value).getOrThrow();
+        return requireValid(value);
+    }
+
+    private static MaterialVariant requireValid(MaterialVariant value) {
+        DataResult<MaterialVariant> validation = validate(value);
+        return validation.result().orElseThrow(() -> new IllegalStateException(
+                validation.error().map(error -> error.message()).orElse("Invalid material variant")));
     }
 
     private static DataResult<MaterialVariant> validate(MaterialVariant value) {

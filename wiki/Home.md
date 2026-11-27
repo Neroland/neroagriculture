@@ -11,9 +11,10 @@ Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
 
 ## Minecraft versions
 
-The Minecraft 1.20.5 build supports Fabric. The 1.20.6 builds support Fabric, Forge
-and NeoForge. These builds use Java 21 and require Neroland Core 1.23.0. The optional JEI and
-EMI integration begins with Minecraft 1.21.1.
+Fabric supports Minecraft 1.20 through 1.20.6. Forge supports 1.20 through 1.20.4 and 1.20.6.
+NeoForge supports 1.20.4 through 1.20.6. Legacy NeoForge 1.20.1 uses the Forge 1.20.1 jar.
+Use Java 17 through 1.20.4, Java 21 for later 1.x releases, and Neroland Core 1.24.0 or newer
+(below 2.0) for the same game version and loader. JEI and EMI integration begins with 1.21.1.
 
 ## The core loop
 

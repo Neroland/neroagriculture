@@ -294,21 +294,21 @@ public final class AgricultureGallery {
 
     private static ItemStack resourceSeed() {
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get(), 16);
-        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(SHOWCASE_MATERIAL, FragmentTier.FORGITE));
+        ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(SHOWCASE_MATERIAL, FragmentTier.FORGITE));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, SHOWCASE_MATERIAL);
         return seed;
     }
 
     private static ItemStack resourceSeed(Identifier material, FragmentTier tier) {
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get(), 16);
-        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier));
+        ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(material, tier));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, material);
         return seed;
     }
 
     private static ItemStack resourceFragment(Identifier material, FragmentTier tier, int count) {
         ItemStack fragment = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), count);
-        fragment.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier));
+        ModDataComponents.MATERIAL_VARIANT.set(fragment, MaterialVariant.of(material, tier));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(fragment, material);
         return fragment;
     }

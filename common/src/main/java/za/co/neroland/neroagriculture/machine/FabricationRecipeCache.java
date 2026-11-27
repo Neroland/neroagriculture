@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import net.minecraft.server.level.ServerLevel;
+//? if >=1.20.2 {
 import net.minecraft.world.item.crafting.RecipeHolder;
+//?} else {
+/*import za.co.neroland.neroagriculture.recipe.compat.RecipeHolder;
+*///?}
 import net.minecraft.world.item.crafting.RecipeType;
 
 import za.co.neroland.neroagriculture.recipe.FabricationRecipe;
@@ -27,16 +31,34 @@ final class FabricationRecipeCache {
 
     /** Id-sorted fabrication recipes of {@code type}; an immutable shared list, never {@code null}. */
     static List<FabricationRecipe> recipes(ServerLevel level, RecipeType<FabricationRecipe> type) {
+        //? if >=1.20.2 {
         Collection<RecipeHolder<?>> recipes = level.recipeAccess().getRecipes();
+        //?} else {
+        /*Collection<net.minecraft.world.item.crafting.Recipe<?>> recipes = level.getRecipeManager().getRecipes();
+        *///?}
         Index current = index;
         if (current == null || current.recipesIdentity() != recipes || current.size() != recipes.size()) {
+            //? if >=1.20.2 {
             current = rebuild(recipes);
+            //?} else {
+            /*List<RecipeHolder<?>> holders = new java.util.ArrayList<>(recipes.size());
+            for (var recipe : recipes) {
+                holders.add(new RecipeHolder<>(recipe.getId(), recipe));
+            }
+            current = rebuild(holders, recipes);
+            *///?}
             index = current;
         }
         return current.byType().getOrDefault(type, List.of());
     }
 
+    //? if >=1.20.2 {
     private static Index rebuild(Collection<RecipeHolder<?>> recipes) {
+        return rebuild(recipes, recipes);
+    }
+    //?}
+
+    private static Index rebuild(Collection<RecipeHolder<?>> recipes, Object identity) {
         Map<RecipeType<?>, List<FabricationRecipe>> byType = recipes.stream()
                 //? if >=1.21.2 {
                 .sorted(Comparator.comparing(holder -> holder.id().identifier().toString()))
@@ -48,6 +70,6 @@ final class FabricationRecipeCache {
                 .map(recipe -> (FabricationRecipe) recipe)
                 .collect(Collectors.groupingBy(recipe -> (RecipeType<?>) recipe.getType(),
                         Collectors.collectingAndThen(Collectors.toList(), List::copyOf)));
-        return new Index(recipes, recipes.size(), Map.copyOf(byType));
+        return new Index(identity, recipes.size(), Map.copyOf(byType));
     }
 }

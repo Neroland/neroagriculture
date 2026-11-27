@@ -108,8 +108,19 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         level.setBlock(pos, state.setValue(AGE, Math.min(MAX_AGE, state.getValue(AGE) + step)), 3);
     }
 
+    //? if >=1.20.5 {
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
             Player player, BlockHitResult hit) {
+    //?} else {
+    /*@Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+            Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        return useWithoutItem(state, level, pos, player, hit);
+    }
+
+    private InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+            Player player, BlockHitResult hit) {
+    *///?}
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(player instanceof ServerPlayer serverPlayer)
                 || !(level.getBlockEntity(pos) instanceof SpeciesCropBlockEntity crop)) return InteractionResult.FAIL;
@@ -120,8 +131,8 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         level.setBlock(pos, state.setValue(AGE, 0), 3);
         ItemStack produce = new ItemStack(kind == FoodDefinition.Kind.ALIEN
                 ? ModItems.ALIEN_PRODUCE.get() : ModItems.ENGINEERED_FOOD.get());
-        produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
-        if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
+        ModDataComponents.SPECIES_VARIANT.set(produce, SpeciesVariant.of(definition.id()));
+        if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(produce, crop.genetics());
         if (!serverPlayer.getInventory().add(produce)) popResource(level, pos, produce);
         AgricultureMilestones.harvested(serverPlayer);
         return InteractionResult.SUCCESS;
@@ -141,9 +152,9 @@ public final class SpeciesCropBlock extends BaseEntityBlock {
         if (!level.isClientSide() && !player.getAbilities().instabuild && blockEntity instanceof SpeciesCropBlockEntity crop) {
             ItemStack seed = new ItemStack(kind == FoodDefinition.Kind.ALIEN
                     ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
-            seed.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(crop.species()));
-            seed.set(ModDataComponents.HARVEST_COUNT.get(), crop.harvestCount());
-            if (!crop.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), crop.genetics());
+            ModDataComponents.SPECIES_VARIANT.set(seed, SpeciesVariant.of(crop.species()));
+            ModDataComponents.HARVEST_COUNT.set(seed, crop.harvestCount());
+            if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(seed, crop.genetics());
             popResource(level, pos, seed);
         }
     }

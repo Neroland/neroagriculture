@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+//? if >=1.20.2 {
 import net.minecraft.world.item.crafting.RecipeHolder;
+//?} else {
+/*import za.co.neroland.neroagriculture.recipe.compat.RecipeHolder;
+*///?}
 //? if >=1.21.2 {
 import net.minecraft.world.item.crafting.RecipeMap;
 //?}
@@ -54,7 +58,12 @@ public final class ViewerRecipes {
         /*// Before 1.21.2 vanilla still syncs every recipe to the client, so the client level has them all.
         net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
         if (recipes.isEmpty() && level != null) {
+            //? if >=1.20.2 {
             return fabrication(level.getRecipeManager().getRecipes());
+            //?} else {
+            //return fabrication(level.getRecipeManager().getRecipes().stream()
+            //        .<RecipeHolder<?>>map(recipe -> new RecipeHolder<>(recipe.getId(), recipe)).toList());
+            //?}
         }
         *///?}
         return recipes;

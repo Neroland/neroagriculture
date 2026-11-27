@@ -18,8 +18,13 @@ public record MaterialCatalogSyncPayload(List<Entry> entries) implements CustomP
     public static final int MAX_PAYLOAD_BYTES = 256 * 1024;
     public static final int MAX_ID_LENGTH = 128;
     public static final int MAX_DISPLAY_LENGTH = 128;
+    //? if >=1.20.5 {
     public static final Type<MaterialCatalogSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(
             NeroAgricultureCommon.MOD_ID, "material_catalog_v2"));
+    //?} else {
+    /*public static final Type<MaterialCatalogSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(
+            NeroAgricultureCommon.MOD_ID, "material_catalog_v2"), MaterialCatalogSyncPayload.class);
+    *///?}
     public static final StreamCodec<RegistryFriendlyByteBuf, MaterialCatalogSyncPayload> STREAM_CODEC =
             StreamCodec.of(MaterialCatalogSyncPayload::write, MaterialCatalogSyncPayload::read);
 

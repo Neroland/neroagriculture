@@ -53,7 +53,7 @@ public final class AreaFarming {
 
     private static boolean plantResource(ServerLevel level, BlockPos cropPos, FragmentTier bedTier, ItemStack seed,
             @Nullable ServerPlayer gatePlayer) {
-        MaterialVariant variant = seed.get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(seed);
         if (variant == null) return false;
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
         if (!lookup.permitsGrowth()) return false;
@@ -68,16 +68,16 @@ public final class AreaFarming {
             level.removeBlock(cropPos, false);
             return false;
         }
-        int harvests = seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0);
+        int harvests = ModDataComponents.HARVEST_COUNT.getOrDefault(seed, 0);
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(), harvests));
-        crop.setGenetics(seed.get(ModDataComponents.GENETICS.get()));
+        crop.setGenetics(ModDataComponents.GENETICS.get(seed));
         seed.shrink(1);
         return true;
     }
 
     private static boolean plantSpecies(ServerLevel level, BlockPos cropPos, FragmentTier bedTier, ItemStack seed,
             @Nullable ServerPlayer gatePlayer) {
-        SpeciesVariant variant = seed.get(ModDataComponents.SPECIES_VARIANT.get());
+        SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(seed);
         if (variant == null) return false;
         FoodDefinition definition = FoodCatalog.lookup(level.getServer(), variant.species()).orElse(null);
         if (definition == null) return false;
@@ -92,8 +92,8 @@ public final class AreaFarming {
             level.removeBlock(cropPos, false);
             return false;
         }
-        crop.setSpecies(definition.id(), seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0));
-        crop.setGenetics(seed.get(ModDataComponents.GENETICS.get()));
+        crop.setSpecies(definition.id(), ModDataComponents.HARVEST_COUNT.getOrDefault(seed, 0));
+        crop.setGenetics(ModDataComponents.GENETICS.get(seed));
         seed.shrink(1);
         return true;
     }
@@ -153,8 +153,8 @@ public final class AreaFarming {
         crop.recordHarvest();
         level.setBlock(cropPos, state.setValue(SpeciesCropBlock.AGE, 0), 3);
         ItemStack produce = new ItemStack(alien ? ModItems.ALIEN_PRODUCE.get() : ModItems.ENGINEERED_FOOD.get());
-        produce.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(definition.id()));
-        if (!crop.genetics().isEmpty()) produce.set(ModDataComponents.GENETICS.get(), crop.genetics());
+        ModDataComponents.SPECIES_VARIANT.set(produce, SpeciesVariant.of(definition.id()));
+        if (!crop.genetics().isEmpty()) ModDataComponents.GENETICS.set(produce, crop.genetics());
         sink.accept(produce);
         return true;
     }
@@ -164,7 +164,7 @@ public final class AreaFarming {
         int remaining = amount;
         while (remaining > 0) {
             ItemStack stack = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), Math.min(64, remaining));
-            stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
+            ModDataComponents.MATERIAL_VARIANT.set(stack, MaterialVariant.of(material, family));
             za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, color, visualFamily);
             remaining -= stack.getCount();
             sink.accept(stack);

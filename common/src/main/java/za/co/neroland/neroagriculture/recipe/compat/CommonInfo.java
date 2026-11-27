@@ -8,7 +8,6 @@ package za.co.neroland.neroagriculture.recipe.compat;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 public record CommonInfo(boolean showNotification) {
@@ -17,6 +16,7 @@ public record CommonInfo(boolean showNotification) {
             Codec.BOOL.optionalFieldOf("show_notification", true).xmap(CommonInfo::new, CommonInfo::showNotification);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CommonInfo> STREAM_CODEC =
-            ByteBufCodecs.BOOL.<RegistryFriendlyByteBuf>cast().map(CommonInfo::new, CommonInfo::showNotification);
+            StreamCodec.of((buffer, value) -> buffer.writeBoolean(value.showNotification()),
+                    buffer -> new CommonInfo(buffer.readBoolean()));
 }
 *///?}

@@ -233,7 +233,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         ItemStack neutral = new ItemStack(MaterialOperations.neutralFragment(definition.tier()),
                 recipe == null ? 2 : recipe.resultTemplate().count());
         ItemStack material = new ItemStack(ModItems.RESOURCE_FRAGMENT.get());
-        material.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+        ModDataComponents.MATERIAL_VARIANT.set(material, MaterialVariant.of(definition.id(), definition.tier()));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(material, definition.color(), definition.visualFamily());
         Operation operation = recipe == null ? catalogOperation("extract", definition, 1, 0, 0, neutral, material)
                 : operation(recipe, recipe.inputCount(), 0, 0, neutral, material);
@@ -254,7 +254,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         int secondary = 0;
         if (result.is(ModItems.CHARGED_SEED.get())) {
             if (!items.get(SECONDARY).is(ModItems.BLANK_SEED.get())) return fail(MachineBlockedReason.NO_RECIPE);
-            result.set(ModDataComponents.FRAGMENT_CHARGE.get(), FragmentCharge.of(family));
+            ModDataComponents.FRAGMENT_CHARGE.set(result, FragmentCharge.of(family));
             secondary = 1;
         }
         Operation operation = operation(recipe, recipe.inputCount(), secondary, 0, result, ItemStack.EMPTY);
@@ -271,7 +271,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
      */
     private Resolution resolveFusion(ServerLevel level) {
         if (!AgricultureConfig.FUSION_ENABLED.get()) return fail(MachineBlockedReason.NO_RECIPE);
-        MaterialVariant primary = items.get(PRIMARY).get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant primary = ModDataComponents.MATERIAL_VARIANT.get(items.get(PRIMARY));
         if (primary == null) return fail(MachineBlockedReason.INVALID_COMPONENT);
         var primaryLookup = MaterialCatalog.forServer(level.getServer()).lookup(primary.material());
         if (!primaryLookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
@@ -301,7 +301,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         MachineBlockedReason researchBlock = researchBlock(player, alloy);
         if (researchBlock != null) return fail(researchBlock);
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
-        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(alloy, tier));
+        ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(alloy, tier));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.color(), definition.visualFamily());
         Operation operation = operation(recipe, recipe.inputCount(), recipe.secondaryCount(), 0, seed, ItemStack.EMPTY);
         return canOutput(operation) ? ok(operation) : fail(MachineBlockedReason.OUTPUT_FULL);
@@ -344,7 +344,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
         MachineBlockedReason researchBlock = researchBlock(player, definition.id());
         if (researchBlock != null) return fail(researchBlock);
         ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
-        seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(definition.id(), definition.tier()));
+        ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(definition.id(), definition.tier()));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, definition.color(), definition.visualFamily());
         Operation operation = recipe == null ? catalogOperation("synthesize", definition, 1, fragmentCost, 1, seed, ItemStack.EMPTY)
                 : operation(recipe, recipe.inputCount(), fragmentCost, 1, seed, ItemStack.EMPTY);
@@ -359,7 +359,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
     }
 
     private Resolution resolveConversion(ServerLevel level) {
-        MaterialVariant variant = items.get(PRIMARY).get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(items.get(PRIMARY));
         if (variant == null) return fail(MachineBlockedReason.INVALID_COMPONENT);
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
         if (!lookup.permitsGrowth()) return fail(MachineBlockedReason.CATALOG_DISABLED);
@@ -464,7 +464,7 @@ public final class FoundationMachineBlockEntity extends AbstractMachineBlockEnti
             za.co.neroland.neroagriculture.food.FoodCatalog.lookup(level.getServer(), subject).ifPresent(definition -> {
                 ItemStack seed = new ItemStack(definition.kind() == za.co.neroland.neroagriculture.food.FoodDefinition.Kind.ALIEN
                         ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
-                seed.set(ModDataComponents.SPECIES_VARIANT.get(),
+                ModDataComponents.SPECIES_VARIANT.set(seed,
                         za.co.neroland.neroagriculture.content.SpeciesVariant.of(definition.id()));
                 //? if >=26.3 {
                 /*if (!player.getInventory().add(seed)) player.drop(seed, false, net.minecraft.util.Prediction.SERVER_ONLY);

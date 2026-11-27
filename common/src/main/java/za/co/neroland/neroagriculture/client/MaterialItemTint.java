@@ -5,9 +5,11 @@ package za.co.neroland.neroagriculture.client;
 // definitions, so each loader registers this as the item colour handler for those two items instead.
 
 //? if <1.21.4 {
-/*import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.ItemStack;
+/*import net.minecraft.world.item.ItemStack;
+//? if >=1.20.5 {
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.CustomModelData;
+//?}
 
 public final class MaterialItemTint {
 
@@ -21,8 +23,15 @@ public final class MaterialItemTint {
         if (tintIndex != 0) {
             return -1;
         }
+        //? if >=1.20.5 {
         CustomModelData data = stack.get(DataComponents.CUSTOM_MODEL_DATA);
-        return 0xFF000000 | ((data == null ? DEFAULT_RGB : data.value()) & 0xFFFFFF);
+        int rgb = data == null ? DEFAULT_RGB : data.value();
+        //?} else {
+        //var tag = stack.getTag();
+        //int rgb = tag == null || !tag.contains("CustomModelData", net.minecraft.nbt.Tag.TAG_ANY_NUMERIC)
+        //        ? DEFAULT_RGB : tag.getInt("CustomModelData");
+        //?}
+        return 0xFF000000 | (rgb & 0xFFFFFF);
     }
 }
 *///?}

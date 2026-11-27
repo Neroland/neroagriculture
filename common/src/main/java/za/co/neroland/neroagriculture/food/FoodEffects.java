@@ -17,9 +17,21 @@ public final class FoodEffects {
     public static Optional<Holder<MobEffect>> holder(EffectCategory category) {
         return switch (category) {
             case NONE -> Optional.empty();
+            //? if >=1.20.5 {
             case NIGHT_VISION -> Optional.of(MobEffects.NIGHT_VISION);
+            //?} else {
+            /*case NIGHT_VISION -> Optional.of(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION));
+            *///?}
+            //? if >=1.20.5 {
             case MINING_HASTE -> Optional.of(MobEffects.HASTE);
+            //?} else {
+            /*case MINING_HASTE -> Optional.of(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.HASTE));
+            *///?}
+            //? if >=1.20.5 {
             case FIRE_RESISTANCE -> Optional.of(MobEffects.FIRE_RESISTANCE);
+            //?} else {
+            /*case FIRE_RESISTANCE -> Optional.of(net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.FIRE_RESISTANCE));
+            *///?}
             case LOW_GRAVITY_ADAPTATION -> Optional.of(ModMobEffects.lowGravity());
             case OXYGEN_EFFICIENCY -> Optional.of(ModMobEffects.oxygenEfficiency());
             case FREEZE_IMMUNITY -> Optional.of(ModMobEffects.freezeImmunity());
@@ -37,7 +49,12 @@ public final class FoodEffects {
         if (!definition.hasEffect()) return;
         int amplifier = za.co.neroland.neroagriculture.genetics.GeneticEffects.foodAmplifier(
                 definition.effectiveAmplifier(), definition.potencyCap(), genetics);
+        //? if >=1.20.5 {
         holder(definition.effect()).ifPresent(effect -> entity.addEffect(new MobEffectInstance(effect,
                 definition.effectiveDurationTicks(), amplifier)));
+        //?} else {
+        /*holder(definition.effect()).ifPresent(effect -> entity.addEffect(new MobEffectInstance(effect.value(),
+                definition.effectiveDurationTicks(), amplifier)));
+        *///?}
     }
 }

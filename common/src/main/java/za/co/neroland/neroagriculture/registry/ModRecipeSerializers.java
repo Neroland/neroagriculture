@@ -51,7 +51,7 @@ public final class ModRecipeSerializers {
             RecipeSerializer<FabricationRecipe> serializer = new RecipeSerializer<>(
                     FabricationRecipe.mapCodec(type::get, self::get),
                     FabricationRecipe.streamCodec(type::get, self::get));
-            //?} else {
+            //?} else if >=1.20.5 {
             /*// Before 26.1 RecipeSerializer is an interface rather than a record.
             com.mojang.serialization.MapCodec<FabricationRecipe> codec = FabricationRecipe.mapCodec(type::get, self::get);
             net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, FabricationRecipe> stream =
@@ -62,6 +62,16 @@ public final class ModRecipeSerializers {
                     return stream;
                 }
             };
+            *///?} else {
+            /*RecipeSerializer<FabricationRecipe> serializer = new za.co.neroland.neroagriculture.recipe.LegacyRecipeSerializer<>(
+                    FabricationRecipe.mapCodec(type::get, self::get).codec(),
+                    FabricationRecipe.streamCodec(type::get, self::get),
+                    //? if <1.20.2 {
+                    FabricationRecipe::bindId
+                    //?} else {
+                    //(recipe, id) -> {}
+                    //?}
+            );
             *///?}
             self.set(serializer);
             return serializer;

@@ -24,7 +24,12 @@ import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 @Mod(NeroAgricultureCommon.MOD_ID)
 public final class NeroAgricultureForge {
 
+    //? if >=1.20.5 {
     public NeroAgricultureForge(FMLJavaModLoadingContext context) {
+    //?} else {
+    /*public NeroAgricultureForge() {
+        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+    *///?}
         NeroAgricultureCommon.LOGGER.info("[NeroAgriculture] Forge bootstrap");
         NeroAgricultureCommon.init();
         // Anonymous, NeroAgriculture-only crash reporting (opt-out via config/neroagriculture.properties).
@@ -84,10 +89,18 @@ public final class NeroAgricultureForge {
         /*net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(event ->
                 za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.getServer()));
         *///?}
-        //? if <1.21.6 {
+        //? if >=1.20.5 && <1.21.6 {
         /*net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(
                 (net.minecraftforge.event.TickEvent.ServerTickEvent.Post event) ->
                         za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.getServer()));
+        *///?}
+        //? if <1.20.5 {
+        /*net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(
+                (net.minecraftforge.event.TickEvent.ServerTickEvent event) -> {
+                    if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) {
+                        za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.getServer());
+                    }
+                });
         *///?}
     }
 }

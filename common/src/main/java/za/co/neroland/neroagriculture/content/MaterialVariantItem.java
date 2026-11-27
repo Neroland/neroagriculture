@@ -40,7 +40,7 @@ public class MaterialVariantItem extends Item {
      */
     @Nullable
     protected Component variantLabel(ItemStack stack) {
-        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(stack);
         return variant == null ? null : Component.literal(materialName(variant.material()));
     }
 
@@ -66,9 +66,9 @@ public class MaterialVariantItem extends Item {
     *///?}
         if (!appendVariantDetails(stack, tooltip)) return;
         tooltip.accept(Component.translatable("tooltip.neroagriculture.harvests",
-                stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0)).withStyle(ChatFormatting.GRAY));
+                ModDataComponents.HARVEST_COUNT.getOrDefault(stack, 0)).withStyle(ChatFormatting.GRAY));
         if (this instanceof ResourceSeedItem || this instanceof SpeciesSeedItem) {
-            var genetics = stack.getOrDefault(ModDataComponents.GENETICS.get(),
+            var genetics = ModDataComponents.GENETICS.getOrDefault(stack,
                     za.co.neroland.neroagriculture.genetics.Genetics.EMPTY);
             tooltip.accept(Component.translatable("tooltip.neroagriculture.genetics_growth", genetics.yield(),
                     genetics.speed(), genetics.hardiness()).withStyle(ChatFormatting.GRAY));
@@ -83,7 +83,7 @@ public class MaterialVariantItem extends Item {
      * Subclasses backed by a different identity component override this.
      */
     protected boolean appendVariantDetails(ItemStack stack, Consumer<Component> tooltip) {
-        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(stack);
         if (variant == null) return false;
         tooltip.accept(Component.literal(variant.material().toString()).withStyle(ChatFormatting.GRAY));
         var metadata = ClientMaterialCatalog.entries().get(variant.material());

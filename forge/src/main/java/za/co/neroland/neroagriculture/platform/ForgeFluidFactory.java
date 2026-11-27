@@ -23,8 +23,13 @@ import za.co.neroland.neroagriculture.fluid.FluidKind;
  * {@link ForgeFlowingFluid.Properties} per {@link FluidKind}.
  */
 public final class ForgeFluidFactory implements FluidFactory {
+    //? if >=1.20.5 {
     private static final DeferredRegister<FluidType> TYPES =
             DeferredRegister.create(ForgeRegistries.FLUID_TYPES, NeroAgricultureCommon.MOD_ID);
+    //?} else {
+    /*private static final DeferredRegister<FluidType> TYPES =
+            DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, NeroAgricultureCommon.MOD_ID);
+    *///?}
     private static final Map<FluidKind, RegistryObject<FluidType>> TYPE_BY_KIND =
             new EnumMap<>(FluidKind.class);
     private static final Map<FluidKind, ForgeFlowingFluid.Properties> PROPERTIES_BY_KIND =

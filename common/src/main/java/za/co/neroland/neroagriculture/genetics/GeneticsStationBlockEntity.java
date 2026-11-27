@@ -106,19 +106,19 @@ public final class GeneticsStationBlockEntity extends AbstractMachineBlockEntity
     private ItemStack plannedResult() {
         ItemStack a = items.get(INPUT_A);
         if (!isSeed(a)) return ItemStack.EMPTY;
-        Genetics genA = a.getOrDefault(ModDataComponents.GENETICS.get(), Genetics.EMPTY);
+        Genetics genA = ModDataComponents.GENETICS.getOrDefault(a, Genetics.EMPTY);
         ItemStack b = items.get(INPUT_B);
         Genetics resultGenetics;
         if (isSeed(b)) {
-            resultGenetics = Genetics.splice(genA, b.getOrDefault(ModDataComponents.GENETICS.get(), Genetics.EMPTY));
+            resultGenetics = Genetics.splice(genA, ModDataComponents.GENETICS.getOrDefault(b, Genetics.EMPTY));
         } else if (b.is(ModItems.RESOURCE_FRAGMENT.get())) {
             resultGenetics = genA.upgradedLowest();
         } else {
             return ItemStack.EMPTY;
         }
         ItemStack output = a.copyWithCount(1);
-        if (resultGenetics.isEmpty()) output.remove(ModDataComponents.GENETICS.get());
-        else output.set(ModDataComponents.GENETICS.get(), resultGenetics);
+        if (resultGenetics.isEmpty()) ModDataComponents.GENETICS.remove(output);
+        else ModDataComponents.GENETICS.set(output, resultGenetics);
         return output;
     }
 

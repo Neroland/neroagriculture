@@ -175,7 +175,7 @@ public final class ModItems {
 
     private static ItemStack speciesExample(Item item, Identifier species) {
         ItemStack stack = new ItemStack(item);
-        stack.set(ModDataComponents.SPECIES_VARIANT.get(),
+        ModDataComponents.SPECIES_VARIANT.set(stack,
                 za.co.neroland.neroagriculture.content.SpeciesVariant.of(species));
         return stack;
     }
@@ -186,7 +186,7 @@ public final class ModItems {
 
     private static ItemStack resourceSeed(Identifier material, FragmentTier family) {
         ItemStack stack = new ItemStack(RESOURCE_SEED.get());
-        stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, family));
+        ModDataComponents.MATERIAL_VARIANT.set(stack, MaterialVariant.of(material, family));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(stack, material);
         return stack;
     }

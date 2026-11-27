@@ -2,6 +2,7 @@ package za.co.neroland.neroagriculture.content;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.mojang.serialization.JsonOps;
 import com.google.gson.JsonParser;
@@ -48,6 +49,6 @@ class MaterialVariantTest {
             }
         }
         var future = JsonParser.parseString("{\"version\":2,\"material\":\"nerospace:voidglass\",\"family\":\"voidite\"}");
-        assertThrows(IllegalStateException.class, () -> MaterialVariant.CODEC.parse(JsonOps.INSTANCE, future).getOrThrow());
+        assertTrue(MaterialVariant.CODEC.parse(JsonOps.INSTANCE, future).error().isPresent());
     }
 }

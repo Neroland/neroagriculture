@@ -183,7 +183,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         }
         if (aggregate == null) {
             for (int i = SEED_START; i <= SEED_END; i++) {
-                MaterialVariant variant = items.get(i).get(ModDataComponents.MATERIAL_VARIANT.get());
+                MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(items.get(i));
                 if (!items.get(i).is(ModItems.RESOURCE_SEED.get()) || variant == null) continue;
                 var lookup = catalog.lookup(variant.material());
                 var definition = lookup.material().map(material -> material.definition()).orElse(null);
@@ -217,7 +217,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
      */
     private boolean outputHasRoomFor(TowerSlot slot) {
         ItemStack probe = new ItemStack(ModItems.RESOURCE_FRAGMENT.get(), 1);
-        probe.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+        ModDataComponents.MATERIAL_VARIANT.set(probe, MaterialVariant.of(slot.material(), slot.family()));
         if (level != null && level.getServer() != null) {
             za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, slot.material(), level.getServer());
         } else {
@@ -305,14 +305,14 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         for (int s = SEED_START; s <= SEED_END; s++) {
             ItemStack seed = items.get(s);
             if (!seed.is(ModItems.RESOURCE_SEED.get())) continue;
-            MaterialVariant variant = seed.get(ModDataComponents.MATERIAL_VARIANT.get());
+            MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(seed);
             if (variant == null) continue;
             var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
             if (!lookup.permitsGrowth()) continue;
             var definition = lookup.material().orElseThrow().definition();
             if (!worldAllowed(definition, level)) continue;
-            Genetics genetics = seed.getOrDefault(ModDataComponents.GENETICS.get(), Genetics.EMPTY);
-            slot.plant(definition.id(), definition.tier(), seed.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0), genetics);
+            Genetics genetics = ModDataComponents.GENETICS.getOrDefault(seed, Genetics.EMPTY);
+            slot.plant(definition.id(), definition.tier(), ModDataComponents.HARVEST_COUNT.getOrDefault(seed, 0), genetics);
             seed.shrink(1);
             return;
         }
@@ -381,7 +381,7 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
             return;
         }
         ItemStack probe = new ItemStack(ModItems.RESOURCE_FRAGMENT.get());
-        probe.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+        ModDataComponents.MATERIAL_VARIANT.set(probe, MaterialVariant.of(slot.material(), slot.family()));
         za.co.neroland.neroagriculture.content.MaterialTints.apply(probe, definition.color(), definition.visualFamily());
         if (outputCapacityFor(probe) < amount) return; // output jammed: keep the slot mature, consume nothing
         insertAmount(probe, amount);
@@ -477,14 +477,14 @@ public final class CropTowerControllerBlockEntity extends AbstractMachineBlockEn
         for (TowerSlot slot : slots) {
             if (slot.isEmpty()) continue;
             ItemStack seed = new ItemStack(ModItems.RESOURCE_SEED.get());
-            seed.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(slot.material(), slot.family()));
+            ModDataComponents.MATERIAL_VARIANT.set(seed, MaterialVariant.of(slot.material(), slot.family()));
             if (level.getServer() != null) {
                 za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material(), level.getServer());
             } else {
                 za.co.neroland.neroagriculture.content.MaterialTints.apply(seed, slot.material());
             }
-            seed.set(ModDataComponents.HARVEST_COUNT.get(), slot.harvestCount());
-            if (!slot.genetics().isEmpty()) seed.set(ModDataComponents.GENETICS.get(), slot.genetics());
+            ModDataComponents.HARVEST_COUNT.set(seed, slot.harvestCount());
+            if (!slot.genetics().isEmpty()) ModDataComponents.GENETICS.set(seed, slot.genetics());
             net.minecraft.world.level.block.Block.popResource(level, worldPosition, seed);
             slot.clear();
         }

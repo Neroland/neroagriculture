@@ -22,7 +22,13 @@ public final class GreenhouseDoorBlock extends DoorBlock {
     public static final MapCodec<GreenhouseDoorBlock> CODEC = BlockCodecs.simple(GreenhouseDoorBlock::new);
 
     public GreenhouseDoorBlock(Properties properties) {
+        //? if >=1.21 {
         super(BlockSetType.COPPER, properties);
+        //?} else if >=1.20.3 {
+        /*super(BlockSetType.OAK, properties);
+        *///?} else {
+        /*super(properties, BlockSetType.OAK);
+        *///?}
     }
 
     public MapCodec<? extends DoorBlock> codec() {

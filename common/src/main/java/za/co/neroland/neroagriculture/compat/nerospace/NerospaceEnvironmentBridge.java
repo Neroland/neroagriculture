@@ -292,8 +292,8 @@ public final class NerospaceEnvironmentBridge {
                 int strength, long durationTicks) {
             int bounded = Math.clamp(strength, 1,
                     za.co.neroland.nerospace.api.NerospaceOxygen.MAX_STRENGTH);
-            long boundedDuration = Math.clamp(durationTicks, 1L,
-                    za.co.neroland.nerospace.api.NerospaceOxygen.MAX_DURATION_TICKS);
+            long boundedDuration = Math.max(1L, Math.min(durationTicks,
+                    za.co.neroland.nerospace.api.NerospaceOxygen.MAX_DURATION_TICKS));
             za.co.neroland.nerospace.api.NerospaceOxygen.contribute(level, source, center, radius,
                     bounded, boundedDuration);
         }

@@ -40,8 +40,8 @@ public final class CropPollination {
             Genetics childGenetics = Pollination.childGenetics(crop.genetics(), neighbour.genetics(), mutate, seed);
             ItemStack childSeed = new ItemStack(childDefinition.kind() == FoodDefinition.Kind.ALIEN
                     ? ModItems.ALIEN_SEED.get() : ModItems.FOOD_SEED.get());
-            childSeed.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(childDefinition.id()));
-            if (!childGenetics.isEmpty()) childSeed.set(ModDataComponents.GENETICS.get(), childGenetics);
+            ModDataComponents.SPECIES_VARIANT.set(childSeed, SpeciesVariant.of(childDefinition.id()));
+            if (!childGenetics.isEmpty()) ModDataComponents.GENETICS.set(childSeed, childGenetics);
             Block.popResource(level, pos.above(), childSeed);
             return true;
         }

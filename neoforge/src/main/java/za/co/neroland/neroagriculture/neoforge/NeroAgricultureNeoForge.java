@@ -73,7 +73,15 @@ public final class NeroAgricultureNeoForge {
                 ServerStateReset.serverStarted(event.getServer()));
         NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> ServerStateReset.serverStopped());
         // Ages the crop-tower output window so neroagriculture:tower_output falls back on time.
+        //? if >=1.20.5 {
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) ->
                 za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.getServer()));
+        //?} else {
+        /*NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TickEvent.ServerTickEvent event) -> {
+            if (event.phase == net.neoforged.neoforge.event.TickEvent.Phase.END) {
+                za.co.neroland.neroagriculture.tower.TowerOutputChannel.serverTick(event.getServer());
+            }
+        });
+        *///?}
     }
 }

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1]
+
+### Added
+
+- Minecraft 1.20 through 1.20.6 on Fabric, 1.20 through 1.20.4 and 1.20.6 on Forge, and
+  1.20.4 through 1.20.6 on NeoForge. NeoForge 1.20.5 uses loader 20.5.21-beta.
+- Legacy item tags preserve material identity, harvest counts, genetics, species and fragment charge.
+- The greenhouse door stays hand-openable on 1.20.x and uses the vanilla oak door sound set.
+
+### Changed
+
+- Requires matching Neroland Core 1.24.0 or newer (below 2.0). JEI and EMI integration begins with
+  Minecraft 1.21.1.
+
+### Fixed
+
+- Forge capability registration waits until machines have initialized their side configuration.
+
 ## [0.9.0] - 2026-11-26
 
 ### Added

@@ -12,9 +12,10 @@ Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
 
 ## Build targets
 
-- **Minecraft:** 1.20.5 (Fabric), 1.20.6 (Fabric, Forge and NeoForge), and the 1.21.x and
-  26.x targets listed in the [release workflow](.github/workflows/publish.yml)
-- **Java:** 21 for 1.20.5 and 1.20.6, 25 for 26.x
+- **Minecraft:** 1.20 through 1.20.6 on Fabric, 1.20 through 1.20.4 and 1.20.6 on Forge, and
+  1.20.4 through 1.20.6 on NeoForge. Legacy NeoForge 1.20.1 uses the Forge 1.20.1 jar.
+  See the [release workflow](.github/workflows/publish.yml) for 1.21.x and 26.x targets.
+- **Java:** 17 through 1.20.4, 21 for later 1.x releases, and 25 for 26.x
 - **Neroland Core:** 1.24.0 or newer (below 2.0)
 - **Recipe viewers:** JEI and EMI integration begin with Minecraft 1.21.1
 - Mod id: `neroagriculture` · package `za.co.neroland.neroagriculture`

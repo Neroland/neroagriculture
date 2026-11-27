@@ -25,8 +25,13 @@ public record SpeciesCatalogSyncPayload(List<Entry> entries) implements CustomPa
     public static final int MAX_PAYLOAD_BYTES = 256 * 1024;
     public static final int MAX_ID_LENGTH = 128;
     public static final int MAX_DISPLAY_LENGTH = 128;
+    //? if >=1.20.5 {
     public static final Type<SpeciesCatalogSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(
             NeroAgricultureCommon.MOD_ID, "species_catalog"));
+    //?} else {
+    /*public static final Type<SpeciesCatalogSyncPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(
+            NeroAgricultureCommon.MOD_ID, "species_catalog"), SpeciesCatalogSyncPayload.class);
+    *///?}
     public static final StreamCodec<RegistryFriendlyByteBuf, SpeciesCatalogSyncPayload> STREAM_CODEC =
             StreamCodec.of(SpeciesCatalogSyncPayload::write, SpeciesCatalogSyncPayload::read);
 

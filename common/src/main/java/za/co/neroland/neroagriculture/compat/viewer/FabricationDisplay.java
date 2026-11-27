@@ -10,7 +10,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+//? if >=1.20.2 {
 import net.minecraft.world.item.crafting.RecipeHolder;
+//?} else {
+/*import za.co.neroland.neroagriculture.recipe.compat.RecipeHolder;
+*///?}
 
 import za.co.neroland.neroagriculture.catalog.ClientMaterialCatalog;
 import za.co.neroland.neroagriculture.content.FragmentCharge;
@@ -91,7 +95,7 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
                 if (result.is(ModItems.CHARGED_SEED.get())) {
                     // Charging consumes one Blank Seed and stamps the family on the Charged Seed.
                     inputs.add(List.of(new ItemStack(ModItems.BLANK_SEED.get())));
-                    family.ifPresent(tier -> result.set(ModDataComponents.FRAGMENT_CHARGE.get(), FragmentCharge.of(tier)));
+                    family.ifPresent(tier -> ModDataComponents.FRAGMENT_CHARGE.set(result, FragmentCharge.of(tier)));
                 }
                 outputs.add(result);
             }
@@ -134,7 +138,7 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
                     // Food and alien research hands over the species seed.
                     subject.ifPresent(species -> {
                         try {
-                            result.set(ModDataComponents.SPECIES_VARIANT.get(), SpeciesVariant.of(species));
+                            ModDataComponents.SPECIES_VARIANT.set(result, SpeciesVariant.of(species));
                         } catch (RuntimeException invalid) {
                             // Unknown species id: show the plain seed.
                         }
@@ -203,7 +207,7 @@ public record FabricationDisplay(FabricationPage page, Identifier id, List<List<
             return stack;
         }
         try {
-            stack.set(ModDataComponents.MATERIAL_VARIANT.get(), MaterialVariant.of(material, tier.get()));
+            ModDataComponents.MATERIAL_VARIANT.set(stack, MaterialVariant.of(material, tier.get()));
             MaterialCatalogSyncPayload.Entry entry = ClientMaterialCatalog.entries().get(material);
             if (entry == null) MaterialTints.apply(stack, material);
             else MaterialTints.apply(stack, entry.color(), entry.visualFamily());

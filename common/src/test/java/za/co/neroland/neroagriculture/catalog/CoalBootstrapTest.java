@@ -17,7 +17,12 @@ class CoalBootstrapTest {
         for (String name : new String[] {"field_generator", "fragment_extractor", "territe_grow_bed",
                 "seed_research_bench", "seed_synthesizer", "prospora_seed"}) {
             JsonObject recipe = resource("recipe/" + name + ".json");
-            assertEquals("neroagriculture:" + name, recipe.getAsJsonObject("result").get("id").getAsString());
+            //? if >=1.20.5 {
+            String itemKey = "id";
+            //?} else {
+            /*String itemKey = "item";
+            *///?}
+            assertEquals("neroagriculture:" + name, recipe.getAsJsonObject("result").get(itemKey).getAsString());
         }
         JsonObject bench = resource("recipe/seed_research_bench.json");
         assertEquals("minecraft:crafting_table", ingredient(bench.getAsJsonObject("key").get("C")));

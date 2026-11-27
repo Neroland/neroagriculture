@@ -28,7 +28,7 @@ public final class ResourceSeedItem extends MaterialVariantItem {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.FAIL;
         ItemStack stack = context.getItemInHand();
-        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(stack);
         if (variant == null) return fail(serverPlayer, "warning.neroagriculture.invalid_seed");
 
         var lookup = MaterialCatalog.forServer(serverPlayer.level().getServer()).lookup(variant.material());
@@ -53,9 +53,9 @@ public final class ResourceSeedItem extends MaterialVariantItem {
             level.removeBlock(cropPos, false);
             return InteractionResult.FAIL;
         }
-        int harvests = stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0);
+        int harvests = ModDataComponents.HARVEST_COUNT.getOrDefault(stack, 0);
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(), harvests));
-        crop.setGenetics(stack.get(ModDataComponents.GENETICS.get()));
+        crop.setGenetics(ModDataComponents.GENETICS.get(stack));
         if (!serverPlayer.getAbilities().instabuild) stack.shrink(1);
         return InteractionResult.SUCCESS;
     }
@@ -72,7 +72,7 @@ public final class ResourceSeedItem extends MaterialVariantItem {
      */
     public static boolean tryPlantAbove(net.minecraft.server.level.ServerLevel level, @org.jetbrains.annotations.Nullable ServerPlayer player,
             net.minecraft.core.BlockPos bedPos, ItemStack stack) {
-        MaterialVariant variant = stack.get(ModDataComponents.MATERIAL_VARIANT.get());
+        MaterialVariant variant = ModDataComponents.MATERIAL_VARIANT.get(stack);
         if (variant == null) return false;
         var lookup = MaterialCatalog.forServer(level.getServer()).lookup(variant.material());
         if (!lookup.permitsGrowth()) return false;
@@ -94,9 +94,9 @@ public final class ResourceSeedItem extends MaterialVariantItem {
             level.removeBlock(cropPos, false);
             return false;
         }
-        int harvests = stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0);
+        int harvests = ModDataComponents.HARVEST_COUNT.getOrDefault(stack, 0);
         crop.setVariant(new CropVariantState(CropVariantState.CURRENT_FORMAT, definition.id(), definition.tier(), harvests));
-        crop.setGenetics(stack.get(ModDataComponents.GENETICS.get()));
+        crop.setGenetics(ModDataComponents.GENETICS.get(stack));
         stack.shrink(1);
         return true;
     }

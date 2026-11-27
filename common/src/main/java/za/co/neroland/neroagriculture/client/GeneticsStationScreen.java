@@ -108,7 +108,7 @@ public final class GeneticsStationScreen extends AbstractContainerScreen<Genetic
 
         // live trait readout for the input seed (slot 0), between the slots and the progress bar
         ItemStack input = menu.slots.get(0).getItem();
-        Genetics genetics = input.get(ModDataComponents.GENETICS.get());
+        Genetics genetics = ModDataComponents.GENETICS.get(input);
         Component traits = genetics == null
                 ? Component.translatable("screen.neroagriculture.genetics.insert_seed")
                 : Component.literal("Y" + genetics.yield() + " S" + genetics.speed() + " H" + genetics.hardiness()

@@ -13,7 +13,7 @@ plugins {
 
 // MC version comes from the Stonecutter node (e.g. :fabric:26.1.2), not a global property.
 def mc = stonecutter.current.version
-def spaceApiMc = mc.startsWith('1.20.') ? '1.21.1' : mc
+def preComponents = stonecutter.eval(mc, '<1.20.5')
 // Minecraft before 26.1 ships obfuscated, so those cells need mappings and a remapped jar.
 def obfuscated = mc.startsWith('1.')
 apply plugin: obfuscated ? 'net.fabricmc.fabric-loom-remap' : 'net.fabricmc.fabric-loom'
@@ -27,7 +27,7 @@ def fabricApi = project.findProperty("fabric_api_version_${mc}")
 def jeiVersion = project.findProperty("jei_version_${mc}")
 def emiFile = project.findProperty("emi_file_fabric_${mc}")
 def nerolandcoreVersion = project.findProperty('nerolandcore_version')
-def nerospaceVersion = project.findProperty('nerospace_version')
+def nerospaceVersion = rootProject.property('nerospace_version')
 
 // This node's projectDir is <loader>/versions/<v>; the authoritative loader source +
 // resources live in the BRANCH root (fabric/). Resolve branch-root paths via the parent.
@@ -84,7 +84,7 @@ dependencies {
             modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
         }
         modImplementation "za.co.neroland.nerolandcore:nerolandcore-fabric-${mc}:${nerolandcoreVersion}"
-        modCompileOnly "za.co.neroland.nerospace:nerospace-fabric-${spaceApiMc}:${nerospaceVersion}"
+        modCompileOnly "za.co.neroland.nerospace:nerospace-fabric-${mc}:${nerospaceVersion}"
     } else {
     // NOTE: no `mappings` — de-obfuscated 26.x needs none (Fabric Loom 1.17+).
     implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
@@ -98,7 +98,7 @@ dependencies {
     // Nerospace — OPTIONAL sibling. compileOnly: we compile against its public api package but never
     // ship or require it, and compat/nerospace/NerospaceEnvironmentBridge keeps every Nerospace type
     // behind a lazily loaded holder so the mod runs unchanged when Nerospace is absent.
-    compileOnly "za.co.neroland.nerospace:nerospace-fabric-${spaceApiMc}:${nerospaceVersion}"
+    compileOnly "za.co.neroland.nerospace:nerospace-fabric-${mc}:${nerospaceVersion}"
     }
 
     // Sentry SDK (telemetry/NeroAgricultureTelemetry): compile against it + embed it as a jar-in-jar so the
@@ -160,6 +160,7 @@ if (!emiFile && !emiVersion) {
 // Run & Debug works — while values stay dynamic (sourced from gradle.properties).
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def props = [
+        java_version: project.javaRelease,
         mod_id               : rootProject.mod_id,
         mod_version          : rootProject.mod_version,
         mod_name             : rootProject.mod_name,

@@ -47,13 +47,13 @@ public final class SpeciesSeedItem extends MaterialVariantItem {
      */
     @Nullable
     @Override protected Component variantLabel(ItemStack stack) {
-        SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+        SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(stack);
         return variant == null ? null : Component.literal(materialName(variant.species()));
     }
 
     @Override
     protected boolean appendVariantDetails(ItemStack stack, Consumer<Component> tooltip) {
-        SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+        SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(stack);
         if (variant == null) return false;
         tooltip.accept(Component.literal(variant.species().toString()).withStyle(ChatFormatting.GRAY));
         var metadata = ClientSpeciesCatalog.entries().get(variant.species());
@@ -94,7 +94,7 @@ public final class SpeciesSeedItem extends MaterialVariantItem {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.FAIL;
         ItemStack stack = context.getItemInHand();
-        SpeciesVariant variant = stack.get(ModDataComponents.SPECIES_VARIANT.get());
+        SpeciesVariant variant = ModDataComponents.SPECIES_VARIANT.get(stack);
         if (variant == null) return fail(serverPlayer, "warning.neroagriculture.invalid_seed");
 
         FoodDefinition definition = FoodCatalog.lookup(serverPlayer.level().getServer(), variant.species()).orElse(null);
@@ -115,8 +115,8 @@ public final class SpeciesSeedItem extends MaterialVariantItem {
             level.removeBlock(cropPos, false);
             return InteractionResult.FAIL;
         }
-        crop.setSpecies(definition.id(), stack.getOrDefault(ModDataComponents.HARVEST_COUNT.get(), 0));
-        crop.setGenetics(stack.get(ModDataComponents.GENETICS.get()));
+        crop.setSpecies(definition.id(), ModDataComponents.HARVEST_COUNT.getOrDefault(stack, 0));
+        crop.setGenetics(ModDataComponents.GENETICS.get(stack));
         if (!serverPlayer.getAbilities().instabuild) stack.shrink(1);
         return InteractionResult.SUCCESS;
     }
